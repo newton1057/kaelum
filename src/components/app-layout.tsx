@@ -134,28 +134,32 @@ export default function AppLayout() {
       isReasoningComplete: false,
     };
     addMessageToChat(activeChatId, botMessage);
+    
+    // Random delay between 6 to 10 seconds
+    const randomDelay = Math.random() * (10000 - 6000) + 6000;
 
-    // Simulate typing for reasoning
-    let reasoningText = '';
-    const reasoningWords = question.reasoning.split(' ');
-    let wordIndex = 0;
+    setTimeout(() => {
+      // Simulate typing for reasoning letter by letter
+      let reasoningText = '';
+      let charIndex = 0;
 
-    const interval = setInterval(() => {
-      if (wordIndex < reasoningWords.length) {
-        reasoningText += (wordIndex > 0 ? ' ' : '') + reasoningWords[wordIndex];
-        updateMessageInChat(activeChatId, botMessageId, {
-          reasoning: reasoningText,
-        });
-        wordIndex++;
-      } else {
-        clearInterval(interval);
-        // Finish reasoning and add final answer
-        updateMessageInChat(activeChatId, botMessageId, {
-          isReasoningComplete: true,
-          content: question.answer,
-        });
-      }
-    }, 50);
+      const interval = setInterval(() => {
+        if (charIndex < question.reasoning.length) {
+          reasoningText += question.reasoning.charAt(charIndex);
+          updateMessageInChat(activeChatId, botMessageId, {
+            reasoning: reasoningText,
+          });
+          charIndex++;
+        } else {
+          clearInterval(interval);
+          // Finish reasoning and add final answer
+          updateMessageInChat(activeChatId, botMessageId, {
+            isReasoningComplete: true,
+            content: question.answer,
+          });
+        }
+      }, 10); // Interval per character
+    }, randomDelay);
   };
 
 
