@@ -25,7 +25,7 @@ export function ModelSelector({ selectedModel, onModelChange }: ModelSelectorPro
 
   return (
     <Select value={selectedModel.id} onValueChange={handleValueChange}>
-      <SelectTrigger className="w-auto border-2">
+      <SelectTrigger className="w-auto border-0 bg-transparent">
         <SelectValue>
           <span className="font-bold">{selectedModel.name}</span>
         </SelectValue>
@@ -35,7 +35,7 @@ export function ModelSelector({ selectedModel, onModelChange }: ModelSelectorPro
           <SelectItem key={model.id} value={model.id}>
             <div className="flex flex-col">
               <span className="font-bold">{model.name}</span>
-              <span className="text-xs text-muted-foreground">
+              <span className="text-xs text-muted-foreground group-hover:text-accent-foreground/80">
                 {model.description}
               </span>
             </div>
