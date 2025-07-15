@@ -84,10 +84,6 @@ export function UserSettingsModal({
               <Separator />
 
               <div className="space-y-4">
-                <h4 className="text-sm font-medium leading-none flex items-center gap-2 text-destructive">
-                  <Trash2 size={16} />
-                  Borrar Datos
-                </h4>
                 <p className="text-sm text-muted-foreground">
                   Esta acción eliminará permanentemente todas tus
                   conversaciones. No se puede deshacer.
