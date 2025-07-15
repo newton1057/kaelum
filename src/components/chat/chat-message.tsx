@@ -21,7 +21,6 @@ interface ChatMessageProps {
 export default function ChatMessage({ message }: ChatMessageProps) {
   const isUser = message.role === 'user';
   const showReasoning = message.reasoning !== undefined;
-  const [isAccordionOpen, setAccordionOpen] = React.useState(false);
 
   const ReasoningSection = () => {
     if (!showReasoning) return null;
@@ -45,20 +44,17 @@ export default function ChatMessage({ message }: ChatMessageProps) {
     }
 
     return (
-      <Accordion
-        type="single"
-        collapsible
-        className="w-full"
-        onValueChange={(value) => setAccordionOpen(!!value)}
-      >
+      <Accordion type="single" collapsible className="w-full">
         <AccordionItem value="item-1" className="border-none">
-          <AccordionTrigger className="mt-2 text-xs h-auto p-1 text-muted-foreground hover:bg-transparent hover:text-primary hover:no-underline justify-start gap-1">
-            <span>{isAccordionOpen ? 'Ocultar' : 'Mostrar'} razonamiento</span>
-            {isAccordionOpen ? (
-              <ChevronUp className="h-4 w-4" />
-            ) : (
-              <ChevronDown className="h-4 w-4" />
-            )}
+          <AccordionTrigger className="mt-2 text-xs h-auto p-1 text-muted-foreground hover:bg-transparent hover:text-primary hover:no-underline justify-start gap-1 [&[data-state=open]>svg:last-child]:rotate-180">
+            <span className="[&[data-state=open]>span:first-child]:hidden">
+              <span>Mostrar</span>
+            </span>
+             <span className="[&[data-state=closed]>span:first-child]:hidden">
+              <span>Ocultar</span>
+            </span>
+            <span>razonamiento</span>
+            <ChevronDown className="h-4 w-4 transition-transform duration-200" />
           </AccordionTrigger>
           <AccordionContent>
             <Card className="max-w-md bg-muted/50 border-primary/20">
