@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import type { Chat, Message, Model } from '@/lib/types';
+import { useState, useMemo, useEffect } from 'react';
+import type { Chat, Message, Model, SuggestedQuestion } from '@/lib/types';
 import { v4 as uuidv4 } from 'uuid';
 import ChatSidebar from './chat-sidebar';
 import ChatPanel from './chat-panel';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { MODELS } from '@/lib/models';
+import { SUGGESTED_QUESTIONS } from '@/lib/questions';
 
 const initialChats: Chat[] = [
   {
@@ -74,6 +75,40 @@ export default function ChatLayout() {
     setActiveChatId(chatId);
   };
 
+  const addMessageToChat = (chatId: string, message: Message) => {
+    setChats((prevChats) =>
+      prevChats.map((chat) => {
+        if (chat.id === chatId) {
+          return {
+            ...chat,
+            messages: [...chat.messages, message],
+          };
+        }
+        return chat;
+      })
+    );
+  };
+
+  const updateMessageInChat = (
+    chatId: string,
+    messageId: string,
+    updatedMessage: Partial<Message>
+  ) => {
+    setChats((prevChats) =>
+      prevChats.map((chat) => {
+        if (chat.id === chatId) {
+          return {
+            ...chat,
+            messages: chat.messages.map((msg) =>
+              msg.id === messageId ? { ...msg, ...updatedMessage } : msg
+            ),
+          };
+        }
+        return chat;
+      })
+    );
+  };
+
   const handleSendMessage = (content: string) => {
     if (!activeChatId) return;
 
@@ -82,17 +117,7 @@ export default function ChatLayout() {
       role: 'user',
       content,
     };
-
-    const updatedChats = chats.map((chat) => {
-      if (chat.id === activeChatId) {
-        return {
-          ...chat,
-          messages: [...chat.messages, userMessage],
-        };
-      }
-      return chat;
-    });
-    setChats(updatedChats);
+    addMessageToChat(activeChatId, userMessage);
 
     // Mock AI response
     setTimeout(() => {
@@ -101,17 +126,56 @@ export default function ChatLayout() {
         role: 'bot',
         content: `Esta es una respuesta simulada de ${selectedModel.name} a: "${content}". Una IA real proporcionaría una respuesta más útil.`,
       };
-      const finalChats = updatedChats.map((chat) => {
-        if (chat.id === activeChatId) {
-          return {
-            ...chat,
-            messages: [...chat.messages, botMessage],
-          };
-        }
-        return chat;
-      });
-      setChats(finalChats);
+      addMessageToChat(activeChatId, botMessage);
     }, 1000);
+  };
+
+  const handleSendSuggestedQuestion = (question: SuggestedQuestion) => {
+    if (!activeChatId) return;
+
+    const userMessage: Message = {
+      id: uuidv4(),
+      role: 'user',
+      content: question.question,
+    };
+    addMessageToChat(activeChatId, userMessage);
+
+    const reasoningMessageId = uuidv4();
+    const reasoningMessage: Message = {
+      id: reasoningMessageId,
+      role: 'bot',
+      content: '',
+      isReasoning: true,
+    };
+    addMessageToChat(activeChatId, reasoningMessage);
+
+    // Simulate typing for reasoning
+    let reasoningText = '';
+    const reasoningWords = question.reasoning.split(' ');
+    let wordIndex = 0;
+
+    const interval = setInterval(() => {
+      if (wordIndex < reasoningWords.length) {
+        reasoningText += (wordIndex > 0 ? ' ' : '') + reasoningWords[wordIndex];
+        updateMessageInChat(activeChatId, reasoningMessageId, {
+          content: reasoningText,
+        });
+        wordIndex++;
+      } else {
+        clearInterval(interval);
+        // Finish reasoning and add final answer
+        updateMessageInChat(activeChatId, reasoningMessageId, {
+          isReasoning: false,
+        });
+
+        const answerMessage: Message = {
+          id: uuidv4(),
+          role: 'bot',
+          content: question.answer,
+        };
+        addMessageToChat(activeChatId, answerMessage);
+      }
+    }, 50);
   };
 
   return (
@@ -125,8 +189,12 @@ export default function ChatLayout() {
       <ChatPanel
         chat={activeChat}
         onSendMessage={handleSendMessage}
+        onSendSuggestedQuestion={handleSendSuggestedQuestion}
         selectedModel={selectedModel}
         onModelChange={setSelectedModel}
+        suggestedQuestions={
+          activeChat?.messages.length === 1 ? SUGGESTED_QUESTIONS : []
+        }
       />
     </SidebarProvider>
   );

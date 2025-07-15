@@ -2,6 +2,7 @@ export type Message = {
   id: string;
   role: 'user' | 'bot';
   content: string;
+  isReasoning?: boolean;
 };
 
 export type Chat = {
@@ -11,7 +12,14 @@ export type Chat = {
 };
 
 export type Model = {
-    id: string;
-    name: string;
-    description: string;
+  id: string;
+  name: string;
+  description: string;
+};
+
+export type SuggestedQuestion = {
+  id: string;
+  question: string;
+  reasoning: string;
+  answer: string;
 };
