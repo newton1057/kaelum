@@ -25,7 +25,7 @@ export function ModelSelector({ selectedModel, onModelChange }: ModelSelectorPro
 
   return (
     <Select value={selectedModel.id} onValueChange={handleValueChange}>
-      <SelectTrigger className="w-48 border-2">
+      <SelectTrigger className="w-auto border-2">
         <SelectValue>
           <span className="font-bold">{selectedModel.name}</span>
         </SelectValue>
