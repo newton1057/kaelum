@@ -2,6 +2,29 @@ import type { SuggestedQuestion } from './types';
 
 export const SUGGESTED_QUESTIONS: SuggestedQuestion[] = [
   {
+    id: '8',
+    question: 'Voy a recetar Tramadol a Jonh Doe para el manejo de dolor lumbar crónico, ya que ha tenido buena respuesta en otros pacientes. ¿Ves algún riesgo o mejora posible basada en su perfil genético y datos clínicos?',
+    reasoning: `We began by extracting John Doe’s pharmacogenetic panel, focusing on opioid-related markers. His OPRM1 genotype is AG, indicating reduced μ-opioid receptor sensitivity, which literature associates with a higher required dose for analgesic effect and potentially diminished efficacy of drugs like Tramadol. Next, we reviewed his CYP2D6 status; he is a *1/*1 normal metabolizer, meaning he can convert Tramadol into its active M1 metabolite efficiently, but this does not offset the receptor-level reduced sensitivity.
+
+We also queried his electronic health records for medication tolerance history. Notably, he has a documented pattern of low adherence to treatments that involve gastrointestinal side effects—these are common with Tramadol, increasing the likelihood of discontinuation. Reviewing his insurance formulary confirmed coverage for alternative agents.
+
+To identify safer and potentially more adherent alternatives, we filtered NSAID options with minimal pharmacogenetic concerns. Celecoxib emerged as a suitable candidate: no significant interactions with OPRM1 or CYP2D6 pathways, and its side effect profile suggests a lower rate of GI intolerance relative to non-selective NSAIDs in similar cohorts. Predictive adherence models estimate a 34% improvement versus opioids for this patient type. We also ran cost impact projections, which indicate an expected annual savings of approximately 2,100 MXN due to reduced early discontinuations and fewer return visits for unmanaged pain.
+
+Given these findings, Tramadol does not appear optimal for John Doe. A shift to Celecoxib is recommended as a safer, more effective, and economically advantageous approach, though the final prescribing decision remains with the treating physician.`,
+    answer: `Análisis farmacogenético y clínico de John Doe:
+- **Genotipo OPRM1 AG** → Disminución en sensibilidad a opioides, incluyendo Tramadol.
+- **Genotipo CYP2D6 *1/*1** → Metabolizador normal, pero no compensa la baja sensibilidad a opioides.
+- **Historial**: baja adherencia a tratamientos con efectos secundarios gastrointestinales (frecuente en tramadol).
+
+**Alternativa sugerida:**
+- **Celecoxib**: mínima interacción genética, menor riesgo de efectos adversos, **+34% adherencia esperada**.
+- Cubierto por el plan de seguro actual.
+- **Ahorro estimado por paciente**: $2,100 MXN/año considerando reducción en abandonos y reconsultas.
+
+**Conclusión**: Tramadol no es óptimo para este paciente. Recomendamos Celecoxib como opción más segura, eficaz y económica.
+*Esta es una recomendación basada en la data que se me ha alimentado, la responsabilidad es del medico tratante.*`
+  },
+  {
     id: '7',
     question: '¿Qué características clínicas, demográficas y de hábitos tienen en común los asegurados que generaron siniestros de más de 500,000 MXN antes de los 50 años?',
     reasoning: 'We compiled claim data above the 500,000 MXN threshold and filtered for age under 50. Integrating this with electronic health records revealed hypertension as the most frequent unmanaged condition. We then layered in demographic data and noticed a trend: many had changed their primary residence within the last 18 months, possibly indicating life instability or stress. Lifestyle data from intake surveys showed low water intake as another common factor. Additionally, while many reported using health tracking apps, they often had sparse or inconsistent entries, suggesting superficial engagement. Combining these data points, we were able to build a predictive profile that achieved over 85% precision in identifying high-cost cases before age 50.',
