@@ -2,6 +2,15 @@ import type { SuggestedQuestion } from './types';
 
 export const SUGGESTED_QUESTIONS: SuggestedQuestion[] = [
   {
+    id: '6',
+    question: '¿Qué combinación de condiciones preexistentes, tratamientos y genética correlaciona más fuertemente con siniestros de cáncer de mama severos en mujeres <45 años?',
+    reasoning: 'We merged datasets containing clinical histories, medication records, and constructed partial family trees to infer undeclared genetic predispositions. Running correlation analyses on this enriched dataset highlighted three dominant factors. First, many patients under 45 with severe breast cancer claims had family patterns consistent with hereditary risk, even if not formally disclosed. Second, a sizable portion had been diagnosed with PCOS in the last decade, suggesting possible hormonal links. Third, continuous use of hormonal contraceptives without annual screenings was also prevalent. By combining these dimensions, we uncovered a statistically significant cluster of risk factors that correlate with severe early-onset cases.',
+    answer: `En mujeres <45 años con siniestros severos por cáncer de mama:
+- **54%** tenían antecedentes familiares no declarados oficialmente pero detectados vía árbol genealógico.
+- **37%** habían sido diagnosticadas con SOP en la última década.
+- **23%** usaban anticonceptivos hormonales continuos sin chequeos anuales.`
+  },
+  {
     id: '5',
     question: '¿Qué productos o coberturas son más susceptibles de fraude o mal uso, según patrones históricos?',
     reasoning: 'We aggregated claims flagged by the fraud detection engine over the past five years and clustered them by product line. The cluster with the highest frequency of anomalies was tied to minor medical expenses with extended dental coverage. Further spatial analysis using postal codes revealed a pattern: multiple insureds from the same area filing similar claims. We also checked provider IDs and found that many claims originated from out-of-network clinics with irregular billing histories. Temporal analysis showed these claims often occurred outside normal business hours. Pulling these variables together painted a clear risk profile around this specific product and scenario.',
