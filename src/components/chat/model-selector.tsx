@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import {
   Select,
@@ -25,8 +25,10 @@ export function ModelSelector({ selectedModel, onModelChange }: ModelSelectorPro
 
   return (
     <Select value={selectedModel.id} onValueChange={handleValueChange}>
-      <SelectTrigger className="w-64 border-2">
-        <SelectValue placeholder="Select a model" />
+      <SelectTrigger className="w-48 border-2">
+        <SelectValue>
+          <span className="font-bold">{selectedModel.name}</span>
+        </SelectValue>
       </SelectTrigger>
       <SelectContent>
         {MODELS.map((model) => (

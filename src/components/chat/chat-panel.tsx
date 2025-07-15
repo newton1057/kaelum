@@ -22,7 +22,7 @@ export default function ChatPanel({ chat, onSendMessage, selectedModel, onModelC
             <SidebarTrigger />
             <AppLogo />
         </div>
-        <div className="hidden md:block">
+        <div className="hidden md:flex md:justify-center">
            <ModelSelector selectedModel={selectedModel} onModelChange={onModelChange} />
         </div>
       </header>
