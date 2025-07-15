@@ -23,7 +23,7 @@ import { Button } from '../ui/button';
 import { Progress } from '../ui/progress';
 import { Separator } from '../ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BrainCircuit, Trash2, User } from 'lucide-react';
+import { BrainCircuit, Info, Trash2, User } from 'lucide-react';
 import { useState } from 'react';
 
 interface UserSettingsModalProps {
@@ -138,6 +138,23 @@ export function UserSettingsModal({
                   elara.vance@medmail.com
                 </p>
                 <p className="text-sm text-primary">Doctora</p>
+              </div>
+              <Separator className="my-4" />
+              <div className="text-left w-full space-y-2">
+                <h4 className="text-sm font-medium leading-none flex items-center gap-2">
+                  <Info size={16} />
+                  Principales Usos
+                </h4>
+                <p className="text-sm text-muted-foreground">
+                  Como asistente médico, "ima" está especializada en responder
+                  preguntas y proporcionar información exclusivamente dentro del
+                  dominio de la medicina.
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Por ejemplo, puede acceder a información sobre enfermedades y
+                  tratamientos, pero no podrá responder a preguntas sobre temas
+                  no médicos como finanzas o deportes.
+                </p>
               </div>
             </div>
           </TabsContent>
