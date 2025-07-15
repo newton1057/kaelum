@@ -69,9 +69,9 @@ export function UserSettingsModal({
                   Memoria de Contexto
                 </h4>
                 <p className="text-sm text-muted-foreground">
-                  Para mejorar la interacción, creamos pequeños contextos de
-                  chats con contenido relevante. Aquí puedes ver el uso de
-                  esta memoria.
+                  La memoria se utiliza para almacenar información relevante de
+                  tus conversaciones pasadas, como tus preferencias, objetivos
+                  y datos personales.
                 </p>
                 <div className="space-y-2">
                   <Progress value={memoryUsage} />
