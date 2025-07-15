@@ -25,8 +25,8 @@ export default function ChatPanel({
   className,
 }: ChatPanelProps) {
   return (
-    <div className={cn('flex flex-col', className)}>
-      <div className="flex-1 overflow-y-auto">
+    <div className={cn('flex flex-col h-full', className)}>
+      <div className="flex-1">
         <ChatMessages messages={chat?.messages ?? []} />
       </div>
       <div className="border-t p-4">

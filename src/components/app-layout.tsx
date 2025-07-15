@@ -188,22 +188,23 @@ export default function AppLayout() {
             view={view}
             onViewChange={setView}
           />
-          {view === 'chat' ? (
-            <ChatPanel
-              className="flex-1 overflow-y-auto"
-              chat={activeChat}
-              onSendMessage={handleSendMessage}
-              onSendSuggestedQuestion={handleSendSuggestedQuestion}
-              selectedModel={selectedModel}
-              onModelChange={setSelectedModel}
-              suggestedQuestions={
-                activeChat?.messages.length === 1 ? SUGGESTED_QUESTIONS : []
-              }
-              onDeleteAllChats={handleDeleteAllChats}
-            />
-          ) : (
-            <DashboardLayout className="flex-1 overflow-y-auto" />
-          )}
+          <div className="flex-1 overflow-y-auto">
+            {view === 'chat' ? (
+              <ChatPanel
+                chat={activeChat}
+                onSendMessage={handleSendMessage}
+                onSendSuggestedQuestion={handleSendSuggestedQuestion}
+                selectedModel={selectedModel}
+                onModelChange={setSelectedModel}
+                suggestedQuestions={
+                  activeChat?.messages.length === 1 ? SUGGESTED_QUESTIONS : []
+                }
+                onDeleteAllChats={handleDeleteAllChats}
+              />
+            ) : (
+              <DashboardLayout />
+            )}
+          </div>
         </SidebarInset>
       </div>
     </SidebarProvider>
