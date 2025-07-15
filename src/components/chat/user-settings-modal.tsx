@@ -146,14 +146,10 @@ export function UserSettingsModal({
                   Principales Usos
                 </h4>
                 <p className="text-sm text-muted-foreground">
-                  Como asistente médico, "ima" está especializada en responder
-                  preguntas y proporcionar información exclusivamente dentro del
-                  dominio de la medicina.
+                  Este perfil esta especializado en responder preguntas y proporcionar información exclusivamente dentro del dominio de la medicina.
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  Por ejemplo, puede acceder a información sobre enfermedades y
-                  tratamientos, pero no podrá responder a preguntas sobre temas
-                  no médicos como finanzas o deportes.
+                  Por ejemplo, puede acceder a información sobre enfermedades y tratamientos, pero no podrá responder a preguntas sobre temas no médicos como finanzas o deportes.
                 </p>
               </div>
             </div>
