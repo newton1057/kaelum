@@ -124,9 +124,8 @@ export function UserSettingsModal({
             <div className="flex flex-col items-center justify-center space-y-4 py-8">
               <Avatar className="h-24 w-24">
                 <AvatarImage
-                  src="https://placehold.co/100x100.png"
+                  src="https://firebasestorage.googleapis.com/v0/b/aurora-4e980.appspot.com/o/resourcesPDFima%2Fdefault.jpg?alt=media&token=31b50401-b3d0-49c9-b186-6545c413c608"
                   alt="User Avatar"
-                  data-ai-hint="person portrait"
                 />
                 <AvatarFallback>
                   <User className="h-12 w-12" />
