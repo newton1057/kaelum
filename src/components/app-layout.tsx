@@ -158,7 +158,7 @@ export default function AppLayout() {
             content: question.answer,
           });
         }
-      }, 10); // Interval per character
+      }, 50); // Interval per character
     }, randomDelay);
   };
 
@@ -192,7 +192,7 @@ export default function AppLayout() {
             view={view}
             onViewChange={setView}
           />
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 w-full flex flex-col overflow-y-auto">
             {view === 'chat' ? (
               <ChatPanel
                 chat={activeChat}
@@ -204,6 +204,7 @@ export default function AppLayout() {
                   activeChat?.messages.length === 1 ? SUGGESTED_QUESTIONS : []
                 }
                 onDeleteAllChats={handleDeleteAllChats}
+                className="flex-1 flex flex-col"
               />
             ) : (
               <DashboardLayout />
