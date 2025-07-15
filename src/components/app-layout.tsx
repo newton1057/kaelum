@@ -173,15 +173,15 @@ export default function AppLayout() {
 
   return (
     <SidebarProvider defaultOpen>
-      <div className="flex h-screen">
+      <div className="flex h-screen" style={{ width: '100%' }}>
         <ChatSidebar
           chats={chats}
           activeChatId={activeChatId}
           onNewChat={handleNewChat}
           onSelectChat={handleSelectChat}
         />
-        <SidebarInset className="flex flex-col p-0 overflow-hidden">
-           <AppHeader
+        <SidebarInset className="flex flex-col p-0">
+          <AppHeader
             selectedModel={selectedModel}
             onModelChange={setSelectedModel}
             onDeleteAllChats={handleDeleteAllChats}
