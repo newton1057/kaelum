@@ -3,7 +3,7 @@
 import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, Pie, PieChart, ResponsiveContainer, XAxis, YAxis } from 'recharts';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { BrainCircuit, Clock, HeartPulse, Users } from 'lucide-react';
+import { BrainCircuit, Clock, Download, HeartPulse, Users } from 'lucide-react';
 
 const modelUsageData = [
   { model: 'Axón', queries: 186, fill: 'var(--color-axon)' },
@@ -27,6 +27,16 @@ const weeklyActivityData = [
   { date: 'Dom', queries: 30 },
 ];
 
+const appInstallsData = [
+  { date: 'Lun', installs: 12 },
+  { date: 'Mar', installs: 18 },
+  { date: 'Mié', installs: 15 },
+  { date: 'Jue', installs: 25 },
+  { date: 'Vie', installs: 31 },
+  { date: 'Sáb', installs: 10 },
+  { date: 'Dom', installs: 8 },
+];
+
 const usageByAreaData = [
   { name: 'Cardiología', queries: 75, fill: 'var(--color-cardiology)' },
   { name: 'Dermatología', queries: 62, fill: 'var(--color-dermatology)' },
@@ -44,6 +54,10 @@ const usageByAreaData = [
 const chartConfig = {
     queries: {
       label: 'Consultas',
+    },
+    installs: {
+      label: 'Instalaciones',
+      color: 'hsl(var(--chart-2))',
     },
     axon: {
       label: 'Axón',
@@ -108,12 +122,12 @@ export default function DashboardLayout() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Precisión del Modelo</CardTitle>
-            <BrainCircuit className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Instalaciones de la App</CardTitle>
+            <Download className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">94.3%</div>
-            <p className="text-xs text-muted-foreground">Promedio de ambos modelos</p>
+            <div className="text-2xl font-bold">+119</div>
+            <p className="text-xs text-muted-foreground">+15% desde la última semana</p>
           </CardContent>
         </Card>
         <Card>
@@ -127,8 +141,8 @@ export default function DashboardLayout() {
           </CardContent>
         </Card>
       </div>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
+        <Card>
           <CardHeader>
             <CardTitle>Actividad de la Última Semana</CardTitle>
             <CardDescription>Número de consultas procesadas por día.</CardDescription>
@@ -166,30 +180,42 @@ export default function DashboardLayout() {
             </ChartContainer>
           </CardContent>
         </Card>
-        <Card className="col-span-3">
+        <Card>
           <CardHeader>
-            <CardTitle>Uso por Modelo</CardTitle>
-            <CardDescription>Comparativa de consultas por modelo de IA.</CardDescription>
+            <CardTitle>Instalaciones de la App (Última Semana)</CardTitle>
+            <CardDescription>Nuevas instalaciones de la app "ima" por día.</CardDescription>
           </CardHeader>
-          <CardContent>
-             <ChartContainer config={chartConfig} className="h-[300px] w-full">
-              <BarChart data={modelUsageData} layout="vertical" margin={{ left: -20 }}>
-                <CartesianGrid horizontal={false} />
-                <XAxis type="number" dataKey="queries" hide />
-                <YAxis
-                  dataKey="model"
-                  type="category"
+          <CardContent className="pl-2">
+            <ChartContainer config={chartConfig} className="h-[300px] w-full">
+              <LineChart
+                data={appInstallsData}
+                margin={{ top: 5, right: 20, left: -10, bottom: 0 }}
+              >
+                <CartesianGrid vertical={false} />
+                <XAxis
+                  dataKey="date"
                   tickLine={false}
                   axisLine={false}
-                  tickMargin={10}
-                  tick={{ fill: 'hsl(var(--foreground))' }}
+                  tickMargin={8}
+                />
+                <YAxis
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                  tickFormatter={(value) => `${value}`}
                 />
                 <ChartTooltip
                   cursor={false}
-                  content={<ChartTooltipContent hideLabel />}
+                  content={<ChartTooltipContent indicator="dot" />}
                 />
-                <Bar dataKey="queries" radius={5} />
-              </BarChart>
+                <Line
+                  dataKey="installs"
+                  type="monotone"
+                  stroke="var(--color-installs)"
+                  strokeWidth={2}
+                  dot={true}
+                />
+              </LineChart>
             </ChartContainer>
           </CardContent>
         </Card>
