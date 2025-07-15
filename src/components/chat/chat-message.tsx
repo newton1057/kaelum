@@ -1,3 +1,5 @@
+'use client';
+
 import { cn } from '@/lib/utils';
 import type { Message } from '@/lib/types';
 import { BotAvatar } from '../icons';
@@ -57,12 +59,14 @@ export default function ChatMessage({ message }: ChatMessageProps) {
               size="sm"
               className="mt-2 text-xs h-auto p-1 text-muted-foreground hover:bg-transparent hover:text-primary"
             >
-              <span>{isAccordionOpen ? 'Ocultar' : 'Mostrar'} razonamiento</span>
-              {isAccordionOpen ? (
-                <ChevronUp className="ml-1 h-4 w-4" />
-              ) : (
-                <ChevronDown className="ml-1 h-4 w-4" />
-              )}
+              <>
+                <span>{isAccordionOpen ? 'Ocultar' : 'Mostrar'} razonamiento</span>
+                {isAccordionOpen ? (
+                  <ChevronUp className="ml-1 h-4 w-4" />
+                ) : (
+                  <ChevronDown className="ml-1 h-4 w-4" />
+                )}
+              </>
             </Button>
           </AccordionTrigger>
           <AccordionContent>
