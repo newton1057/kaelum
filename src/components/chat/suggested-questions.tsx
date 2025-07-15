@@ -28,7 +28,7 @@ export function SuggestedQuestions({
     >
       <CarouselContent>
         {questions.map((q) => (
-          <CarouselItem key={q.id} className="md:basis-1/2">
+          <CarouselItem key={q.id} className="sm:basis-1/2 lg:basis-1/3">
             <div className="p-1 h-full">
               <Card
                 className="cursor-pointer transition-colors hover:bg-muted h-full flex flex-col justify-start"
