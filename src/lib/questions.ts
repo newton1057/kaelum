@@ -2,6 +2,18 @@ import type { SuggestedQuestion } from './types';
 
 export const SUGGESTED_QUESTIONS: SuggestedQuestion[] = [
   {
+    id: '7',
+    question: '¿Qué características clínicas, demográficas y de hábitos tienen en común los asegurados que generaron siniestros de más de 500,000 MXN antes de los 50 años?',
+    reasoning: 'We compiled claim data above the 500,000 MXN threshold and filtered for age under 50. Integrating this with electronic health records revealed hypertension as the most frequent unmanaged condition. We then layered in demographic data and noticed a trend: many had changed their primary residence within the last 18 months, possibly indicating life instability or stress. Lifestyle data from intake surveys showed low water intake as another common factor. Additionally, while many reported using health tracking apps, they often had sparse or inconsistent entries, suggesting superficial engagement. Combining these data points, we were able to build a predictive profile that achieved over 85% precision in identifying high-cost cases before age 50.',
+    answer: `De los asegurados con siniestros >500,000 MXN antes de los 50 años:
+- **74%** tenían historial de hipertensión no controlada.
+- **61%** habían cambiado de dirección residencial en los últimos 18 meses.
+- **48%** declararon consumir menos de 2 litros de agua al día.
+- **31%** usaban apps de monitoreo de salud pero no registraban datos consistentes.
+
+Con estos datos se construyó un perfil predictivo con **+85% de precisión**.`
+  },
+  {
     id: '6',
     question: '¿Qué combinación de condiciones preexistentes, tratamientos y genética correlaciona más fuertemente con siniestros de cáncer de mama severos en mujeres <45 años?',
     reasoning: 'We merged datasets containing clinical histories, medication records, and constructed partial family trees to infer undeclared genetic predispositions. Running correlation analyses on this enriched dataset highlighted three dominant factors. First, many patients under 45 with severe breast cancer claims had family patterns consistent with hereditary risk, even if not formally disclosed. Second, a sizable portion had been diagnosed with PCOS in the last decade, suggesting possible hormonal links. Third, continuous use of hormonal contraceptives without annual screenings was also prevalent. By combining these dimensions, we uncovered a statistically significant cluster of risk factors that correlate with severe early-onset cases.',
