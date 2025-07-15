@@ -158,7 +158,7 @@ export default function AppLayout() {
             content: question.answer,
           });
         }
-      }, 50); // Interval per character
+      }, 25); // Interval per character
     }, randomDelay);
   };
 
