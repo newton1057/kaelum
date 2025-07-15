@@ -4,6 +4,7 @@ import type { Chat, Model, SuggestedQuestion } from '@/lib/types';
 import MessageInput from './message-input';
 import ChatMessages from './chat-messages';
 import { SuggestedQuestions } from './suggested-questions';
+import { cn } from '@/lib/utils';
 
 interface ChatPanelProps {
   chat?: Chat;
@@ -13,6 +14,7 @@ interface ChatPanelProps {
   onModelChange: (model: Model) => void;
   suggestedQuestions: SuggestedQuestion[];
   onDeleteAllChats: () => void;
+  className?: string;
 }
 
 export default function ChatPanel({
@@ -20,9 +22,10 @@ export default function ChatPanel({
   onSendMessage,
   onSendSuggestedQuestion,
   suggestedQuestions,
+  className,
 }: ChatPanelProps) {
   return (
-    <div className="flex flex-col h-full w-full">
+    <div className={cn('flex flex-col', className)}>
       <div className="flex-1 overflow-y-auto">
         <ChatMessages messages={chat?.messages ?? []} />
       </div>
