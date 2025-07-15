@@ -30,7 +30,7 @@ export default function ChatPanel({
         <ChatMessages messages={chat?.messages ?? []} />
       </div>
       <div className="border-t">
-        <div className="max-w-3xl mx-auto w-full p-4">
+        <div className="w-full p-4">
           {suggestedQuestions.length > 0 && (
             <SuggestedQuestions
               questions={suggestedQuestions}
