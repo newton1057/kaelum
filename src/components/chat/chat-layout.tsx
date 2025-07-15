@@ -12,7 +12,7 @@ import { SUGGESTED_QUESTIONS } from '@/lib/questions';
 const initialChats: Chat[] = [
   {
     id: '1',
-    title: 'Bienvenido a ima',
+    title: 'Demo',
     messages: [
       {
         id: '1-1',
