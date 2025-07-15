@@ -188,7 +188,7 @@ export default function AppLayout() {
             view={view}
             onViewChange={setView}
           />
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto w-full">
             {view === 'chat' ? (
               <ChatPanel
                 chat={activeChat}
