@@ -9,3 +9,9 @@ export type Chat = {
   title: string;
   messages: Message[];
 };
+
+export type Model = {
+    id: string;
+    name: string;
+    description: string;
+};

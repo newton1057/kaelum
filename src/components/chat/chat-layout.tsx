@@ -1,11 +1,12 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import type { Chat, Message } from '@/lib/types';
+import type { Chat, Message, Model } from '@/lib/types';
 import { v4 as uuidv4 } from 'uuid';
 import ChatSidebar from './chat-sidebar';
 import ChatPanel from './chat-panel';
 import { SidebarProvider } from '@/components/ui/sidebar';
+import { MODELS } from '@/lib/models';
 
 const initialChats: Chat[] = [
   {
@@ -46,6 +47,7 @@ export default function ChatLayout() {
   const [activeChatId, setActiveChatId] = useState<string | null>(
     initialChats.length > 0 ? initialChats[0].id : null
   );
+  const [selectedModel, setSelectedModel] = useState<Model>(MODELS[0]);
 
   const activeChat = useMemo(
     () => chats.find((chat) => chat.id === activeChatId),
@@ -97,7 +99,7 @@ export default function ChatLayout() {
       const botMessage: Message = {
         id: uuidv4(),
         role: 'bot',
-        content: `This is a mock response to: "${content}". A real AI would provide a more helpful answer.`,
+        content: `This is a mock response from ${selectedModel.name} to: "${content}". A real AI would provide a more helpful answer.`,
       };
       const finalChats = updatedChats.map((chat) => {
         if (chat.id === activeChatId) {
@@ -120,7 +122,12 @@ export default function ChatLayout() {
         onNewChat={handleNewChat}
         onSelectChat={handleSelectChat}
       />
-      <ChatPanel chat={activeChat} onSendMessage={handleSendMessage} />
+      <ChatPanel
+        chat={activeChat}
+        onSendMessage={handleSendMessage}
+        selectedModel={selectedModel}
+        onModelChange={setSelectedModel}
+      />
     </SidebarProvider>
   );
 }
