@@ -37,7 +37,7 @@ export default function ChatSidebar({
           </Button>
         </div>
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="px-2">
         <SidebarMenu>
           {chats.map((chat) => (
             <SidebarMenuItem key={chat.id}>
