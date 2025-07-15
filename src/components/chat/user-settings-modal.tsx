@@ -18,7 +18,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Avatar, AvatarFallback } from '../ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Button } from '../ui/button';
 import { Progress } from '../ui/progress';
 import { Separator } from '../ui/separator';
@@ -98,7 +98,7 @@ export function UserSettingsModal({
                   <AlertDialogContent>
                     <AlertDialogHeader>
                       <AlertDialogTitle>
-                        ¿Estás absolutamente seguro?
+                        ¿Estás absolutely seguro?
                       </AlertDialogTitle>
                       <AlertDialogDescription>
                         Esta acción no se puede deshacer. Esto borrará
@@ -121,10 +121,24 @@ export function UserSettingsModal({
             </div>
           </TabsContent>
           <TabsContent value="profile">
-            <div className="py-4">
-              <p className="text-sm text-muted-foreground text-center">
-                La configuración del perfil estará disponible próximamente.
-              </p>
+            <div className="flex flex-col items-center justify-center space-y-4 py-8">
+              <Avatar className="h-24 w-24">
+                <AvatarImage
+                  src="https://placehold.co/100x100.png"
+                  alt="User Avatar"
+                  data-ai-hint="person portrait"
+                />
+                <AvatarFallback>
+                  <User className="h-12 w-12" />
+                </AvatarFallback>
+              </Avatar>
+              <div className="text-center">
+                <p className="text-xl font-semibold">Dr. Elara Vance</p>
+                <p className="text-sm text-muted-foreground">
+                  elara.vance@medmail.com
+                </p>
+                <p className="text-sm text-primary">Doctora</p>
+              </div>
             </div>
           </TabsContent>
         </Tabs>
