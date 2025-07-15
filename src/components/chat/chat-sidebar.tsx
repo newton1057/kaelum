@@ -3,13 +3,14 @@
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
-import { MessageSquare, Plus } from 'lucide-react';
+import { LogOut, MessageSquare, Plus } from 'lucide-react';
 import type { Chat } from '@/lib/types';
 import { AppLogo } from '../icons';
 
@@ -53,6 +54,16 @@ export default function ChatSidebar({
           ))}
         </SidebarMenu>
       </SidebarContent>
+      <SidebarFooter className="p-2">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton className="w-full justify-start">
+              <LogOut />
+              <span>Cerrar sesión</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   );
 }
