@@ -11,10 +11,10 @@ const modelUsageData = [
 ];
 
 const patientDistributionData = [
-    { name: '0-18', value: 8, fill: 'var(--color-a)' },
-    { name: '19-35', value: 15, fill: 'var(--color-b)' },
-    { name: '36-55', value: 22, fill: 'var(--color-c)' },
-    { name: '56+', value: 12, fill: 'var(--color-d)' },
+    { name: '0-18', value: 8, fill: 'var(--color-ageGroup1)' },
+    { name: '19-35', value: 15, fill: 'var(--color-ageGroup2)' },
+    { name: '36-55', value: 22, fill: 'var(--color-ageGroup3)' },
+    { name: '56+', value: 12, fill: 'var(--color-ageGroup4)' },
 ];
 
 
@@ -39,6 +39,22 @@ const chartConfig = {
     soma: {
       label: 'Soma',
       color: 'hsl(var(--chart-2))',
+    },
+    ageGroup1: {
+        label: '0-18',
+        color: 'hsl(var(--chart-1))',
+    },
+    ageGroup2: {
+        label: '19-35',
+        color: 'hsl(var(--chart-2))',
+    },
+    ageGroup3: {
+        label: '36-55',
+        color: 'hsl(var(--chart-3))',
+    },
+    ageGroup4: {
+        label: '56+',
+        color: 'hsl(var(--chart-4))',
     },
 };
 
@@ -161,7 +177,7 @@ export default function DashboardLayout() {
                 <CardDescription>Distribución de los pacientes por grupo de edad.</CardDescription>
             </CardHeader>
             <CardContent>
-                <ChartContainer config={{}} className="h-[250px] w-full">
+                <ChartContainer config={chartConfig} className="h-[250px] w-full">
                     <PieChart>
                          <ChartTooltip
                             cursor={false}
