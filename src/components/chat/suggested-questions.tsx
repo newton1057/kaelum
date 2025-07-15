@@ -31,7 +31,7 @@ export function SuggestedQuestions({
           <CarouselItem key={q.id} className="md:basis-1/2">
             <div className="p-1 h-full">
               <Card
-                className="cursor-pointer transition-colors hover:bg-muted h-full flex flex-col justify-center"
+                className="cursor-pointer transition-colors hover:bg-muted h-full flex flex-col justify-start"
                 onClick={() => onSelectQuestion(q)}
               >
                 <CardContent className="p-4">
