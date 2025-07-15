@@ -2,6 +2,17 @@ import type { SuggestedQuestion } from './types';
 
 export const SUGGESTED_QUESTIONS: SuggestedQuestion[] = [
   {
+    id: '4',
+    question: '¿Qué microsegmentos dentro de mi cartera tienen alta frecuencia pero baja severidad, y podrían ser redireccionados a programas de prevención?',
+    reasoning: 'Analyzing historical claim data, we first filtered by visit frequency over the past 24 months to identify insured members with more than 6 consultations per year. We then intersected this cohort with cost data to isolate those with a relatively low average ticket size. Further segmentation by diagnosis codes highlighted a concentration of individuals with chronic anxiety. We noticed most had no formal treatment plan recorded. By cross-referencing age distributions and verifying hospital admission histories, we found a group with zero hospitalizations in two years. This suggests persistent low-acuity utilization. Combining these attributes, we identified a candidate segment that could be steered toward low-cost digital interventions to potentially reduce unnecessary consultations.',
+    answer: `Encontramos un microgrupo de 11,500 asegurados:
+- **Edad 29-42**, con ansiedad crónica, sin tratamiento formal.
+- Consultan medicina general **6+ veces al año**.
+- **Sin hospitalizaciones** en 24 meses.
+
+Este grupo genera alta frecuencia (11.3 visitas/año promedio), pero con ticket promedio de $1,520. Se sugiere canalización a programas digitales de atención emocional.`
+  },
+  {
     id: '1',
     question:
       'Una mujer de 30 años presenta antecedentes de picazón debajo de la mama derecha y presenta una lesión anular en el examen. ¿Cuál es el hongo más probable que causa esta afección?',
