@@ -22,7 +22,7 @@ export default function ChatMessages({ messages }: ChatMessagesProps) {
 
   return (
     <ScrollArea className="h-full" ref={scrollAreaRef} viewportRef={viewportRef}>
-      <div className="p-4 md:p-6">
+      <div className="p-4 md:p-6 max-w-4xl mx-auto w-full">
         {messages.length === 0 ? (
           <div className="flex h-[calc(100vh-10rem)] flex-col items-center justify-center gap-4 text-center">
             <AppLogo />

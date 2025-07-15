@@ -29,14 +29,16 @@ export default function ChatPanel({
       <div className="flex-1">
         <ChatMessages messages={chat?.messages ?? []} />
       </div>
-      <div className="border-t p-4">
-        {suggestedQuestions.length > 0 && (
-          <SuggestedQuestions
-            questions={suggestedQuestions}
-            onSelectQuestion={onSendSuggestedQuestion}
-          />
-        )}
-        <MessageInput onSendMessage={onSendMessage} />
+      <div className="border-t">
+        <div className="max-w-4xl mx-auto w-full p-4">
+          {suggestedQuestions.length > 0 && (
+            <SuggestedQuestions
+              questions={suggestedQuestions}
+              onSelectQuestion={onSendSuggestedQuestion}
+            />
+          )}
+          <MessageInput onSendMessage={onSendMessage} />
+        </div>
       </div>
     </div>
   );
