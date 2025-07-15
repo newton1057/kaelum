@@ -11,12 +11,12 @@ import { MODELS } from '@/lib/models';
 const initialChats: Chat[] = [
   {
     id: '1',
-    title: 'Bienvenido a SynapseAI',
+    title: 'Bienvenido a ima',
     messages: [
       {
         id: '1-1',
         role: 'bot',
-        content: '¡Hola! Soy SynapseAI. ¿Cómo puedo ayudarte hoy?',
+        content: '¡Hola! Soy ima. ¿Cómo puedo ayudarte hoy?',
       },
     ],
   },
@@ -62,7 +62,7 @@ export default function ChatLayout() {
         {
           id: uuidv4(),
           role: 'bot',
-          content: 'Soy SynapseAI. ¡Pregúntame lo que sea!',
+          content: 'Soy ima. ¡Pregúntame lo que sea!',
         },
       ],
     };

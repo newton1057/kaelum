@@ -10,5 +10,5 @@ export function BotAvatar(props: SVGProps<SVGSVGElement>) {
 }
 
 export function AppLogo() {
-  return <h1 className="text-lg font-bold text-primary">SynapseAI</h1>;
+  return <h1 className="text-lg font-bold text-primary">ima</h1>;
 }

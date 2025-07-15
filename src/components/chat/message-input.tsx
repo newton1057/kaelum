@@ -50,7 +50,7 @@ export default function MessageInput({ onSendMessage }: MessageInputProps) {
         value={inputValue}
         onInput={handleInputChange}
         onKeyDown={handleKeyDown}
-        placeholder="Pregúntale a SynapseAI..."
+        placeholder="Pregúntale a ima..."
         className="max-h-48 min-h-12 resize-none overflow-y-auto rounded-2xl border-2 border-border bg-background pr-12"
         rows={1}
       />
