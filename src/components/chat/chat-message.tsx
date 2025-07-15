@@ -12,7 +12,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
-import { Button } from '../ui/button';
 import React from 'react';
 
 interface ChatMessageProps {
@@ -53,21 +52,13 @@ export default function ChatMessage({ message }: ChatMessageProps) {
         onValueChange={(value) => setAccordionOpen(!!value)}
       >
         <AccordionItem value="item-1" className="border-none">
-          <AccordionTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="mt-2 text-xs h-auto p-1 text-muted-foreground hover:bg-transparent hover:text-primary"
-            >
-              <>
-                <span>{isAccordionOpen ? 'Ocultar' : 'Mostrar'} razonamiento</span>
-                {isAccordionOpen ? (
-                  <ChevronUp className="ml-1 h-4 w-4" />
-                ) : (
-                  <ChevronDown className="ml-1 h-4 w-4" />
-                )}
-              </>
-            </Button>
+          <AccordionTrigger className="mt-2 text-xs h-auto p-1 text-muted-foreground hover:bg-transparent hover:text-primary hover:no-underline justify-start gap-1">
+            <span>{isAccordionOpen ? 'Ocultar' : 'Mostrar'} razonamiento</span>
+            {isAccordionOpen ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
           </AccordionTrigger>
           <AccordionContent>
             <Card className="max-w-md bg-muted/50 border-primary/20">
