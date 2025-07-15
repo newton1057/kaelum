@@ -11,32 +11,32 @@ import { MODELS } from '@/lib/models';
 const initialChats: Chat[] = [
   {
     id: '1',
-    title: 'Welcome to SynapseAI',
+    title: 'Bienvenido a SynapseAI',
     messages: [
       {
         id: '1-1',
         role: 'bot',
-        content: 'Hello! I am SynapseAI. How can I help you today?',
+        content: '¡Hola! Soy SynapseAI. ¿Cómo puedo ayudarte hoy?',
       },
     ],
   },
   {
     id: '2',
-    title: 'History of Ancient Rome',
+    title: 'Historia de la Antigua Roma',
     messages: [
-      { id: '2-1', role: 'user', content: 'Tell me about the Roman Empire.' },
+      { id: '2-1', role: 'user', content: 'Háblame del Imperio Romano.' },
       {
         id: '2-2',
         role: 'bot',
         content:
-          'The Roman Empire was one of the most influential civilizations in world history, lasting for over a thousand years. It began in 27 BC when Augustus became the first Roman emperor.',
+          'El **Imperio Romano** fue una de las civilizaciones más influyentes de la historia, con una duración de más de mil años. \n\nComenzó en el 27 a.C. cuando *Augusto* se convirtió en el primer emperador romano. \n\nPuedes aprender más sobre:\n- La República Romana\n- Las Guerras Púnicas\n- La caída del Imperio',
       },
-      { id: '2-3', role: 'user', content: 'What caused its fall?' },
+      { id: '2-3', role: 'user', content: '¿Qué causó su caída?' },
       {
         id: '2-4',
         role: 'bot',
         content:
-          'The fall of the Western Roman Empire in 476 AD was caused by a combination of factors, including economic instability, political corruption, overexpansion, and barbarian invasions.',
+          'La caída del Imperio Romano de Occidente en el 476 d.C. fue causada por una combinación de factores, entre ellos: `inestabilidad económica`, `corrupción política`, `sobreexpansión` e `invasiones bárbaras`.',
       },
     ],
   },
@@ -57,12 +57,12 @@ export default function ChatLayout() {
   const handleNewChat = () => {
     const newChat: Chat = {
       id: uuidv4(),
-      title: 'New Conversation',
+      title: 'Nueva Conversación',
       messages: [
         {
           id: uuidv4(),
           role: 'bot',
-          content: 'I am SynapseAI. Ask me anything!',
+          content: 'Soy SynapseAI. ¡Pregúntame lo que sea!',
         },
       ],
     };
@@ -99,7 +99,7 @@ export default function ChatLayout() {
       const botMessage: Message = {
         id: uuidv4(),
         role: 'bot',
-        content: `This is a mock response from ${selectedModel.name} to: "${content}". A real AI would provide a more helpful answer.`,
+        content: `Esta es una respuesta simulada de ${selectedModel.name} a: "${content}". Una IA real proporcionaría una respuesta más útil.`,
       };
       const finalChats = updatedChats.map((chat) => {
         if (chat.id === activeChatId) {

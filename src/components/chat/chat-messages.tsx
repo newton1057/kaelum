@@ -27,7 +27,7 @@ export default function ChatMessages({ messages }: ChatMessagesProps) {
           <div className="flex h-[calc(100vh-10rem)] flex-col items-center justify-center gap-4 text-center">
             <AppLogo />
             <p className="text-lg text-muted-foreground">
-              Start a conversation with SynapseAI
+              Inicia una conversación con SynapseAI
             </p>
           </div>
         ) : (

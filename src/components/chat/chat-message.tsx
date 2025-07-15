@@ -3,6 +3,7 @@ import type { Message } from '@/lib/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { BotAvatar } from '../icons';
 import { User } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 
 interface ChatMessageProps {
   message: Message;
@@ -26,7 +27,15 @@ export default function ChatMessage({ message }: ChatMessageProps) {
             : 'rounded-bl-none bg-muted text-muted-foreground'
         )}
       >
-        <p className="text-base leading-relaxed">{message.content}</p>
+        <div className="prose prose-sm prose-p:text-inherit prose-strong:text-inherit prose-em:text-inherit prose-code:text-inherit prose-li:text-inherit max-w-none text-sm leading-relaxed text-inherit">
+          <ReactMarkdown
+            components={{
+                p: ({node, ...props}) => <p className="mb-2 last:mb-0" {...props} />,
+            }}
+          >
+            {message.content}
+          </ReactMarkdown>
+        </div>
       </div>
       {isUser && (
         <Avatar>

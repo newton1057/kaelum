@@ -33,7 +33,7 @@ export default function ChatSidebar({
           <AppLogo />
           <Button variant="ghost" size="icon" onClick={onNewChat}>
             <Plus />
-            <span className="sr-only">New Chat</span>
+            <span className="sr-only">Nuevo Chat</span>
           </Button>
         </div>
       </SidebarHeader>

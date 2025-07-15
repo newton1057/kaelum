@@ -50,7 +50,7 @@ export default function MessageInput({ onSendMessage }: MessageInputProps) {
         value={inputValue}
         onInput={handleInputChange}
         onKeyDown={handleKeyDown}
-        placeholder="Ask SynapseAI..."
+        placeholder="Pregúntale a SynapseAI..."
         className="max-h-48 min-h-12 resize-none overflow-y-auto rounded-2xl border-2 border-border bg-background pr-12"
         rows={1}
       />
@@ -62,7 +62,7 @@ export default function MessageInput({ onSendMessage }: MessageInputProps) {
         disabled={!inputValue.trim()}
       >
         <SendHorizontal />
-        <span className="sr-only">Send message</span>
+        <span className="sr-only">Enviar mensaje</span>
       </Button>
     </form>
   );
