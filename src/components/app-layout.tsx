@@ -7,7 +7,7 @@ import DashboardLayout from './dashboard/dashboard-layout';
 import type { Chat, Message, Model, SuggestedQuestion } from '@/lib/types';
 import { MODELS } from '@/lib/models';
 import { AppHeader } from './app-header';
-import { SidebarProvider } from './ui/sidebar';
+import { SidebarProvider, SidebarInset } from './ui/sidebar';
 import ChatSidebar from './chat/chat-sidebar';
 import { v4 as uuidv4 } from 'uuid';
 import { SUGGESTED_QUESTIONS } from '@/lib/questions';
@@ -173,20 +173,20 @@ export default function AppLayout() {
 
   return (
     <SidebarProvider defaultOpen>
-      <div className="flex flex-col h-screen">
-        <AppHeader
-          selectedModel={selectedModel}
-          onModelChange={setSelectedModel}
-          onDeleteAllChats={handleDeleteAllChats}
-          view={view}
-          onViewChange={setView}
+      <div className="flex h-screen">
+        <ChatSidebar
+          chats={chats}
+          activeChatId={activeChatId}
+          onNewChat={handleNewChat}
+          onSelectChat={handleSelectChat}
         />
-        <div className="flex flex-1 overflow-hidden">
-           <ChatSidebar
-            chats={chats}
-            activeChatId={activeChatId}
-            onNewChat={handleNewChat}
-            onSelectChat={handleSelectChat}
+        <SidebarInset className="flex max-h-svh flex-col p-0">
+           <AppHeader
+            selectedModel={selectedModel}
+            onModelChange={setSelectedModel}
+            onDeleteAllChats={handleDeleteAllChats}
+            view={view}
+            onViewChange={setView}
           />
           {view === 'chat' ? (
             <ChatPanel
@@ -203,7 +203,7 @@ export default function AppLayout() {
           ) : (
             <DashboardLayout />
           )}
-        </div>
+        </SidebarInset>
       </div>
     </SidebarProvider>
   );
