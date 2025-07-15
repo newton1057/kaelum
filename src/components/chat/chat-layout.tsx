@@ -8,6 +8,7 @@ import ChatPanel from './chat-panel';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { MODELS } from '@/lib/models';
 import { SUGGESTED_QUESTIONS } from '@/lib/questions';
+import { useToast } from '@/hooks/use-toast';
 
 const initialChats: Chat[] = [
   {
@@ -29,6 +30,7 @@ export default function ChatLayout() {
     initialChats.length > 0 ? initialChats[0].id : null
   );
   const [selectedModel, setSelectedModel] = useState<Model>(MODELS[0]);
+  const { toast } = useToast();
 
   const activeChat = useMemo(
     () => chats.find((chat) => chat.id === activeChatId),
@@ -153,6 +155,19 @@ export default function ChatLayout() {
     }, 50);
   };
 
+  const handleDeleteAllChats = () => {
+    setChats([]);
+    setActiveChatId(null);
+    toast({
+      title: 'Chats eliminados',
+      description: 'Todas tus conversaciones han sido borradas.',
+    });
+    // Create a new initial chat after deletion
+    setTimeout(() => {
+      handleNewChat();
+    }, 500);
+  };
+
   return (
     <SidebarProvider defaultOpen>
       <ChatSidebar
@@ -170,6 +185,7 @@ export default function ChatLayout() {
         suggestedQuestions={
           activeChat?.messages.length === 1 ? SUGGESTED_QUESTIONS : []
         }
+        onDeleteAllChats={handleDeleteAllChats}
       />
     </SidebarProvider>
   );

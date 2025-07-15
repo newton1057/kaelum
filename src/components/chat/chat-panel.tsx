@@ -6,8 +6,7 @@ import MessageInput from './message-input';
 import ChatMessages from './chat-messages';
 import { AppLogo } from '../icons';
 import { ModelSelector } from './model-selector';
-import { Avatar, AvatarFallback } from '../ui/avatar';
-import { User } from 'lucide-react';
+import { UserSettingsModal } from './user-settings-modal';
 import { SuggestedQuestions } from './suggested-questions';
 
 interface ChatPanelProps {
@@ -17,6 +16,7 @@ interface ChatPanelProps {
   selectedModel: Model;
   onModelChange: (model: Model) => void;
   suggestedQuestions: SuggestedQuestion[];
+  onDeleteAllChats: () => void;
 }
 
 export default function ChatPanel({
@@ -26,6 +26,7 @@ export default function ChatPanel({
   selectedModel,
   onModelChange,
   suggestedQuestions,
+  onDeleteAllChats,
 }: ChatPanelProps) {
   return (
     <SidebarInset className="flex max-h-svh flex-col p-0">
@@ -49,11 +50,7 @@ export default function ChatPanel({
               onModelChange={onModelChange}
             />
           </div>
-          <Avatar>
-            <AvatarFallback className="bg-primary/20 text-primary">
-              <User />
-            </AvatarFallback>
-          </Avatar>
+          <UserSettingsModal onDeleteAllChats={onDeleteAllChats} />
         </div>
       </header>
       <div className="flex-1 overflow-y-auto">
