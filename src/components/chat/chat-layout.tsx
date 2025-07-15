@@ -5,8 +5,6 @@ import type { Chat, Message, Model, SuggestedQuestion } from '@/lib/types';
 import { v4 as uuidv4 } from 'uuid';
 import ChatSidebar from './chat-sidebar';
 import ChatPanel from './chat-panel';
-import { SidebarProvider } from '@/components/ui/sidebar';
-import { MODELS } from '@/lib/models';
 import { SUGGESTED_QUESTIONS } from '@/lib/questions';
 import { useToast } from '@/hooks/use-toast';
 
@@ -24,12 +22,12 @@ const initialChats: Chat[] = [
   },
 ];
 
-export default function ChatLayout() {
+export default function ChatLayout({ selectedModel, onModelChange, onDeleteAllChats }) {
   const [chats, setChats] = useState<Chat[]>(initialChats);
   const [activeChatId, setActiveChatId] = useState<string | null>(
     initialChats.length > 0 ? initialChats[0].id : null
   );
-  const [selectedModel, setSelectedModel] = useState<Model>(MODELS[0]);
+
   const { toast } = useToast();
 
   const activeChat = useMemo(
@@ -155,21 +153,19 @@ export default function ChatLayout() {
     }, 50);
   };
 
-  const handleDeleteAllChats = () => {
+  const handleDeleteAllLocalChats = () => {
     setChats([]);
     setActiveChatId(null);
-    toast({
-      title: 'Chats eliminados',
-      description: 'Todas tus conversaciones han sido borradas.',
-    });
+    onDeleteAllChats(); // Call parent handler
     // Create a new initial chat after deletion
     setTimeout(() => {
       handleNewChat();
     }, 500);
   };
 
+
   return (
-    <SidebarProvider defaultOpen>
+    <>
       <ChatSidebar
         chats={chats}
         activeChatId={activeChatId}
@@ -181,12 +177,12 @@ export default function ChatLayout() {
         onSendMessage={handleSendMessage}
         onSendSuggestedQuestion={handleSendSuggestedQuestion}
         selectedModel={selectedModel}
-        onModelChange={setSelectedModel}
+        onModelChange={onModelChange}
         suggestedQuestions={
           activeChat?.messages.length === 1 ? SUGGESTED_QUESTIONS : []
         }
-        onDeleteAllChats={handleDeleteAllChats}
+        onDeleteAllChats={handleDeleteAllLocalChats}
       />
-    </SidebarProvider>
+    </>
   );
 }
