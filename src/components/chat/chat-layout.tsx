@@ -21,26 +21,6 @@ const initialChats: Chat[] = [
       },
     ],
   },
-  {
-    id: '2',
-    title: 'Historia de la Antigua Roma',
-    messages: [
-      { id: '2-1', role: 'user', content: 'Háblame del Imperio Romano.' },
-      {
-        id: '2-2',
-        role: 'bot',
-        content:
-          'El **Imperio Romano** fue una de las civilizaciones más influyentes de la historia, con una duración de más de mil años. \n\nComenzó en el 27 a.C. cuando *Augusto* se convirtió en el primer emperador romano. \n\nPuedes aprender más sobre:\n- La República Romana\n- Las Guerras Púnicas\n- La caída del Imperio',
-      },
-      { id: '2-3', role: 'user', content: '¿Qué causó su caída?' },
-      {
-        id: '2-4',
-        role: 'bot',
-        content:
-          'La caída del Imperio Romano de Occidente en el 476 d.C. fue causada por una combinación de factores, entre ellos: `inestabilidad económica`, `corrupción política`, `sobreexpansión` e `invasiones bárbaras`.',
-      },
-    ],
-  },
 ];
 
 export default function ChatLayout() {
