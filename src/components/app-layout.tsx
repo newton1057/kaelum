@@ -180,7 +180,7 @@ export default function AppLayout() {
           onNewChat={handleNewChat}
           onSelectChat={handleSelectChat}
         />
-        <SidebarInset className="flex max-h-svh flex-col p-0">
+        <SidebarInset className="flex flex-col p-0 overflow-hidden">
            <AppHeader
             selectedModel={selectedModel}
             onModelChange={setSelectedModel}
@@ -188,21 +188,23 @@ export default function AppLayout() {
             view={view}
             onViewChange={setView}
           />
-          {view === 'chat' ? (
-            <ChatPanel
-              chat={activeChat}
-              onSendMessage={handleSendMessage}
-              onSendSuggestedQuestion={handleSendSuggestedQuestion}
-              selectedModel={selectedModel}
-              onModelChange={setSelectedModel}
-              suggestedQuestions={
-                activeChat?.messages.length === 1 ? SUGGESTED_QUESTIONS : []
-              }
-              onDeleteAllChats={handleDeleteAllChats}
-            />
-          ) : (
-            <DashboardLayout />
-          )}
+          <div className="flex-1 overflow-y-auto">
+            {view === 'chat' ? (
+              <ChatPanel
+                chat={activeChat}
+                onSendMessage={handleSendMessage}
+                onSendSuggestedQuestion={handleSendSuggestedQuestion}
+                selectedModel={selectedModel}
+                onModelChange={setSelectedModel}
+                suggestedQuestions={
+                  activeChat?.messages.length === 1 ? SUGGESTED_QUESTIONS : []
+                }
+                onDeleteAllChats={handleDeleteAllChats}
+              />
+            ) : (
+              <DashboardLayout />
+            )}
+          </div>
         </SidebarInset>
       </div>
     </SidebarProvider>

@@ -22,7 +22,7 @@ export default function ChatPanel({
   suggestedQuestions,
 }: ChatPanelProps) {
   return (
-    <div className="flex flex-1 flex-col overflow-hidden">
+    <div className="flex flex-col h-full">
       <div className="flex-1 overflow-y-auto">
         <ChatMessages messages={chat?.messages ?? []} />
       </div>
