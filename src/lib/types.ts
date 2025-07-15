@@ -2,7 +2,8 @@ export type Message = {
   id: string;
   role: 'user' | 'bot';
   content: string;
-  isReasoning?: boolean;
+  reasoning?: string;
+  isReasoningComplete?: boolean;
 };
 
 export type Chat = {
@@ -12,7 +13,7 @@ export type Chat = {
 };
 
 export type Model = {
-  id: string;
+  id:string;
   name: string;
   description: string;
 };

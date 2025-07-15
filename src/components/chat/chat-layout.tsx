@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import type { Chat, Message, Model, SuggestedQuestion } from '@/lib/types';
 import { v4 as uuidv4 } from 'uuid';
 import ChatSidebar from './chat-sidebar';
@@ -140,14 +140,15 @@ export default function ChatLayout() {
     };
     addMessageToChat(activeChatId, userMessage);
 
-    const reasoningMessageId = uuidv4();
-    const reasoningMessage: Message = {
-      id: reasoningMessageId,
+    const botMessageId = uuidv4();
+    const botMessage: Message = {
+      id: botMessageId,
       role: 'bot',
       content: '',
-      isReasoning: true,
+      reasoning: '',
+      isReasoningComplete: false,
     };
-    addMessageToChat(activeChatId, reasoningMessage);
+    addMessageToChat(activeChatId, botMessage);
 
     // Simulate typing for reasoning
     let reasoningText = '';
@@ -157,23 +158,17 @@ export default function ChatLayout() {
     const interval = setInterval(() => {
       if (wordIndex < reasoningWords.length) {
         reasoningText += (wordIndex > 0 ? ' ' : '') + reasoningWords[wordIndex];
-        updateMessageInChat(activeChatId, reasoningMessageId, {
-          content: reasoningText,
+        updateMessageInChat(activeChatId, botMessageId, {
+          reasoning: reasoningText,
         });
         wordIndex++;
       } else {
         clearInterval(interval);
         // Finish reasoning and add final answer
-        updateMessageInChat(activeChatId, reasoningMessageId, {
-          isReasoning: false,
-        });
-
-        const answerMessage: Message = {
-          id: uuidv4(),
-          role: 'bot',
+        updateMessageInChat(activeChatId, botMessageId, {
+          isReasoningComplete: true,
           content: question.answer,
-        };
-        addMessageToChat(activeChatId, answerMessage);
+        });
       }
     }, 50);
   };
