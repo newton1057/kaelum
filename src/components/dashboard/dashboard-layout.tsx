@@ -122,7 +122,7 @@ export default function DashboardLayout() {
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">1.2s</div>
+            <div className="text-2xl font-bold">9.2s</div>
             <p className="text-xs text-muted-foreground">Promedio por consulta</p>
           </CardContent>
         </Card>
