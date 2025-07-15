@@ -2,6 +2,13 @@
 
 import { Card, CardContent } from '@/components/ui/card';
 import type { SuggestedQuestion } from '@/lib/types';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from '@/components/ui/carousel';
 
 interface SuggestedQuestionsProps {
   questions: SuggestedQuestion[];
@@ -13,18 +20,30 @@ export function SuggestedQuestions({
   onSelectQuestion,
 }: SuggestedQuestionsProps) {
   return (
-    <div className="mb-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
-      {questions.map((q) => (
-        <Card
-          key={q.id}
-          className="cursor-pointer transition-colors hover:bg-muted"
-          onClick={() => onSelectQuestion(q)}
-        >
-          <CardContent className="p-4">
-            <p className="text-sm font-medium">{q.question}</p>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
+    <Carousel
+      opts={{
+        align: 'start',
+      }}
+      className="w-full mb-4"
+    >
+      <CarouselContent>
+        {questions.map((q) => (
+          <CarouselItem key={q.id} className="md:basis-1/2">
+            <div className="p-1 h-full">
+              <Card
+                className="cursor-pointer transition-colors hover:bg-muted h-full flex flex-col justify-center"
+                onClick={() => onSelectQuestion(q)}
+              >
+                <CardContent className="p-4">
+                  <p className="text-sm font-medium">{q.question}</p>
+                </CardContent>
+              </Card>
+            </div>
+          </CarouselItem>
+        ))}
+      </CarouselContent>
+      <CarouselPrevious className="hidden sm:flex" />
+      <CarouselNext className="hidden sm:flex" />
+    </Carousel>
   );
 }
