@@ -1,8 +1,8 @@
 'use client';
 
-import { Bar, BarChart, CartesianGrid, Line, LineChart, Pie, PieChart, ResponsiveContainer, XAxis, YAxis } from 'recharts';
+import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, Pie, PieChart, ResponsiveContainer, XAxis, YAxis } from 'recharts';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { BrainCircuit, Clock, HeartPulse, Users } from 'lucide-react';
 
 const modelUsageData = [
@@ -17,7 +17,6 @@ const patientDistributionData = [
     { name: '56+', value: 12, fill: 'var(--color-ageGroup4)' },
 ];
 
-
 const weeklyActivityData = [
   { date: 'Lun', queries: 32 },
   { date: 'Mar', queries: 45 },
@@ -27,6 +26,20 @@ const weeklyActivityData = [
   { date: 'Sáb', queries: 25 },
   { date: 'Dom', queries: 30 },
 ];
+
+const usageByAreaData = [
+  { name: 'Cardiología', queries: 75, fill: 'var(--color-cardiology)' },
+  { name: 'Dermatología', queries: 62, fill: 'var(--color-dermatology)' },
+  { name: 'Endocrinología', queries: 55, fill: 'var(--color-endocrinology)' },
+  { name: 'Gastroenterología', queries: 48, fill: 'var(--color-gastroenterology)' },
+  { name: 'Neurología', queries: 42, fill: 'var(--color-neurology)' },
+  { name: 'Oncología', queries: 35, fill: 'var(--color-oncology)' },
+  { name: 'Pediatría', queries: 30, fill: 'var(--color-pediatrics)' },
+  { name: 'Farmacología', queries: 85, fill: 'var(--color-pharmacology)' },
+  { name: 'Medicina General', queries: 95, fill: 'var(--color-general-medicine)' },
+  { name: 'Psiquiatría', queries: 40, fill: 'var(--color-psychiatry)' },
+].sort((a, b) => a.queries - b.queries);
+
 
 const chartConfig = {
     queries: {
@@ -56,6 +69,16 @@ const chartConfig = {
         label: '56+',
         color: 'hsl(var(--chart-4))',
     },
+    cardiology: { label: 'Cardiología', color: 'hsl(var(--chart-1))' },
+    dermatology: { label: 'Dermatología', color: 'hsl(var(--chart-2))' },
+    endocrinology: { label: 'Endocrinología', color: 'hsl(var(--chart-3))' },
+    gastroenterology: { label: 'Gastroenterología', color: 'hsl(var(--chart-4))' },
+    neurology: { label: 'Neurología', color: 'hsl(var(--chart-5))' },
+    oncology: { label: 'Oncología', color: 'hsl(var(--chart-1))' }, // Re-using colors for simplicity
+    pediatrics: { label: 'Pediatría', color: 'hsl(var(--chart-2))' },
+    pharmacology: { label: 'Farmacología', color: 'hsl(var(--chart-3))' },
+    'general-medicine': { label: 'Medicina General', color: 'hsl(var(--chart-4))' },
+    psychiatry: { label: 'Psiquiatría', color: 'hsl(var(--chart-5))' },
 };
 
 export default function DashboardLayout() {
@@ -159,6 +182,7 @@ export default function DashboardLayout() {
                   tickLine={false}
                   axisLine={false}
                   tickMargin={10}
+                  tick={{ fill: 'hsl(var(--foreground))' }}
                 />
                 <ChartTooltip
                   cursor={false}
@@ -171,13 +195,42 @@ export default function DashboardLayout() {
         </Card>
       </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-full">
+        <Card className="col-span-4">
+            <CardHeader>
+                <CardTitle>Uso de la IA por Área Médica</CardTitle>
+                <CardDescription>Distribución de consultas por especialidad.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <ChartContainer config={chartConfig} className="h-[350px] w-full">
+                    <BarChart
+                        data={usageByAreaData}
+                        layout="vertical"
+                        margin={{ left: 20, right: 20 }}
+                    >
+                        <CartesianGrid horizontal={false} />
+                        <YAxis
+                            dataKey="name"
+                            type="category"
+                            tickLine={false}
+                            axisLine={false}
+                        />
+                        <XAxis dataKey="queries" type="number" hide />
+                        <ChartTooltip
+                            cursor={false}
+                            content={<ChartTooltipContent hideLabel />}
+                        />
+                        <Bar dataKey="queries" radius={5} />
+                    </BarChart>
+                </ChartContainer>
+            </CardContent>
+        </Card>
+        <Card className="col-span-3">
             <CardHeader>
                 <CardTitle>Distribución de Pacientes</CardTitle>
                 <CardDescription>Distribución de los pacientes por grupo de edad.</CardDescription>
             </CardHeader>
             <CardContent>
-                <ChartContainer config={chartConfig} className="h-[250px] w-full">
+                <ChartContainer config={chartConfig} className="h-[350px] w-full">
                     <PieChart>
                          <ChartTooltip
                             cursor={false}
@@ -189,9 +242,10 @@ export default function DashboardLayout() {
                             nameKey="name"
                             cx="50%"
                             cy="50%"
-                            outerRadius={80}
+                            outerRadius={100}
                             label
                         />
+                        <ChartLegend content={<ChartLegendContent nameKey="name" />} />
                     </PieChart>
                 </ChartContainer>
             </CardContent>
