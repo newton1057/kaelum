@@ -32,6 +32,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import type { PatientData } from '@/lib/types';
 import { useEffect, useState } from 'react';
+import { Check } from 'lucide-react';
 
 const patientFormSchema = z.object({
   name: z.string().min(2, {
@@ -262,29 +263,29 @@ export function NewPatientDialog({
                     />
                   </FormControl>
                   <div className="flex flex-wrap gap-2 pt-2">
-                    {historyChips.map((chip) => (
-                      <Button
-                        key={chip}
-                        type="button"
-                        variant={
-                          selectedHistory.includes(chip)
-                            ? 'secondary'
-                            : 'outline'
-                        }
-                        size="sm"
-                        onClick={() =>
-                          handleChipClick(
-                            'medicalHistory',
-                            chip,
-                            selectedHistory,
-                            setSelectedHistory
-                          )
-                        }
-                        className="h-auto px-2 py-1 text-xs"
-                      >
-                        {chip}
-                      </Button>
-                    ))}
+                    {historyChips.map((chip) => {
+                      const isSelected = selectedHistory.includes(chip);
+                      return (
+                        <Button
+                          key={chip}
+                          type="button"
+                          variant={isSelected ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() =>
+                            handleChipClick(
+                              'medicalHistory',
+                              chip,
+                              selectedHistory,
+                              setSelectedHistory
+                            )
+                          }
+                          className="h-auto px-2 py-1 text-xs"
+                        >
+                          {isSelected && <Check className="mr-2 h-4 w-4" />}
+                          {chip}
+                        </Button>
+                      );
+                    })}
                   </div>
                   <FormMessage />
                 </FormItem>
@@ -304,29 +305,29 @@ export function NewPatientDialog({
                     />
                   </FormControl>
                   <div className="flex flex-wrap gap-2 pt-2">
-                    {medicationChips.map((chip) => (
-                      <Button
-                        key={chip}
-                        type="button"
-                        variant={
-                          selectedMedications.includes(chip)
-                            ? 'secondary'
-                            : 'outline'
-                        }
-                        size="sm"
-                        onClick={() =>
-                          handleChipClick(
-                            'medications',
-                            chip,
-                            selectedMedications,
-                            setSelectedMedications
-                          )
-                        }
-                        className="h-auto px-2 py-1 text-xs"
-                      >
-                        {chip}
-                      </Button>
-                    ))}
+                    {medicationChips.map((chip) => {
+                      const isSelected = selectedMedications.includes(chip);
+                      return (
+                        <Button
+                          key={chip}
+                          type="button"
+                          variant={isSelected ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() =>
+                            handleChipClick(
+                              'medications',
+                              chip,
+                              selectedMedications,
+                              setSelectedMedications
+                            )
+                          }
+                          className="h-auto px-2 py-1 text-xs"
+                        >
+                          {isSelected && <Check className="mr-2 h-4 w-4" />}
+                          {chip}
+                        </Button>
+                      );
+                    })}
                   </div>
                   <FormMessage />
                 </FormItem>
@@ -346,29 +347,29 @@ export function NewPatientDialog({
                     />
                   </FormControl>
                   <div className="flex flex-wrap gap-2 pt-2">
-                    {allergyChips.map((chip) => (
-                      <Button
-                        key={chip}
-                        type="button"
-                        variant={
-                          selectedAllergies.includes(chip)
-                            ? 'secondary'
-                            : 'outline'
-                        }
-                        size="sm"
-                        onClick={() =>
-                          handleChipClick(
-                            'allergies',
-                            chip,
-                            selectedAllergies,
-                            setSelectedAllergies
-                          )
-                        }
-                        className="h-auto px-2 py-1 text-xs"
-                      >
-                        {chip}
-                      </Button>
-                    ))}
+                    {allergyChips.map((chip) => {
+                      const isSelected = selectedAllergies.includes(chip);
+                      return (
+                        <Button
+                          key={chip}
+                          type="button"
+                          variant={isSelected ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() =>
+                            handleChipClick(
+                              'allergies',
+                              chip,
+                              selectedAllergies,
+                              setSelectedAllergies
+                            )
+                          }
+                          className="h-auto px-2 py-1 text-xs"
+                        >
+                          {isSelected && <Check className="mr-2 h-4 w-4" />}
+                          {chip}
+                        </Button>
+                      );
+                    })}
                   </div>
                   <FormMessage />
                 </FormItem>
@@ -383,4 +384,3 @@ export function NewPatientDialog({
     </Dialog>
   );
 }
-
