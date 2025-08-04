@@ -50,6 +50,10 @@ interface NewPatientDialogProps {
   onSubmit: (data: PatientData) => void;
 }
 
+const historyChips = ['Hipertensión', 'Diabetes Tipo 2', 'Asma', 'Hipotiroidismo'];
+const medicationChips = ['Losartán 50mg', 'Metformina 850mg', 'Salbutamol', 'Levotiroxina 100mcg'];
+const allergyChips = ['Penicilina', 'Aspirina', 'Mariscos', 'Polen'];
+
 export function NewPatientDialog({
   isOpen,
   onOpenChange,
@@ -77,6 +81,15 @@ export function NewPatientDialog({
     };
     onSubmit(dataToSubmit);
     form.reset();
+  };
+
+  const handleChipClick = (
+    field: keyof PatientFormValues,
+    value: string
+  ) => {
+    const currentValue = form.getValues(field) || '';
+    const newValue = currentValue ? `${currentValue}, ${value}` : value;
+    form.setValue(field, newValue);
   };
 
   return (
@@ -156,11 +169,25 @@ export function NewPatientDialog({
                   <FormLabel>Historial Médico Relevante</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Ej. Hipertensión diagnosticada en 2010, diabetes tipo 2."
+                      placeholder="Ej. Hipertensión, Diabetes tipo 2..."
                       className="resize-none"
                       {...field}
                     />
                   </FormControl>
+                  <div className="flex flex-wrap gap-2 pt-2">
+                    {historyChips.map((chip) => (
+                      <Button
+                        key={chip}
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleChipClick('medicalHistory', chip)}
+                        className="h-auto px-2 py-1 text-xs"
+                      >
+                        {chip}
+                      </Button>
+                    ))}
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
@@ -173,11 +200,25 @@ export function NewPatientDialog({
                   <FormLabel>Medicamentos Actuales</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Ej. Losartán 50mg/día, Metformina 850mg/día."
+                      placeholder="Ej. Losartán 50mg, Metformina 850mg..."
                       className="resize-none"
                       {...field}
                     />
                   </FormControl>
+                  <div className="flex flex-wrap gap-2 pt-2">
+                    {medicationChips.map((chip) => (
+                      <Button
+                        key={chip}
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleChipClick('medications', chip)}
+                        className="h-auto px-2 py-1 text-xs"
+                      >
+                        {chip}
+                      </Button>
+                    ))}
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
@@ -190,11 +231,25 @@ export function NewPatientDialog({
                   <FormLabel>Alergias Conocidas</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Ej. Penicilina, mariscos."
+                      placeholder="Ej. Penicilina, mariscos..."
                       className="resize-none"
                       {...field}
                     />
                   </FormControl>
+                  <div className="flex flex-wrap gap-2 pt-2">
+                    {allergyChips.map((chip) => (
+                      <Button
+                        key={chip}
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleChipClick('allergies', chip)}
+                        className="h-auto px-2 py-1 text-xs"
+                      >
+                        {chip}
+                      </Button>
+                    ))}
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
