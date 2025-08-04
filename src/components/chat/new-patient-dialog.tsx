@@ -1,3 +1,4 @@
+
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -30,6 +31,7 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import type { PatientData } from '@/lib/types';
+import { useEffect, useState } from 'react';
 
 const patientFormSchema = z.object({
   name: z.string().min(2, {
@@ -133,6 +135,34 @@ export function NewPatientDialog({
     },
   });
 
+  const [selectedHistory, setSelectedHistory] = useState<string[]>([]);
+  const [selectedMedications, setSelectedMedications] = useState<string[]>([]);
+  const [selectedAllergies, setSelectedAllergies] = useState<string[]>([]);
+
+  const handleChipClick = (
+    field: keyof PatientFormValues,
+    value: string,
+    selectedItems: string[],
+    setSelectedItems: React.Dispatch<React.SetStateAction<string[]>>
+  ) => {
+    const newSelectedItems = selectedItems.includes(value)
+      ? selectedItems.filter((item) => item !== value)
+      : [...selectedItems, value];
+
+    setSelectedItems(newSelectedItems);
+    form.setValue(field, newSelectedItems.join(', '));
+  };
+  
+   useEffect(() => {
+    if (!isOpen) {
+      form.reset();
+      setSelectedHistory([]);
+      setSelectedMedications([]);
+      setSelectedAllergies([]);
+    }
+  }, [isOpen, form]);
+
+
   const handleFormSubmit = (values: PatientFormValues) => {
     const dataToSubmit: PatientData = {
       name: values.name,
@@ -144,15 +174,9 @@ export function NewPatientDialog({
     };
     onSubmit(dataToSubmit);
     form.reset();
-  };
-
-  const handleChipClick = (
-    field: keyof PatientFormValues,
-    value: string
-  ) => {
-    const currentValue = form.getValues(field) || '';
-    const newValue = currentValue ? `${currentValue}, ${value}` : value;
-    form.setValue(field, newValue);
+    setSelectedHistory([]);
+    setSelectedMedications([]);
+    setSelectedAllergies([]);
   };
 
   return (
@@ -242,9 +266,20 @@ export function NewPatientDialog({
                       <Button
                         key={chip}
                         type="button"
-                        variant="outline"
+                        variant={
+                          selectedHistory.includes(chip)
+                            ? 'secondary'
+                            : 'outline'
+                        }
                         size="sm"
-                        onClick={() => handleChipClick('medicalHistory', chip)}
+                        onClick={() =>
+                          handleChipClick(
+                            'medicalHistory',
+                            chip,
+                            selectedHistory,
+                            setSelectedHistory
+                          )
+                        }
                         className="h-auto px-2 py-1 text-xs"
                       >
                         {chip}
@@ -273,9 +308,20 @@ export function NewPatientDialog({
                       <Button
                         key={chip}
                         type="button"
-                        variant="outline"
+                        variant={
+                          selectedMedications.includes(chip)
+                            ? 'secondary'
+                            : 'outline'
+                        }
                         size="sm"
-                        onClick={() => handleChipClick('medications', chip)}
+                        onClick={() =>
+                          handleChipClick(
+                            'medications',
+                            chip,
+                            selectedMedications,
+                            setSelectedMedications
+                          )
+                        }
                         className="h-auto px-2 py-1 text-xs"
                       >
                         {chip}
@@ -304,9 +350,20 @@ export function NewPatientDialog({
                       <Button
                         key={chip}
                         type="button"
-                        variant="outline"
+                        variant={
+                          selectedAllergies.includes(chip)
+                            ? 'secondary'
+                            : 'outline'
+                        }
                         size="sm"
-                        onClick={() => handleChipClick('allergies', chip)}
+                        onClick={() =>
+                          handleChipClick(
+                            'allergies',
+                            chip,
+                            selectedAllergies,
+                            setSelectedAllergies
+                          )
+                        }
                         className="h-auto px-2 py-1 text-xs"
                       >
                         {chip}
@@ -326,3 +383,4 @@ export function NewPatientDialog({
     </Dialog>
   );
 }
+
