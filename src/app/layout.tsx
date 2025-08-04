@@ -3,7 +3,7 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: 'ima Chat',
+  title: 'SynapseAI Chat',
   description: 'Generado por Firebase Studio',
 };
 

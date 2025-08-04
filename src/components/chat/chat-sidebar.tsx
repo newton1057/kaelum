@@ -8,12 +8,14 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
-  SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { LogOut, MessageSquare, Plus } from 'lucide-react';
 import type { Chat } from '@/lib/types';
 import { AppLogo } from '../icons';
+import { useRouter } from 'next/navigation';
+import { useToast } from '@/hooks/use-toast';
+
 
 interface ChatSidebarProps {
   chats: Chat[];
@@ -28,6 +30,18 @@ export default function ChatSidebar({
   onNewChat,
   onSelectChat,
 }: ChatSidebarProps) {
+  const router = useRouter();
+  const { toast } = useToast();
+
+  const handleLogout = () => {
+    localStorage.removeItem('isAuthenticated');
+    toast({
+      title: 'Sesión cerrada',
+      description: 'Has cerrado sesión correctamente.',
+    });
+    router.push('/login');
+  };
+
   return (
     <Sidebar>
       <SidebarHeader>
@@ -58,7 +72,10 @@ export default function ChatSidebar({
       <SidebarFooter className="p-2">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton className="w-full justify-start">
+            <SidebarMenuButton
+              className="w-full justify-start"
+              onClick={handleLogout}
+            >
               <LogOut />
               <span>Cerrar sesión</span>
             </SidebarMenuButton>

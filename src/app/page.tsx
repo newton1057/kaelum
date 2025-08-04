@@ -1,5 +1,19 @@
-import AppLayout from "@/components/app-layout";
+'use client';
+
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
-  return <AppLayout />;
+  const router = useRouter();
+
+  useEffect(() => {
+    const isAuthenticated = localStorage.getItem('isAuthenticated');
+    if (isAuthenticated) {
+      router.replace('/chat');
+    } else {
+      router.replace('/login');
+    }
+  }, [router]);
+
+  return null;
 }
