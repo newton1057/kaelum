@@ -1,6 +1,6 @@
 'use client';
 
-import type { Chat, Model, SuggestedQuestion } from '@/lib/types';
+import type { Chat, SuggestedQuestion } from '@/lib/types';
 import MessageInput from './message-input';
 import ChatMessages from './chat-messages';
 import { SuggestedQuestions } from './suggested-questions';
@@ -10,8 +10,6 @@ interface ChatPanelProps {
   chat?: Chat;
   onSendMessage: (content: string) => void;
   onSendSuggestedQuestion: (question: SuggestedQuestion) => void;
-  selectedModel: Model;
-  onModelChange: (model: Model) => void;
   suggestedQuestions: SuggestedQuestion[];
   onDeleteAllChats: () => void;
   className?: string;

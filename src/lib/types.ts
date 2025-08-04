@@ -12,12 +12,6 @@ export type Chat = {
   messages: Message[];
 };
 
-export type Model = {
-  id:string;
-  name: string;
-  description: string;
-};
-
 export type SuggestedQuestion = {
   id: string;
   question: string;

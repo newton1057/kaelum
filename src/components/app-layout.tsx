@@ -3,9 +3,7 @@
 import { useState, useMemo } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import ChatPanel from './chat/chat-panel';
-import DashboardLayout from './dashboard/dashboard-layout';
-import type { Chat, Message, Model, SuggestedQuestion } from '@/lib/types';
-import { MODELS } from '@/lib/models';
+import type { Chat, Message, SuggestedQuestion } from '@/lib/types';
 import { AppHeader } from './app-header';
 import { SidebarProvider, SidebarInset } from './ui/sidebar';
 import ChatSidebar from './chat/chat-sidebar';
@@ -29,8 +27,6 @@ const initialChats: Chat[] = [
 ];
 
 export default function AppLayout() {
-  const [view, setView] = useState<'chat' | 'dashboard'>('chat');
-  const [selectedModel, setSelectedModel] = useState<Model>(MODELS[0]);
   const [chats, setChats] = useState<Chat[]>(initialChats);
   const [activeChatId, setActiveChatId] = useState<string | null>(
     initialChats.length > 0 ? initialChats[0].id : null
@@ -133,7 +129,7 @@ export default function AppLayout() {
       const botMessage: Message = {
         id: uuidv4(),
         role: 'bot',
-        content: `Esta es una respuesta simulada de ${selectedModel.name} a: "${content}". Una IA real proporcionaría una respuesta más útil.`,
+        content: `Esta es una respuesta simulada de ima a: "${content}". Una IA real proporcionaría una respuesta más útil.`,
       };
       addMessageToChat(activeChatId, botMessage);
     }, 1000);
@@ -207,29 +203,19 @@ export default function AppLayout() {
         />
         <SidebarInset className="flex flex-col p-0">
           <AppHeader
-            selectedModel={selectedModel}
-            onModelChange={setSelectedModel}
             onDeleteAllChats={handleDeleteAllChats}
-            view={view}
-            onViewChange={setView}
           />
           <div className="flex-1 w-full flex flex-col overflow-y-auto">
-            {view === 'chat' ? (
-              <ChatPanel
-                chat={activeChat}
-                onSendMessage={handleSendMessage}
-                onSendSuggestedQuestion={handleSendSuggestedQuestion}
-                selectedModel={selectedModel}
-                onModelChange={setSelectedModel}
-                suggestedQuestions={
-                  activeChat?.messages.length === 1 ? SUGGESTED_QUESTIONS : []
-                }
-                onDeleteAllChats={handleDeleteAllChats}
-                className="flex-1 flex flex-col"
-              />
-            ) : (
-              <DashboardLayout />
-            )}
+            <ChatPanel
+              chat={activeChat}
+              onSendMessage={handleSendMessage}
+              onSendSuggestedQuestion={handleSendSuggestedQuestion}
+              suggestedQuestions={
+                activeChat?.messages.length === 1 ? SUGGESTED_QUESTIONS : []
+              }
+              onDeleteAllChats={handleDeleteAllChats}
+              className="flex-1 flex flex-col"
+            />
           </div>
         </SidebarInset>
       </div>
