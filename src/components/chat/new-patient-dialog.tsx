@@ -50,9 +50,72 @@ interface NewPatientDialogProps {
   onSubmit: (data: PatientData) => void;
 }
 
-const historyChips = ['Hipertensión', 'Diabetes Tipo 2', 'Asma', 'Hipotiroidismo'];
-const medicationChips = ['Losartán 50mg', 'Metformina 850mg', 'Salbutamol', 'Levotiroxina 100mcg'];
-const allergyChips = ['Penicilina', 'Aspirina', 'Mariscos', 'Polen'];
+const historyChips = [
+  'Hipertensión',
+  'Diabetes Tipo 2',
+  'Asma',
+  'Hipotiroidismo',
+  'Dislipidemia',
+  'ERGE',
+  'Ansiedad',
+  'Depresión',
+  'Migraña',
+  'Artritis reumatoide',
+  'Osteoartritis',
+  'Insuficiencia renal crónica',
+  'EPOC',
+  'Fibrilación auricular',
+  'Insuficiencia cardíaca',
+  'Cardiopatía isquémica',
+  'ACV previo',
+  'Cáncer',
+  'Obesidad',
+  'Síndrome de intestino irritable',
+];
+const medicationChips = [
+  'Losartán 50mg',
+  'Metformina 850mg',
+  'Salbutamol',
+  'Levotiroxina 100mcg',
+  'Atorvastatina 20mg',
+  'Omeprazol 20mg',
+  'Sertralina 50mg',
+  'Escitalopram 10mg',
+  'Paracetamol 500mg',
+  'Ibuprofeno 400mg',
+  'Aspirina 100mg',
+  'Clopidogrel 75mg',
+  'Amlodipino 5mg',
+  'Enalapril 10mg',
+  'Furosemida 40mg',
+  'Insulina glargina',
+  'Gabapentina 300mg',
+  'Pregabalina 75mg',
+  'Alprazolam 0.5mg',
+  'Clonazepam 0.5mg',
+];
+const allergyChips = [
+  'Penicilina',
+  'Aspirina',
+  'Mariscos',
+  'Polen',
+  'AINES',
+  'Sulfamidas',
+  'Látex',
+  'Nueces',
+  'Polvo',
+  'Pelo de animal',
+  'Yodo',
+  'Huevos',
+  'Leche',
+  'Soya',
+  'Trigo',
+  'Picadura de abeja',
+  'Codeína',
+  'Morfina',
+  'Anestésicos locales',
+  'Lidocaína',
+];
 
 export function NewPatientDialog({
   isOpen,
