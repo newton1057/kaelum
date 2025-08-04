@@ -4,13 +4,7 @@ import { SidebarTrigger } from '@/components/ui/sidebar';
 import { AppLogo } from './icons';
 import { UserSettingsModal } from './chat/user-settings-modal';
 
-interface AppHeaderProps {
-  onDeleteAllChats: () => void;
-}
-
-export function AppHeader({
-  onDeleteAllChats,
-}: AppHeaderProps) {
+export function AppHeader() {
   return (
     <header className="flex h-14 items-center justify-between border-b bg-background/80 px-4 backdrop-blur-sm">
       <div className="flex items-center gap-2">
@@ -23,7 +17,7 @@ export function AppHeader({
         <AppLogo />
       </div>
       <div className="flex items-center gap-4">
-        <UserSettingsModal onDeleteAllChats={onDeleteAllChats} />
+        <UserSettingsModal />
       </div>
     </header>
   );

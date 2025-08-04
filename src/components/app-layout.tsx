@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { useToast } from '@/hooks/use-toast';
 import ChatPanel from './chat/chat-panel';
 import type { Chat, Message, SuggestedQuestion } from '@/lib/types';
 import { AppHeader } from './app-header';
@@ -32,7 +31,6 @@ export default function AppLayout() {
     initialChats.length > 0 ? initialChats[0].id : null
   );
   const [isNewPatientDialogOpen, setIsNewPatientDialogOpen] = useState(false);
-  const { toast } = useToast();
 
   const activeChat = useMemo(
     () => chats.find((chat) => chat.id === activeChatId),
@@ -182,16 +180,6 @@ export default function AppLayout() {
     }, randomDelay);
   };
 
-  const handleDeleteAllChats = () => {
-    setChats([]);
-    setActiveChatId(null);
-    toast({
-      title: 'Chats eliminados',
-      description: 'Todas tus conversaciones han sido borradas.',
-    });
-    // We don't create a new chat automatically anymore, user must click "New Chat"
-  };
-
   return (
     <SidebarProvider defaultOpen>
       <div className="flex h-screen" style={{ width: '100%' }}>
@@ -202,9 +190,7 @@ export default function AppLayout() {
           onSelectChat={handleSelectChat}
         />
         <SidebarInset className="flex flex-col p-0">
-          <AppHeader
-            onDeleteAllChats={handleDeleteAllChats}
-          />
+          <AppHeader />
           <div className="flex-1 w-full flex flex-col overflow-y-auto">
             <ChatPanel
               chat={activeChat}
@@ -213,7 +199,6 @@ export default function AppLayout() {
               suggestedQuestions={
                 activeChat?.messages.length === 1 ? SUGGESTED_QUESTIONS : []
               }
-              onDeleteAllChats={handleDeleteAllChats}
               className="flex-1 flex flex-col"
             />
           </div>

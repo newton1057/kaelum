@@ -11,7 +11,6 @@ interface ChatPanelProps {
   onSendMessage: (content: string) => void;
   onSendSuggestedQuestion: (question: SuggestedQuestion) => void;
   suggestedQuestions: SuggestedQuestion[];
-  onDeleteAllChats: () => void;
   className?: string;
 }
 
