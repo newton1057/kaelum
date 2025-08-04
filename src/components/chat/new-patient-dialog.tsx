@@ -40,6 +40,8 @@ const patientFormSchema = z.object({
   }),
   age: z.coerce.number().int().positive().optional().or(z.literal('')),
   gender: z.enum(['Masculino', 'Femenino', 'Otro']).optional(),
+  height: z.coerce.number().positive().optional().or(z.literal('')),
+  weight: z.coerce.number().positive().optional().or(z.literal('')),
   medicalHistory: z.string().optional(),
   medications: z.string().optional(),
   allergies: z.string().optional(),
@@ -130,6 +132,9 @@ export function NewPatientDialog({
     defaultValues: {
       name: '',
       age: '',
+      gender: undefined,
+      height: '',
+      weight: '',
       medicalHistory: '',
       medications: '',
       allergies: '',
@@ -169,6 +174,8 @@ export function NewPatientDialog({
       name: values.name,
       age: values.age ? Number(values.age) : undefined,
       gender: values.gender,
+      height: values.height ? Number(values.height) : undefined,
+      weight: values.weight ? Number(values.weight) : undefined,
       medicalHistory: values.medicalHistory,
       medications: values.medications,
       allergies: values.allergies,
@@ -209,7 +216,7 @@ export function NewPatientDialog({
               )}
             />
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <FormField
                 control={form.control}
                 name="age"
@@ -244,6 +251,32 @@ export function NewPatientDialog({
                         <SelectItem value="Otro">Otro</SelectItem>
                       </SelectContent>
                     </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+               <FormField
+                control={form.control}
+                name="height"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Estatura (cm)</FormLabel>
+                    <FormControl>
+                      <Input type="number" placeholder="Ej. 175" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+               <FormField
+                control={form.control}
+                name="weight"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Peso (kg)</FormLabel>
+                    <FormControl>
+                      <Input type="number" placeholder="Ej. 70" {...field} />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}

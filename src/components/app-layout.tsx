@@ -45,8 +45,14 @@ export default function AppLayout() {
 
   const handleNewChat = (patientData: PatientData) => {
     let patientSummary = `Iniciando consulta para **${patientData.name}**.`;
-    if (patientData.age || patientData.gender) {
-      patientSummary += `\n- **Paciente:** ${patientData.age ? `${patientData.age} años` : ''}${patientData.age && patientData.gender ? ', ' : ''}${patientData.gender || ''}`;
+    if (patientData.age || patientData.gender || patientData.height || patientData.weight) {
+      patientSummary += `\n- **Paciente:** `;
+      const details = [];
+      if (patientData.age) details.push(`${patientData.age} años`);
+      if (patientData.gender) details.push(patientData.gender);
+      if (patientData.height) details.push(`${patientData.height} cm`);
+      if (patientData.weight) details.push(`${patientData.weight} kg`);
+      patientSummary += details.join(', ');
     }
     if (patientData.medicalHistory) {
       patientSummary += `\n- **Historial Médico:** ${patientData.medicalHistory}`;

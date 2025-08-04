@@ -29,6 +29,8 @@ export type PatientData = {
   name: string;
   age?: number;
   gender?: 'Masculino' | 'Femenino' | 'Otro';
+  height?: number;
+  weight?: number;
   medicalHistory?: string;
   medications?: string;
   allergies?: string;
