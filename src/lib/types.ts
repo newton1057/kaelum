@@ -24,3 +24,12 @@ export type SuggestedQuestion = {
   reasoning: string;
   answer: string;
 };
+
+export type PatientData = {
+  name: string;
+  age?: number;
+  gender?: 'Masculino' | 'Femenino' | 'Otro';
+  medicalHistory?: string;
+  medications?: string;
+  allergies?: string;
+};

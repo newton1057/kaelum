@@ -11,6 +11,8 @@ import { SidebarProvider, SidebarInset } from './ui/sidebar';
 import ChatSidebar from './chat/chat-sidebar';
 import { v4 as uuidv4 } from 'uuid';
 import { SUGGESTED_QUESTIONS } from '@/lib/questions';
+import { NewPatientDialog } from './chat/new-patient-dialog';
+import type { PatientData } from '@/lib/types';
 
 const initialChats: Chat[] = [
   {
@@ -33,33 +35,49 @@ export default function AppLayout() {
   const [activeChatId, setActiveChatId] = useState<string | null>(
     initialChats.length > 0 ? initialChats[0].id : null
   );
+  const [isNewPatientDialogOpen, setIsNewPatientDialogOpen] = useState(false);
   const { toast } = useToast();
-  
+
   const activeChat = useMemo(
     () => chats.find((chat) => chat.id === activeChatId),
     [chats, activeChatId]
   );
 
-  const handleNewChat = () => {
+  const handleNewChat = (patientData: PatientData) => {
+    let patientSummary = `Iniciando consulta para **${patientData.name}**.`;
+    if (patientData.age || patientData.gender) {
+      patientSummary += `\n- **Paciente:** ${patientData.age ? `${patientData.age} años` : ''}${patientData.age && patientData.gender ? ', ' : ''}${patientData.gender || ''}`;
+    }
+    if (patientData.medicalHistory) {
+      patientSummary += `\n- **Historial Médico:** ${patientData.medicalHistory}`;
+    }
+    if (patientData.medications) {
+      patientSummary += `\n- **Medicamentos Actuales:** ${patientData.medications}`;
+    }
+    if (patientData.allergies) {
+      patientSummary += `\n- **Alergias:** ${patientData.allergies}`;
+    }
+
     const newChat: Chat = {
       id: uuidv4(),
-      title: 'Nueva Conversación',
+      title: `Consulta de ${patientData.name}`,
       messages: [
         {
           id: uuidv4(),
           role: 'bot',
-          content: 'Soy ima. ¡Pregúntame lo que sea!',
+          content: `${patientSummary}\n\n¿En qué puedo ayudarte hoy?`,
         },
       ],
     };
     setChats([newChat, ...chats]);
     setActiveChatId(newChat.id);
+    setIsNewPatientDialogOpen(false);
   };
 
   const handleSelectChat = (chatId: string) => {
     setActiveChatId(chatId);
   };
-  
+
   const addMessageToChat = (chatId: string, message: Message) => {
     setChats((prevChats) =>
       prevChats.map((chat) => {
@@ -114,7 +132,7 @@ export default function AppLayout() {
       addMessageToChat(activeChatId, botMessage);
     }, 1000);
   };
-  
+
   const handleSendSuggestedQuestion = (question: SuggestedQuestion) => {
     if (!activeChatId) return;
 
@@ -134,7 +152,7 @@ export default function AppLayout() {
       isReasoningComplete: false,
     };
     addMessageToChat(activeChatId, botMessage);
-    
+
     // Random delay between 6 to 10 seconds
     const randomDelay = Math.random() * (10000 - 6000) + 6000;
 
@@ -162,7 +180,6 @@ export default function AppLayout() {
     }, randomDelay);
   };
 
-
   const handleDeleteAllChats = () => {
     setChats([]);
     setActiveChatId(null);
@@ -170,9 +187,7 @@ export default function AppLayout() {
       title: 'Chats eliminados',
       description: 'Todas tus conversaciones han sido borradas.',
     });
-     setTimeout(() => {
-      handleNewChat();
-    }, 500);
+    // We don't create a new chat automatically anymore, user must click "New Chat"
   };
 
   return (
@@ -181,7 +196,7 @@ export default function AppLayout() {
         <ChatSidebar
           chats={chats}
           activeChatId={activeChatId}
-          onNewChat={handleNewChat}
+          onNewChat={() => setIsNewPatientDialogOpen(true)}
           onSelectChat={handleSelectChat}
         />
         <SidebarInset className="flex flex-col p-0">
@@ -212,6 +227,11 @@ export default function AppLayout() {
           </div>
         </SidebarInset>
       </div>
+      <NewPatientDialog
+        isOpen={isNewPatientDialogOpen}
+        onOpenChange={setIsNewPatientDialogOpen}
+        onSubmit={handleNewChat}
+      />
     </SidebarProvider>
   );
 }

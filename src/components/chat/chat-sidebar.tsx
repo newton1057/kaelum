@@ -8,6 +8,7 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
+  SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { LogOut, MessageSquare, Plus } from 'lucide-react';
@@ -34,11 +35,11 @@ export default function ChatSidebar({
           <AppLogo />
           <Button variant="ghost" size="icon" onClick={onNewChat}>
             <Plus />
-            <span className="sr-only">Nuevo Chat</span>
+            <span className="sr-only">Nueva Consulta</span>
           </Button>
         </div>
       </SidebarHeader>
-      <SidebarContent className="px-2 overflow-y-hidden">
+      <SidebarContent className="px-2">
         <SidebarMenu>
           {chats.map((chat) => (
             <SidebarMenuItem key={chat.id}>
