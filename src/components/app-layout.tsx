@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo } from 'react';
@@ -11,19 +12,7 @@ import { SUGGESTED_QUESTIONS } from '@/lib/questions';
 import { NewPatientDialog } from './chat/new-patient-dialog';
 import type { PatientData } from '@/lib/types';
 
-const initialChats: Chat[] = [
-  {
-    id: '1',
-    title: 'Demo',
-    messages: [
-      {
-        id: '1-1',
-        role: 'bot',
-        content: '¡Hola! Soy ima. ¿Cómo puedo ayudarte hoy?',
-      },
-    ],
-  },
-];
+const initialChats: Chat[] = [];
 
 export default function AppLayout() {
   const [chats, setChats] = useState<Chat[]>(initialChats);
