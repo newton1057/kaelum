@@ -42,7 +42,7 @@ export default function AppLayout() {
            throw new Error(`HTTP error! status: ${res.status}`);
         }
         const sessions = await res.json();
-        alert('Sesiones obtenidas: ' + JSON.stringify(sessions, null, 2));
+        // alert('Sesiones obtenidas: ' + JSON.stringify(sessions, null, 2));
         
         const loadedChats: Chat[] = sessions.map(transformSessionToChat);
         setChats(loadedChats);
@@ -74,6 +74,8 @@ export default function AppLayout() {
       data: patientData
     }
 
+    // alert(JSON.stringify(dataToSend, null, 2));
+    
     const response = await fetch('http://127.0.0.1:5001/chat/start', {
       method: 'POST',
       headers: {
@@ -82,7 +84,6 @@ export default function AppLayout() {
       body: JSON.stringify(dataToSend),
     });
 
-    alert(JSON.stringify(dataToSend, null, 2));
 
     const result = await response.json();
     const data = result.data;
@@ -171,15 +172,23 @@ export default function AppLayout() {
       role: 'user',
       content,
     };
-
     addMessageToChat(activeChatId, userMessage);
+
+    const botLoadingMessageId = uuidv4();
+    const botLoadingMessage: Message = {
+      id: botLoadingMessageId,
+      role: 'bot',
+      content: '',
+      isLoading: true,
+    };
+    addMessageToChat(activeChatId, botLoadingMessage);
 
     const dataToSend = {
       session_id: activeChatId,
       msg: content,
     };
 
-    alert(JSON.stringify(dataToSend, null, 2));
+    // alert(JSON.stringify(dataToSend, null, 2));
 
     const response = await fetch('http://127.0.0.1:5001/chat/message', {
       method: 'POST',
@@ -190,7 +199,10 @@ export default function AppLayout() {
     });
 
     if (!response.ok) {
-      console.error('Error sending message:', response.statusText);
+      updateMessageInChat(activeChatId, botLoadingMessageId, { 
+        content: 'Hubo un error al procesar tu solicitud. Por favor, intenta de nuevo.',
+        isLoading: false,
+      });
       return;
     }
 
@@ -199,31 +211,27 @@ export default function AppLayout() {
 
     const botResponseText = result.messages[result.messages.length - 1].text;
 
-    const botMessageId = uuidv4();
-    const botMessage: Message = {
-      id: botMessageId,
-      role: 'bot',
-      content: '',
-      isReasoningComplete: false, // Use content to stream response
-    };
-    addMessageToChat(activeChatId, botMessage);
-
+    updateMessageInChat(activeChatId, botLoadingMessageId, {
+      isLoading: false,
+      isReasoningComplete: false,
+    });
+    
     let currentText = '';
     let charIndex = 0;
     const interval = setInterval(() => {
       if (charIndex < botResponseText.length) {
         currentText += botResponseText.charAt(charIndex);
-        updateMessageInChat(activeChatId, botMessageId, {
+        updateMessageInChat(activeChatId, botLoadingMessageId, {
           content: currentText,
         });
         charIndex++;
       } else {
         clearInterval(interval);
-        updateMessageInChat(activeChatId, botMessageId, {
-          isReasoningComplete: true, // Or some other flag to indicate completion
+        updateMessageInChat(activeChatId, botLoadingMessageId, {
+          isReasoningComplete: true, 
         });
       }
-    }, 25); // Interval per character
+    }, 25); 
   };
 
   const handleSendSuggestedQuestion = (question: SuggestedQuestion) => {

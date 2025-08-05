@@ -5,6 +5,7 @@ export type Message = {
   reasoning?: string;
   isReasoningComplete?: boolean;
   timestamp?: number;
+  isLoading?: boolean;
 };
 
 export type Chat = {

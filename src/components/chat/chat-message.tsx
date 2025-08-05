@@ -23,6 +23,25 @@ export default function ChatMessage({ message }: ChatMessageProps) {
   const isUser = message.role === 'user';
   const showReasoning = message.reasoning !== undefined;
 
+  const LoadingIndicator = () => (
+    <div className="flex items-start gap-4">
+      <BotAvatar />
+      <div className={cn('flex flex-col items-start')}>
+        <div
+          className={cn(
+            'max-w-md rounded-2xl p-4 shadow-sm',
+            'rounded-bl-none bg-muted text-muted-foreground'
+          )}
+        >
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Loader className="animate-spin" size={16} />
+            <span>Razonamiento...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   const ReasoningSection = () => {
     if (!showReasoning) return null;
 
@@ -76,6 +95,10 @@ export default function ChatMessage({ message }: ChatMessageProps) {
     );
   };
 
+  if (message.isLoading) {
+    return <LoadingIndicator />;
+  }
+  
   return (
     <div
       className={cn(
