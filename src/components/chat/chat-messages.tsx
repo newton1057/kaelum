@@ -8,17 +8,22 @@ import { AppLogo } from '../icons';
 
 interface ChatMessagesProps {
   messages: Message[];
+  activeChatId: string | null;
 }
 
-export default function ChatMessages({ messages }: ChatMessagesProps) {
+export default function ChatMessages({ messages, activeChatId }: ChatMessagesProps) {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (viewportRef.current) {
-      viewportRef.current.scrollTop = viewportRef.current.scrollHeight;
+        setTimeout(() => {
+            if (viewportRef.current) {
+                viewportRef.current.scrollTop = viewportRef.current.scrollHeight;
+            }
+        }, 0);
     }
-  }, [messages]);
+  }, [messages, activeChatId]);
 
   return (
     <ScrollArea className="h-full" ref={scrollAreaRef} viewportRef={viewportRef}>

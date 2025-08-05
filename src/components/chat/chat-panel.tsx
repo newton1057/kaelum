@@ -24,7 +24,7 @@ export default function ChatPanel({
   return (
     <div className={cn('flex flex-col h-full', className)}>
       <div className="flex-1">
-        <ChatMessages messages={chat?.messages ?? []} />
+        <ChatMessages messages={chat?.messages ?? []} activeChatId={chat?.id ?? null} />
       </div>
       <div className="border-t">
         <div className="w-full p-4">
