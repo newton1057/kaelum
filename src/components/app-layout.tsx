@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import ChatPanel from './chat/chat-panel';
 import type { Chat, Message, SuggestedQuestion } from '@/lib/types';
 import { AppHeader } from './app-header';
@@ -11,15 +11,58 @@ import { v4 as uuidv4 } from 'uuid';
 import { SUGGESTED_QUESTIONS } from '@/lib/questions';
 import { NewPatientDialog } from './chat/new-patient-dialog';
 import type { PatientData } from '@/lib/types';
+import { useToast } from '@/hooks/use-toast';
 
 const initialChats: Chat[] = [];
 
+function transformSessionToChat(session: any): Chat {
+  return {
+    id: session.session_id,
+    title: session.data?.name ? `Consulta de ${session.data.name}` : `Chat ${new Date(session.created_at * 1000).toLocaleString()}`,
+    messages: session.messages.map((msg: any, idx: number) => ({
+      id: `${session.session_id}-${idx}`,
+      role: msg.sender === 'model' ? 'bot' : 'user',
+      content: msg.text,
+      timestamp: msg.timestamp,
+    })),
+  };
+}
+
 export default function AppLayout() {
   const [chats, setChats] = useState<Chat[]>(initialChats);
-  const [activeChatId, setActiveChatId] = useState<string | null>(
-    initialChats.length > 0 ? initialChats[0].id : null
-  );
+  const [activeChatId, setActiveChatId] = useState<string | null>(null);
   const [isNewPatientDialogOpen, setIsNewPatientDialogOpen] = useState(false);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const fetchChats = async () => {
+      try {
+        const res = await fetch('http://127.0.0.1:5001/chat/sessions');
+        if (!res.ok) {
+           throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        const sessions = await res.json();
+        alert('Sesiones obtenidas: ' + JSON.stringify(sessions, null, 2));
+        
+        const loadedChats: Chat[] = sessions.map(transformSessionToChat);
+        setChats(loadedChats);
+
+        if (loadedChats.length > 0) {
+          setActiveChatId(loadedChats[0].id);
+        }
+      } catch (error) {
+        console.error('Error loading chats:', error);
+        toast({
+          title: 'Error al cargar las conversaciones',
+          description: 'No se pudieron cargar los chats desde el servidor.',
+          variant: 'destructive',
+        });
+      }
+    };
+
+    fetchChats();
+  }, [toast]);
+
 
   const activeChat = useMemo(
     () => chats.find((chat) => chat.id === activeChatId),

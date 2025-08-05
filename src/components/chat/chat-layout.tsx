@@ -1,7 +1,8 @@
+
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import type { Chat, Message, Model, SuggestedQuestion } from '@/lib/types';
+import type { Chat, Message, SuggestedQuestion } from '@/lib/types';
 import { v4 as uuidv4 } from 'uuid';
 import ChatSidebar from './chat-sidebar';
 import ChatPanel from './chat-panel';
@@ -22,50 +23,12 @@ const initialChats: Chat[] = [
   },
 ];
 
-function transformSessionToChat(session): Chat {
-  return {
-    id: session.session_id,
-    title: `Chat ${new Date(session.created_at * 1000).toLocaleString()}`,
-    messages: session.messages.map((msg, idx) => ({
-      id: `${session.session_id}-${idx}`,
-      role: msg.sender === 'model' ? 'bot' : 'user',
-      content: msg.text,
-      timestamp: msg.timestamp,
-    })),
-  };
-}
-
-export default function ChatLayout({ selectedModel, onModelChange, onDeleteAllChats }) {
+export default function ChatLayout({ onDeleteAllChats }) {
   console.log('El componente ChatLayout se está renderizando.'); 
   const [chats, setChats] = useState<Chat[]>(initialChats);
   const [activeChatId, setActiveChatId] = useState<string | null>(
     initialChats.length > 0 ? initialChats[0].id : null
   );
-
-  useEffect(() => {
-    console.log('useEffect ejecutado');
-    const fetchChats = async () => {
-      try {
-        const res = await fetch('http://127.0.0.1:5001/chat/sessions');
-        const sessions = await res.json();
-        console.log('Sesiones obtenidas:', sessions);
-        const loadedChats: Chat[] = sessions.map(transformSessionToChat);
-        setChats(loadedChats);
-        if (loadedChats.length > 0) {
-          setActiveChatId(loadedChats[0].id);
-        }
-      } catch (error) {
-        toast({
-          title: 'Error al cargar las conversaciones',
-          description: 'No se pudieron cargar los chats desde el servidor.',
-          variant: 'destructive',
-        });
-        console.error('Error loading chats:', error);
-      }
-    };
-
-    fetchChats();
-  }, []);
 
   const { toast } = useToast();
 
@@ -143,7 +106,7 @@ export default function ChatLayout({ selectedModel, onModelChange, onDeleteAllCh
       const botMessage: Message = {
         id: uuidv4(),
         role: 'bot',
-        content: `Esta es una respuesta simulada de ${selectedModel.name} a: "${content}". Una IA real proporcionaría una respuesta más útil.`,
+        content: `Esta es una respuesta simulada a: "${content}". Una IA real proporcionaría una respuesta más útil.`,
       };
       addMessageToChat(activeChatId, botMessage);
     }, 1000);
@@ -215,12 +178,9 @@ export default function ChatLayout({ selectedModel, onModelChange, onDeleteAllCh
         chat={activeChat}
         onSendMessage={handleSendMessage}
         onSendSuggestedQuestion={handleSendSuggestedQuestion}
-        selectedModel={selectedModel}
-        onModelChange={onModelChange}
         suggestedQuestions={
           activeChat?.messages.length === 1 ? SUGGESTED_QUESTIONS : []
         }
-        onDeleteAllChats={handleDeleteAllLocalChats}
       />
     </>
   );

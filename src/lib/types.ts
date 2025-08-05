@@ -4,6 +4,7 @@ export type Message = {
   content: string;
   reasoning?: string;
   isReasoningComplete?: boolean;
+  timestamp?: number;
 };
 
 export type Chat = {
