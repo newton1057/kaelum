@@ -17,7 +17,11 @@ export default function ChatMessages({ messages, activeChatId }: ChatMessagesPro
 
   useEffect(() => {
     if (viewportRef.current) {
-      viewportRef.current.scrollTop = viewportRef.current.scrollHeight;
+      setTimeout(() => {
+        if (viewportRef.current) {
+          viewportRef.current.scrollTop = viewportRef.current.scrollHeight;
+        }
+      }, 0);
     }
   }, [messages, activeChatId]);
 
