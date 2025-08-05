@@ -165,7 +165,6 @@ export default function AppLayout() {
 
   const handleSendMessage = async (content: string) => {
     if (!activeChatId) return;
-    
 
     const userMessage: Message = {
       id: uuidv4(),
@@ -198,19 +197,33 @@ export default function AppLayout() {
     const result = await response.json();
     console.log('Response from server:', result);
 
-    const messages = result.messages;
+    const botResponseText = result.messages[result.messages.length - 1].text;
 
-    
+    const botMessageId = uuidv4();
+    const botMessage: Message = {
+      id: botMessageId,
+      role: 'bot',
+      content: '',
+      isReasoningComplete: false, // Use content to stream response
+    };
+    addMessageToChat(activeChatId, botMessage);
 
-    // Mock AI response
-    setTimeout(() => {
-      const botMessage: Message = {
-        id: uuidv4(),
-        role: 'bot',
-        content: messages[messages.length - 1].text,
-      };
-      addMessageToChat(activeChatId, botMessage);
-    }, 1000);
+    let currentText = '';
+    let charIndex = 0;
+    const interval = setInterval(() => {
+      if (charIndex < botResponseText.length) {
+        currentText += botResponseText.charAt(charIndex);
+        updateMessageInChat(activeChatId, botMessageId, {
+          content: currentText,
+        });
+        charIndex++;
+      } else {
+        clearInterval(interval);
+        updateMessageInChat(activeChatId, botMessageId, {
+          isReasoningComplete: true, // Or some other flag to indicate completion
+        });
+      }
+    }, 25); // Interval per character
   };
 
   const handleSendSuggestedQuestion = (question: SuggestedQuestion) => {
