@@ -27,6 +27,11 @@ export default function AppLayout() {
   );
 
   const handleNewChat = (patientData: PatientData) => {
+    const dataToSend = {
+      data: patientData
+    }
+    alert(JSON.stringify(dataToSend, null, 2));
+
     let patientSummary = `Iniciando consulta para **${patientData.name}**.`;
     if (patientData.age || patientData.gender || patientData.height || patientData.weight) {
       patientSummary += `\n- **Paciente:** `;
