@@ -26,12 +26,25 @@ export default function AppLayout() {
     [chats, activeChatId]
   );
 
-  const handleNewChat = (patientData: PatientData) => {
+  const handleNewChat = async (patientData: PatientData) => {
     const dataToSend = {
       data: patientData
     }
+
+    const response = await fetch('http://127.0.0.1:5001/chat/start', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(dataToSend),
+    });
+
     alert(JSON.stringify(dataToSend, null, 2));
 
+    const result = await response.json();
+    const data = result.data;
+    console.log('Response from server:', data);
+    
     let patientSummary = `Iniciando consulta para **${patientData.name}**.`;
     if (patientData.age || patientData.gender || patientData.height || patientData.weight) {
       patientSummary += `\n- **Paciente:** `;
@@ -53,7 +66,7 @@ export default function AppLayout() {
     }
 
     const newChat: Chat = {
-      id: uuidv4(),
+      id: result.session_id,
       title: `Consulta de ${patientData.name}`,
       messages: [
         {
@@ -63,6 +76,7 @@ export default function AppLayout() {
         },
       ],
     };
+
     setChats([newChat, ...chats]);
     setActiveChatId(newChat.id);
     setIsNewPatientDialogOpen(false);
@@ -106,29 +120,51 @@ export default function AppLayout() {
     );
   };
 
-  const handleSendMessage = (content: string) => {
+  const handleSendMessage = async (content: string) => {
     if (!activeChatId) return;
-
-    const dataToSend = {
-      session_id: activeChatId,
-      msg: content,
-    };
-    alert(JSON.stringify(dataToSend, null, 2));
-
+    
 
     const userMessage: Message = {
       id: uuidv4(),
       role: 'user',
       content,
     };
+
     addMessageToChat(activeChatId, userMessage);
+
+    const dataToSend = {
+      session_id: activeChatId,
+      msg: content,
+    };
+
+    alert(JSON.stringify(dataToSend, null, 2));
+
+    const response = await fetch('http://127.0.0.1:5001/chat/message', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(dataToSend),
+    });
+
+    if (!response.ok) {
+      console.error('Error sending message:', response.statusText);
+      return;
+    }
+
+    const result = await response.json();
+    console.log('Response from server:', result);
+
+    const messages = result.messages;
+
+    
 
     // Mock AI response
     setTimeout(() => {
       const botMessage: Message = {
         id: uuidv4(),
         role: 'bot',
-        content: `Esta es una respuesta simulada de ima a: "${content}". Una IA real proporcionaría una respuesta más útil.`,
+        content: messages[messages.length - 1].text,
       };
       addMessageToChat(activeChatId, botMessage);
     }, 1000);
@@ -142,6 +178,7 @@ export default function AppLayout() {
       role: 'user',
       content: question.question,
     };
+
     addMessageToChat(activeChatId, userMessage);
 
     const botMessageId = uuidv4();
