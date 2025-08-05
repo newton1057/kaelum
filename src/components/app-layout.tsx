@@ -109,6 +109,13 @@ export default function AppLayout() {
   const handleSendMessage = (content: string) => {
     if (!activeChatId) return;
 
+    const dataToSend = {
+      session_id: activeChatId,
+      msg: content,
+    };
+    alert(JSON.stringify(dataToSend, null, 2));
+
+
     const userMessage: Message = {
       id: uuidv4(),
       role: 'user',
