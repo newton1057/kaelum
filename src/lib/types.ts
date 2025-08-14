@@ -6,6 +6,12 @@ export type Message = {
   isReasoningComplete?: boolean;
   timestamp?: number;
   isLoading?: boolean;
+  attachment?: {
+    name: string;
+    contentType: string;
+    size: number;
+    url: string;
+  };
 };
 
 export type Chat = {

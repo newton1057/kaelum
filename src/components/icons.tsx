@@ -1,4 +1,4 @@
-import { BrainCircuit } from 'lucide-react';
+import { BrainCircuit, File } from 'lucide-react';
 import type { SVGProps } from 'react';
 import Image from 'next/image';
 
@@ -20,4 +20,8 @@ export function AppLogo() {
       className="h-8 w-8"
     />
   );
+}
+
+export function FileIcon(props: SVGProps<SVGSVGElement>) {
+  return <File {...props} />;
 }

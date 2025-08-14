@@ -2,7 +2,7 @@
 
 import { cn } from '@/lib/utils';
 import type { Message } from '@/lib/types';
-import { BotAvatar } from '../icons';
+import { BotAvatar, FileIcon } from '../icons';
 import { User, Loader, ChevronDown, ChevronUp } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/accordion';
 import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import Image from 'next/image';
 
 interface ChatMessageProps {
   message: Message;
@@ -94,6 +95,43 @@ export default function ChatMessage({ message }: ChatMessageProps) {
       </Accordion>
     );
   };
+  
+  const AttachmentSection = () => {
+    if (!message.attachment) return null;
+
+    const { url, name, contentType } = message.attachment;
+    const isImage = contentType.startsWith('image/');
+
+    return (
+      <div className="mt-2">
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block max-w-md"
+        >
+          <Card className="overflow-hidden transition-colors hover:bg-muted/50">
+            {isImage ? (
+              <Image
+                src={url}
+                alt={name}
+                width={300}
+                height={200}
+                className="w-full h-auto object-cover"
+              />
+            ) : (
+              <CardHeader className="flex flex-row items-center gap-4 p-4">
+                <FileIcon className="h-8 w-8 text-muted-foreground" />
+                <div className="truncate">
+                  <CardTitle className="text-sm font-medium">{name}</CardTitle>
+                </div>
+              </CardHeader>
+            )}
+          </Card>
+        </a>
+      </div>
+    );
+  };
 
   if (message.isLoading) {
     return <LoadingIndicator />;
@@ -132,6 +170,7 @@ export default function ChatMessage({ message }: ChatMessageProps) {
           </div>
         </div>
         {!isUser && <ReasoningSection />}
+        <AttachmentSection />
       </div>
       {isUser && (
         <Avatar className="h-10 w-10 shrink-0">

@@ -24,6 +24,7 @@ function transformSessionToChat(session: any): Chat {
       role: msg.sender === 'model' ? 'bot' : 'user',
       content: msg.text,
       timestamp: msg.timestamp,
+      attachment: msg.attachment,
     })),
   };
 }
@@ -169,6 +170,15 @@ export default function AppLayout() {
       role: 'user',
       content,
     };
+    if (file) {
+      userMessage.attachment = {
+        name: file.name,
+        contentType: file.type,
+        size: file.size,
+        url: URL.createObjectURL(file), // Create a temporary URL for preview
+      };
+    }
+
     addMessageToChat(activeChatId, userMessage);
 
     const botLoadingMessageId = uuidv4();
@@ -208,10 +218,12 @@ export default function AppLayout() {
     console.log('Response from server:', result);
 
     const botResponseText = result.messages[result.messages.length - 1].text;
+    const botAttachment = result.messages[result.messages.length - 1].attachment;
 
     updateMessageInChat(chatId, loadingMessageId, {
       isLoading: false,
       isReasoningComplete: false,
+      attachment: botAttachment,
     });
     
     let currentText = '';
