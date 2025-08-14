@@ -1,9 +1,10 @@
+
 'use client';
 
 import { useState, useRef, type FormEvent } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { SendHorizontal } from 'lucide-react';
+import { SendHorizontal, Paperclip } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface MessageInputProps {
@@ -45,13 +46,22 @@ export default function MessageInput({ onSendMessage }: MessageInputProps) {
       onSubmit={handleSubmit}
       className="relative flex w-full items-end gap-2"
     >
+      <Button
+        type="button"
+        size="icon"
+        variant="ghost"
+        className="absolute bottom-2 left-2 h-9 w-9 text-muted-foreground hover:bg-primary/10 hover:text-primary"
+      >
+        <Paperclip />
+        <span className="sr-only">Adjuntar archivo</span>
+      </Button>
       <Textarea
         ref={textareaRef}
         value={inputValue}
         onInput={handleInputChange}
         onKeyDown={handleKeyDown}
         placeholder="Pregúntale a ima..."
-        className="max-h-48 min-h-12 resize-none overflow-y-auto rounded-2xl border-2 border-border bg-background pr-12"
+        className="max-h-48 min-h-12 resize-none overflow-y-auto rounded-2xl border-2 border-border bg-background pl-12 pr-12"
         rows={1}
       />
       <Button
