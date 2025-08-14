@@ -14,7 +14,7 @@ export function AppLogo() {
   return (
     <Image
       src="https://firebasestorage.googleapis.com/v0/b/aurora-4e980.appspot.com/o/resourcesPDFima%2Fisotipo.png?alt=media&token=9e26011a-0031-42ba-a365-f6f025b0690e"
-      alt="ima logo"
+      alt="Kaelum logo"
       width={32}
       height={32}
       className="h-8 w-8"

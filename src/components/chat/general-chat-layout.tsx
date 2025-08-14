@@ -88,7 +88,7 @@ export default function GeneralChatLayout() {
         {
           id: uuidv4(),
           role: 'bot',
-          content: 'Soy ima. ¡Pregúntame lo que sea!',
+          content: 'Soy Kaelum. ¡Pregúntame lo que sea!',
         },
       ],
       mode: 'general',

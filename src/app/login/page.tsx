@@ -44,7 +44,7 @@ export default function LoginPage() {
             <div className="mx-auto mb-4">
               <AppLogo />
             </div>
-            <CardTitle>Bienvenido a ima Sierra</CardTitle>
+            <CardTitle>Bienvenido a Kaelum</CardTitle>
             <CardDescription>
               Ingresa tu PIN de 6 dígitos para continuar.
             </CardDescription>
