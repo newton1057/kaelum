@@ -101,7 +101,6 @@ export default function ChatMessage({ message }: ChatMessageProps) {
 
     const { url, name, contentType } = message.attachment;
     const isImage = contentType.startsWith('image/');
-    const isPdf = contentType === 'application/pdf';
 
     return (
       <div className="mt-2">
@@ -117,15 +116,6 @@ export default function ChatMessage({ message }: ChatMessageProps) {
                   className="w-full h-auto object-cover"
                 />
               </a>
-            ) : isPdf ? (
-              <div className="aspect-[4/5] w-full">
-                <iframe
-                  src={url}
-                  title={name}
-                  className="w-full h-full"
-                  frameBorder="0"
-                />
-              </div>
             ) : (
               <a href={url} target="_blank" rel="noopener noreferrer">
                 <CardHeader className="flex flex-row items-center gap-4 p-4">
