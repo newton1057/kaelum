@@ -20,6 +20,7 @@ function transformSessionToChat(session: any): Chat {
       content: msg.text,
       timestamp: msg.timestamp,
     })),
+    mode: 'general',
   };
 }
 
@@ -89,6 +90,7 @@ export default function GeneralChatLayout() {
           content: 'Soy ima. ¡Pregúntame lo que sea!',
         },
       ],
+      mode: 'general',
     };
 
     setChats([newChat, ...chats]);

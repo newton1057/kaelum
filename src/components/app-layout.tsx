@@ -42,7 +42,6 @@ export default function AppLayout() {
            throw new Error(`HTTP error! status: ${res.status}`);
         }
         const result = await res.json();
-        alert('Sesiones obtenidas: ' + JSON.stringify(result, null, 2));
         
         const loadedChats: Chat[] = result.sessions.map(transformSessionToChat);
         setChats(loadedChats);
@@ -73,8 +72,6 @@ export default function AppLayout() {
     const dataToSend = {
       data: patientData
     }
-
-    // alert(JSON.stringify(dataToSend, null, 2));
     
     const response = await fetch('https://kaelumapi-703555916890.northamerica-south1.run.app/chat/start', {
       method: 'POST',
@@ -188,8 +185,6 @@ export default function AppLayout() {
       msg: content,
     };
 
-    // alert(JSON.stringify(dataToSend, null, 2));
-
     const response = await fetch('https://kaelumapi-703555916890.northamerica-south1.run.app/chat/message', {
       method: 'POST',
       headers: {
@@ -227,7 +222,7 @@ export default function AppLayout() {
         charIndex++;
       } else {
         clearInterval(interval);
-        updateMessageIn-Chat(activeChatId, botLoadingMessageId, {
+        updateMessageInChat(activeChatId, botLoadingMessageId, {
           isReasoningComplete: true, 
         });
       }

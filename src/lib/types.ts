@@ -12,6 +12,7 @@ export type Chat = {
   id: string;
   title: string;
   messages: Message[];
+  mode?: 'general' | 'patient';
 };
 
 export type SuggestedQuestion = {

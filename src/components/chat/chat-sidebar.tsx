@@ -45,10 +45,9 @@ export default function ChatSidebar({
   
   const isGeneralChat = pathname.startsWith('/general');
 
-  const consultationChats = chats.filter(chat => !chat.title.startsWith('General'));
-  const generalChats = chats.filter(chat => chat.title.startsWith('General'));
-  
-  const displayedChats = isGeneralChat ? generalChats : consultationChats;
+  const displayedChats = isGeneralChat 
+    ? chats.filter(chat => chat.mode === 'general')
+    : chats.filter(chat => chat.mode !== 'general');
 
   return (
     <Sidebar>
