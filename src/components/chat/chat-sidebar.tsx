@@ -10,10 +10,10 @@ import {
   SidebarMenuButton,
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
-import { LogOut, MessageSquare, Plus } from 'lucide-react';
+import { LogOut, MessageSquare, Plus, LayoutDashboard } from 'lucide-react';
 import type { Chat } from '@/lib/types';
 import { AppLogo } from '../icons';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 
 
@@ -31,6 +31,7 @@ export default function ChatSidebar({
   onSelectChat,
 }: ChatSidebarProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const { toast } = useToast();
 
   const handleLogout = () => {
@@ -54,6 +55,28 @@ export default function ChatSidebar({
         </div>
       </SidebarHeader>
       <SidebarContent className="px-2">
+         <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              onClick={() => router.push('/dashboard')}
+              isActive={pathname === '/dashboard'}
+              className="w-full justify-start"
+            >
+              <LayoutDashboard />
+              <span>Dashboard</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              onClick={() => router.push('/chat')}
+              isActive={pathname.startsWith('/chat')}
+              className="w-full justify-start"
+            >
+              <MessageSquare />
+              <span>Consultas</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
         <SidebarMenu>
           {chats.map((chat) => (
             <SidebarMenuItem key={chat.id}>

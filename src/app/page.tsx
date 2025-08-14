@@ -9,7 +9,7 @@ export default function Home() {
   useEffect(() => {
     const isAuthenticated = localStorage.getItem('isAuthenticated');
     if (isAuthenticated) {
-      router.replace('/chat');
+      router.replace('/dashboard');
     } else {
       router.replace('/login');
     }
