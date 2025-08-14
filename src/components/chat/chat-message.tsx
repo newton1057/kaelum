@@ -101,34 +101,43 @@ export default function ChatMessage({ message }: ChatMessageProps) {
 
     const { url, name, contentType } = message.attachment;
     const isImage = contentType.startsWith('image/');
+    const isPdf = contentType === 'application/pdf';
 
     return (
       <div className="mt-2">
-        <a
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="block max-w-md"
-        >
+        <div className="block max-w-md">
           <Card className="overflow-hidden transition-colors hover:bg-muted/50">
             {isImage ? (
-              <Image
-                src={url}
-                alt={name}
-                width={300}
-                height={200}
-                className="w-full h-auto object-cover"
-              />
+              <a href={url} target="_blank" rel="noopener noreferrer">
+                <Image
+                  src={url}
+                  alt={name}
+                  width={300}
+                  height={200}
+                  className="w-full h-auto object-cover"
+                />
+              </a>
+            ) : isPdf ? (
+              <div className="aspect-[4/5] w-full">
+                <iframe
+                  src={url}
+                  title={name}
+                  className="w-full h-full"
+                  frameBorder="0"
+                />
+              </div>
             ) : (
-              <CardHeader className="flex flex-row items-center gap-4 p-4">
-                <FileIcon className="h-8 w-8 text-muted-foreground" />
-                <div className="truncate">
-                  <CardTitle className="text-sm font-medium">{name}</CardTitle>
-                </div>
-              </CardHeader>
+              <a href={url} target="_blank" rel="noopener noreferrer">
+                <CardHeader className="flex flex-row items-center gap-4 p-4">
+                  <FileIcon className="h-8 w-8 text-muted-foreground" />
+                  <div className="truncate">
+                    <CardTitle className="text-sm font-medium">{name}</CardTitle>
+                  </div>
+                </CardHeader>
+              </a>
             )}
           </Card>
-        </a>
+        </div>
       </div>
     );
   };
