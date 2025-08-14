@@ -14,9 +14,10 @@ import { useRouter } from 'next/navigation';
 const initialChats: Chat[] = [];
 
 function transformSessionToChat(session: any): Chat {
+  const patientName = session.data?.name || session.data?.full_name;
   return {
     id: session.session_id,
-    title: session.data?.name ? `Consulta de ${session.data.name}` : `Chat ${new Date(session.created_at * 1000).toLocaleString()}`,
+    title: patientName ? `Consulta de ${patientName}` : `Chat ${new Date(session.created_at * 1000).toLocaleString()}`,
     messages: session.messages.map((msg: any, idx: number) => ({
       id: `${session.session_id}-${idx}`,
       role: msg.sender === 'model' ? 'bot' : 'user',
