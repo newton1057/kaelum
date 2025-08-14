@@ -10,7 +10,7 @@ import {
   SidebarMenuButton,
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
-import { LogOut, MessageSquare, Plus, LayoutDashboard } from 'lucide-react';
+import { LogOut, MessageSquare, Plus, LayoutDashboard, MessageCircle } from 'lucide-react';
 import type { Chat } from '@/lib/types';
 import { AppLogo } from '../icons';
 import { useRouter, usePathname } from 'next/navigation';
@@ -74,6 +74,16 @@ export default function ChatSidebar({
             >
               <MessageSquare />
               <span>Consultas</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+           <SidebarMenuItem>
+            <SidebarMenuButton
+              onClick={() => router.push('/general')}
+              isActive={pathname.startsWith('/general')}
+              className="w-full justify-start"
+            >
+              <MessageCircle />
+              <span>Chat General</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

@@ -55,13 +55,47 @@ export default function DashboardLayout({
     fetchChats();
   }, []);
 
-  const handleNewChat = async (patientData: PatientData) => {
-    // ... same as in app-layout ...
+  const handleNewChat = () => {
+    // For dashboard, new chat should probably open the dialog, 
+    // which is handled by onNewChat in the sidebar
+     router.push('/chat');
+     // We can't directly open the dialog here as it belongs to AppLayout.
+     // A better approach would be to use a global state manager, but for now
+     // redirecting to the chat page where a new chat can be created is a
+     // reasonable UX. Or, we can just trigger the dialog if we move the dialog logic up.
+     // For now, let's keep it simple. The user can click "New Chat" on the /chat page.
+     // The button in the sidebar now has a single responsibility.
+     setIsNewPatientDialogOpen(true);
   };
 
   const handleSelectChat = (chatId: string) => {
     setActiveChatId(chatId);
     router.push('/chat');
+  };
+  
+  const handleNewPatientChat = async (patientData: PatientData) => {
+    const dataToSend = {
+      data: patientData
+    }
+    
+    const response = await fetch('https://kaelumapi-703555916890.northamerica-south1.run.app/chat/start', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(dataToSend),
+    });
+
+
+    const result = await response.json();
+    const newChatId = result.session_id;
+
+    // After creating, redirect to chat page and let it handle the new chat.
+    // A more robust solution might use global state (Context/Redux)
+    // to update the chat list across layouts.
+    // For now, we fetch chats again on the chat page.
+    router.push('/chat');
+    setIsNewPatientDialogOpen(false);
   };
 
   return (
@@ -83,7 +117,7 @@ export default function DashboardLayout({
       <NewPatientDialog
         isOpen={isNewPatientDialogOpen}
         onOpenChange={setIsNewPatientDialogOpen}
-        onSubmit={handleNewChat}
+        onSubmit={handleNewPatientChat}
       />
     </SidebarProvider>
   );
