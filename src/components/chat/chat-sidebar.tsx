@@ -42,6 +42,13 @@ export default function ChatSidebar({
     });
     router.push('/login');
   };
+  
+  const isGeneralChat = pathname.startsWith('/general');
+
+  const consultationChats = chats.filter(chat => !chat.title.startsWith('General'));
+  const generalChats = chats.filter(chat => chat.title.startsWith('General'));
+  
+  const displayedChats = isGeneralChat ? generalChats : consultationChats;
 
   return (
     <Sidebar>
@@ -88,7 +95,7 @@ export default function ChatSidebar({
           </SidebarMenuItem>
         </SidebarMenu>
         <SidebarMenu>
-          {chats.map((chat) => (
+          {displayedChats.map((chat) => (
             <SidebarMenuItem key={chat.id}>
               <SidebarMenuButton
                 onClick={() => onSelectChat(chat.id)}

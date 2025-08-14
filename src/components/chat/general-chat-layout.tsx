@@ -1,42 +1,87 @@
 
 'use client';
 
-import { useState, useMemo } from 'react';
-import type { Chat, Message } from '@/lib/types';
+import { useState, useMemo, useEffect } from 'react';
+import type { Chat, Message, PatientData } from '@/lib/types';
 import { v4 as uuidv4 } from 'uuid';
 import ChatSidebar from './chat-sidebar';
 import ChatPanel from './chat-panel';
 import { SidebarProvider, SidebarInset } from '../ui/sidebar';
 import { AppHeader } from '../app-header';
+import { useToast } from '@/hooks/use-toast';
 
-const initialChats: Chat[] = [
-  {
-    id: 'general-1',
-    title: 'General Chat',
-    messages: [
-      {
-        id: '1-1',
-        role: 'bot',
-        content: '¡Hola! Soy ima. Este es un chat general. ¿Cómo puedo ayudarte hoy?',
-      },
-    ],
-  },
-];
+function transformSessionToChat(session: any): Chat {
+  return {
+    id: session.session_id,
+    title: session.data?.title || `Chat General ${new Date(session.created_at * 1000).toLocaleString()}`,
+    messages: session.messages.map((msg: any, idx: number) => ({
+      id: `${session.session_id}-${idx}`,
+      role: msg.sender === 'model' ? 'bot' : 'user',
+      content: msg.text,
+      timestamp: msg.timestamp,
+    })),
+  };
+}
 
 export default function GeneralChatLayout() {
-  const [chats, setChats] = useState<Chat[]>(initialChats);
-  const [activeChatId, setActiveChatId] = useState<string | null>(
-    initialChats.length > 0 ? initialChats[0].id : null
-  );
+  const [chats, setChats] = useState<Chat[]>([]);
+  const [activeChatId, setActiveChatId] = useState<string | null>(null);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const fetchChats = async () => {
+      try {
+        const res = await fetch('https://kaelumapi-703555916890.northamerica-south1.run.app/chat/sessions?mode=general');
+        if (!res.ok) {
+           throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        const result = await res.json();
+        
+        const loadedChats: Chat[] = result.sessions.map(transformSessionToChat);
+        setChats(loadedChats);
+
+        if (loadedChats.length > 0) {
+          setActiveChatId(loadedChats[0].id);
+        }
+      } catch (error) {
+        console.error('Error loading general chats:', error);
+        toast({
+          title: 'Error al cargar los chats generales',
+          description: 'No se pudieron cargar los chats desde el servidor.',
+          variant: 'destructive',
+        });
+      }
+    };
+
+    fetchChats();
+  }, [toast]);
+
 
   const activeChat = useMemo(
     () => chats.find((chat) => chat.id === activeChatId),
     [chats, activeChatId]
   );
 
-  const handleNewChat = () => {
+  const handleNewChat = async () => {
+    const dataToSend = {
+      data: {
+        mode: 'general',
+        title: 'Nueva Conversación'
+      }
+    }
+    
+    const response = await fetch('https://kaelumapi-703555916890.northamerica-south1.run.app/chat/start', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(dataToSend),
+    });
+
+    const result = await response.json();
+    
     const newChat: Chat = {
-      id: uuidv4(),
+      id: result.session_id,
       title: 'Nueva Conversación',
       messages: [
         {
@@ -46,6 +91,7 @@ export default function GeneralChatLayout() {
         },
       ],
     };
+
     setChats([newChat, ...chats]);
     setActiveChatId(newChat.id);
   };
@@ -88,7 +134,7 @@ export default function GeneralChatLayout() {
     );
   };
 
-  const handleSendMessage = (content: string) => {
+  const handleSendMessage = async (content: string) => {
     if (!activeChatId) return;
 
     const userMessage: Message = {
@@ -107,18 +153,39 @@ export default function GeneralChatLayout() {
     };
     addMessageToChat(activeChatId, botLoadingMessage);
 
-    // Mock AI response
-    setTimeout(() => {
-        updateMessageInChat(activeChatId, botLoadingMessageId, {
-            isLoading: false,
-        });
+    const dataToSend = {
+      session_id: activeChatId,
+      msg: content,
+    };
 
-      const responseText = `Esta es una respuesta simulada a: "${content}". Una IA real proporcionaría una respuesta más útil.`;
-      let currentText = '';
-      let charIndex = 0;
-      const interval = setInterval(() => {
-      if (charIndex < responseText.length) {
-        currentText += responseText.charAt(charIndex);
+    const response = await fetch('https://kaelumapi-703555916890.northamerica-south1.run.app/chat/message', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(dataToSend),
+    });
+
+    if (!response.ok) {
+      updateMessageInChat(activeChatId, botLoadingMessageId, { 
+        content: 'Hubo un error al procesar tu solicitud. Por favor, intenta de nuevo.',
+        isLoading: false,
+      });
+      return;
+    }
+
+    const result = await response.json();
+    const botResponseText = result.messages[result.messages.length - 1].text;
+
+    updateMessageInChat(activeChatId, botLoadingMessageId, {
+      isLoading: false,
+    });
+    
+    let currentText = '';
+    let charIndex = 0;
+    const interval = setInterval(() => {
+      if (charIndex < botResponseText.length) {
+        currentText += botResponseText.charAt(charIndex);
         updateMessageInChat(activeChatId, botLoadingMessageId, {
           content: currentText,
         });
@@ -126,9 +193,7 @@ export default function GeneralChatLayout() {
       } else {
         clearInterval(interval);
       }
-    }, 25); 
-
-    }, 1500);
+    }, 25);
   };
 
   return (
