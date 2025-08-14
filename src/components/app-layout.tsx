@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -41,9 +42,9 @@ export default function AppLayout() {
            throw new Error(`HTTP error! status: ${res.status}`);
         }
         const sessions = await res.json();
-        // alert('Sesiones obtenidas: ' + JSON.stringify(sessions, null, 2));
+        alert('Sesiones obtenidas: ' + JSON.stringify(sessions, null, 2));
         
-        const loadedChats: Chat[] = sessions.map(transformSessionToChat);
+        const loadedChats: Chat[] = sessions.data.map(transformSessionToChat);
         setChats(loadedChats);
 
         if (loadedChats.length > 0) {
@@ -226,7 +227,7 @@ export default function AppLayout() {
         charIndex++;
       } else {
         clearInterval(interval);
-        updateMessageIn-Chat(activeChatId, botLoadingMessageId, {
+        updateMessageInChat(activeChatId, botLoadingMessageId, {
           isReasoningComplete: true, 
         });
       }
