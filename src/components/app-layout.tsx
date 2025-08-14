@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -37,7 +36,7 @@ export default function AppLayout() {
   useEffect(() => {
     const fetchChats = async () => {
       try {
-        const res = await fetch('http://127.0.0.1:5001/chat/sessions');
+        const res = await fetch('https://kaelumapi-703555916890.northamerica-south1.run.app/chat/sessions');
         if (!res.ok) {
            throw new Error(`HTTP error! status: ${res.status}`);
         }
@@ -76,7 +75,7 @@ export default function AppLayout() {
 
     // alert(JSON.stringify(dataToSend, null, 2));
     
-    const response = await fetch('http://127.0.0.1:5001/chat/start', {
+    const response = await fetch('https://kaelumapi-703555916890.northamerica-south1.run.app/chat/start', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -190,7 +189,7 @@ export default function AppLayout() {
 
     // alert(JSON.stringify(dataToSend, null, 2));
 
-    const response = await fetch('http://127.0.0.1:5001/chat/message', {
+    const response = await fetch('https://kaelumapi-703555916890.northamerica-south1.run.app/chat/message', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -227,7 +226,7 @@ export default function AppLayout() {
         charIndex++;
       } else {
         clearInterval(interval);
-        updateMessageInChat(activeChatId, botLoadingMessageId, {
+        updateMessageIn-Chat(activeChatId, botLoadingMessageId, {
           isReasoningComplete: true, 
         });
       }
