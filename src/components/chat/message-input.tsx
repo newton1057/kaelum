@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useRef, type FormEvent } from 'react';
+import { useState, useRef, type FormEvent, type ChangeEvent } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { SendHorizontal, Paperclip } from 'lucide-react';
@@ -14,6 +14,7 @@ interface MessageInputProps {
 export default function MessageInput({ onSendMessage }: MessageInputProps) {
   const [inputValue, setInputValue] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleInputChange = (e: FormEvent<HTMLTextAreaElement>) => {
     setInputValue(e.currentTarget.value);
@@ -40,16 +41,36 @@ export default function MessageInput({ onSendMessage }: MessageInputProps) {
       handleSubmit(e as any);
     }
   };
+  
+  const handleAttachmentClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      console.log('Archivo seleccionado:', file.name);
+      // Aquí puedes agregar la lógica para manejar el archivo adjunto
+      // Por ejemplo, subirlo a un servidor o mostrar una vista previa.
+    }
+  };
 
   return (
     <form
       onSubmit={handleSubmit}
       className="relative flex w-full items-end gap-2"
     >
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        className="hidden"
+      />
       <Button
         type="button"
         size="icon"
         variant="ghost"
+        onClick={handleAttachmentClick}
         className="absolute bottom-2 left-2 h-9 w-9 text-muted-foreground hover:bg-primary/10 hover:text-primary"
       >
         <Paperclip />
