@@ -65,12 +65,11 @@ export default function GeneralChatLayout() {
   const handleNewChat = async () => {
     const dataToSend = {
       data: {
-        mode: 'general',
         title: 'Nueva Conversación'
       }
     }
     
-    const response = await fetch('https://kaelumapi-703555916890.northamerica-south1.run.app/chat/start', {
+    const response = await fetch('https://kaelumapi-703555916890.northamerica-south1.run.app/chat/start?mode=general', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
