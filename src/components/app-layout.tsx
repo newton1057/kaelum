@@ -291,7 +291,7 @@ export default function AppLayout() {
         />
         <SidebarInset className="flex flex-col p-0">
           <AppHeader />
-          <div className="flex-1 w-full flex flex-col overflow-y-auto">
+          <div className="flex-1 w-full flex flex-col overflow-hidden">
             <ChatPanel
               chat={activeChat}
               onSendMessage={handleSendMessage}

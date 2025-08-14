@@ -23,10 +23,10 @@ export default function ChatPanel({
 }: ChatPanelProps) {
   return (
     <div className={cn('flex flex-col h-full', className)}>
-      <div className="flex-1">
+      <div className="flex-1 overflow-y-auto">
         <ChatMessages messages={chat?.messages ?? []} activeChatId={chat?.id ?? null} />
       </div>
-      <div className="border-t">
+      <div className="border-t bg-background">
         <div className="w-full p-4">
           {suggestedQuestions.length > 0 && (
             <SuggestedQuestions
