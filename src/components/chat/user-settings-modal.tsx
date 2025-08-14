@@ -12,12 +12,14 @@ import { Button } from '../ui/button';
 import { Progress } from '../ui/progress';
 import { Separator } from '../ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BrainCircuit, Info, User } from 'lucide-react';
+import { BrainCircuit, Info, User, Moon, Sun, Monitor } from 'lucide-react';
 import { useState } from 'react';
+import { useTheme } from 'next-themes';
 
 export function UserSettingsModal() {
   const [open, setOpen] = useState(false);
   const memoryUsage = 40; // Mocked value
+  const { setTheme } = useTheme();
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -45,6 +47,26 @@ export function UserSettingsModal() {
           </TabsList>
           <TabsContent value="preferences">
             <div className="space-y-6 py-4">
+              <div className="space-y-4">
+                <h4 className="text-sm font-medium leading-none flex items-center gap-2">
+                  Tema de la Aplicación
+                </h4>
+                <div className="flex gap-2">
+                   <Button variant="outline" size="sm" onClick={() => setTheme('light')}>
+                    <Sun className="mr-2 h-4 w-4" />
+                    Claro
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setTheme('dark')}>
+                    <Moon className="mr-2 h-4 w-4" />
+                    Oscuro
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setTheme('high-contrast')}>
+                    <Monitor className="mr-2 h-4 w-4" />
+                    Alto Contraste
+                  </Button>
+                </div>
+              </div>
+              <Separator />
               <div className="space-y-4">
                 <h4 className="text-sm font-medium leading-none flex items-center gap-2">
                   <BrainCircuit size={16} />
