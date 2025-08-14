@@ -180,37 +180,20 @@ export default function AppLayout() {
     };
     addMessageToChat(activeChatId, botLoadingMessage);
 
-    const dataToSend: { session_id: string; msg: string; multimedia?: string } = {
-      session_id: activeChatId,
-      msg: content,
-    };
-    
+    const formData = new FormData();
+    formData.append('session_id', activeChatId);
+    formData.append('msg', content);
     if (file) {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = async () => {
-        dataToSend.multimedia = reader.result as string;
-        await sendMessageToServer(dataToSend, activeChatId, botLoadingMessageId);
-      };
-      reader.onerror = (error) => {
-        console.error('Error converting file to Base64:', error);
-        updateMessageInChat(activeChatId, botLoadingMessageId, { 
-          content: 'Hubo un error al procesar el archivo. Por favor, intenta de nuevo.',
-          isLoading: false,
-        });
-      };
-    } else {
-      await sendMessageToServer(dataToSend, activeChatId, botLoadingMessageId);
+      formData.append('multimedia', file);
     }
+
+    await sendMessageToServer(formData, activeChatId, botLoadingMessageId);
   };
 
-  const sendMessageToServer = async (data: any, chatId: string, loadingMessageId: string) => {
+  const sendMessageToServer = async (data: FormData, chatId: string, loadingMessageId: string) => {
     const response = await fetch('https://kaelumapi-703555916890.northamerica-south1.run.app/chat/message', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
+      body: data,
     });
 
     if (!response.ok) {
