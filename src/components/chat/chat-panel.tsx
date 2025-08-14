@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 
 interface ChatPanelProps {
   chat?: Chat;
-  onSendMessage: (content: string) => void;
+  onSendMessage: (content: string, file?: File) => void;
   onSendSuggestedQuestion: (question: SuggestedQuestion) => void;
   suggestedQuestions: SuggestedQuestion[];
   className?: string;
