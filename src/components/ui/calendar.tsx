@@ -65,7 +65,7 @@ function Calendar({
           <ChevronRight className={cn("h-4 w-4", className)} {...props} />
         ),
         Dropdown: (props: DropdownProps) => {
-          const { fromYear, toYear, fromMonth, toMonth, fromDate, toDate } = props;
+          const { fromYear, toYear, fromMonth, toMonth, fromDate, toDate, onMonthChange, onYearChange } = props;
           const options = [];
           
           const selectedDate = props.value ? new Date(props.value as string) : new Date();
@@ -84,8 +84,9 @@ function Calendar({
             }
           } else if (props.name === "years") {
             selectedValue = displayMonth.getFullYear().toString();
-            const earliestYear = fromYear || fromDate?.getFullYear() || new Date().getFullYear();
-            const latestYear = toYear || toDate?.getFullYear() || new Date().getFullYear();
+            const earliestYear = fromYear || fromDate?.getFullYear();
+            const latestYear = toYear || toDate?.getFullYear();
+
             if (earliestYear && latestYear) {
               for (let i = latestYear; i >= earliestYear; i--) {
                 options.push(
@@ -103,11 +104,10 @@ function Calendar({
               onValueChange={(newValue) => {
                 const newDate = new Date(displayMonth);
                 if (props.name === "months") {
-                  newDate.setMonth(parseInt(newValue));
+                  onMonthChange?.(new Date(displayMonth.getFullYear(), parseInt(newValue)));
                 } else if (props.name === "years") {
-                  newDate.setFullYear(parseInt(newValue));
+                  onYearChange?.(new Date(parseInt(newValue), displayMonth.getMonth()));
                 }
-                props.onChange?.(newDate);
               }}
             >
               <SelectTrigger>{selectedValue ? (props.name === 'months' ? format(new Date(displayMonth.getFullYear(), parseInt(selectedValue)), 'MMM') : selectedValue) : ''}</SelectTrigger>
