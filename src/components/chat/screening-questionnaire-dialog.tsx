@@ -35,6 +35,7 @@ import { Textarea } from '../ui/textarea';
 import { es } from 'date-fns/locale';
 import { FamilyHistoryGrid } from './family-history-grid';
 import type { FamilyHistoryData } from './family-history-grid';
+import { Separator } from '../ui/separator';
 
 const mexicanStates = [
   'Aguascalientes', 'Baja California', 'Baja California Sur', 'Campeche', 'Chiapas',
@@ -89,6 +90,22 @@ const screeningSchema = z.object({
   motivoConsulta: z.string().min(10, { message: 'El motivo de consulta es obligatorio y debe tener al menos 10 caracteres.' }),
   antecedentesFamiliares: z.record(z.array(z.string())).optional(),
   antecedentesOtros: z.string().optional(),
+  alergias: z.enum(['Sí', 'No'], {
+    required_error: 'Debes seleccionar una opción.',
+  }),
+  alergiasEspecificar: z.string().optional(),
+  cirugias: z.enum(['Sí', 'No'], {
+    required_error: 'Debes seleccionar una opción.',
+  }),
+  cirugiasEspecificar: z.string().optional(),
+  accidentes: z.string().optional(),
+  traumatismoCraneoencefalico: z.enum(['Sí', 'No'], {
+    required_error: 'Debes seleccionar una opción.',
+  }),
+  hospitalizaciones: z.enum(['Sí', 'No'], {
+    required_error: 'Debes seleccionar una opción.',
+  }),
+  hospitalizacionesEspecificar: z.string().optional(),
 }).refine((data) => {
     if (data.channel === 'Otro') {
         return data.channelOther && data.channelOther.length > 0;
@@ -105,6 +122,30 @@ const screeningSchema = z.object({
 }, {
     message: 'Por favor, especifica el sexo.',
     path: ['sexoOtro'],
+}).refine((data) => {
+    if (data.alergias === 'Sí') {
+        return data.alergiasEspecificar && data.alergiasEspecificar.length > 0;
+    }
+    return true;
+}, {
+    message: 'Por favor, especifique sus alergias.',
+    path: ['alergiasEspecificar'],
+}).refine((data) => {
+    if (data.cirugias === 'Sí') {
+        return data.cirugiasEspecificar && data.cirugiasEspecificar.length > 0;
+    }
+    return true;
+}, {
+    message: 'Por favor, describa las cirugías.',
+    path: ['cirugiasEspecificar'],
+}).refine((data) => {
+    if (data.hospitalizaciones === 'Sí') {
+        return data.hospitalizacionesEspecificar && data.hospitalizacionesEspecificar.length > 0;
+    }
+    return true;
+}, {
+    message: 'Por favor, describa las hospitalizaciones.',
+    path: ['hospitalizacionesEspecificar'],
 });
 
 
@@ -136,12 +177,23 @@ export function ScreeningQuestionnaireDialog({
       motivoConsulta: '',
       antecedentesFamiliares: {},
       antecedentesOtros: '',
+      alergias: undefined,
+      alergiasEspecificar: '',
+      cirugias: undefined,
+      cirugiasEspecificar: '',
+      accidentes: '',
+      traumatismoCraneoencefalico: undefined,
+      hospitalizaciones: undefined,
+      hospitalizacionesEspecificar: '',
     },
   });
 
   const watchedChannel = form.watch('channel');
   const watchedSexo = form.watch('sexo');
   const watchedFechaNacimiento = form.watch('fechaNacimiento');
+  const watchedAlergias = form.watch('alergias');
+  const watchedCirugias = form.watch('cirugias');
+  const watchedHospitalizaciones = form.watch('hospitalizaciones');
   const [age, setAge] = useState<number | null>(null);
 
   useEffect(() => {
@@ -157,6 +209,12 @@ export function ScreeningQuestionnaireDialog({
       setAge(null);
     }
   }, [watchedFechaNacimiento]);
+  
+  useEffect(() => {
+    if (!isOpen) {
+        form.reset();
+    }
+  }, [isOpen, form]);
 
   const handleFormSubmit = (values: ScreeningFormValues) => {
     onSubmit(values);
@@ -497,6 +555,214 @@ export function ScreeningQuestionnaireDialog({
                 </FormItem>
               )}
             />
+
+            <div className="space-y-8 rounded-lg border p-6">
+                <div className="space-y-2">
+                    <h3 className="text-lg font-semibold">Antecedentes Personales</h3>
+                    <p className="text-sm text-muted-foreground">Describa sus antecedentes personales.</p>
+                </div>
+                <FormField
+                    control={form.control}
+                    name="alergias"
+                    render={({ field }) => (
+                        <FormItem className="space-y-3">
+                        <FormLabel>¿Tiene usted alergias? *</FormLabel>
+                        <FormControl>
+                            <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="flex items-center gap-4"
+                            >
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="Sí" />
+                                </FormControl>
+                                <FormLabel className="font-normal">Sí</FormLabel>
+                            </FormItem>
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="No" />
+                                </FormControl>
+                                <FormLabel className="font-normal">No</FormLabel>
+                            </FormItem>
+                            </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                {watchedAlergias === 'Sí' && (
+                    <FormField
+                    control={form.control}
+                    name="alergiasEspecificar"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Especifique sus alergias</FormLabel>
+                        <FormControl>
+                            <Textarea
+                            placeholder="Describa sus alergias..."
+                            className="resize-y"
+                            {...field}
+                            />
+                        </FormControl>
+                        <FormDescription>Conteste solo si marcó Sí en la pregunta anterior.</FormDescription>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+                )}
+
+                <FormField
+                    control={form.control}
+                    name="cirugias"
+                    render={({ field }) => (
+                        <FormItem className="space-y-3">
+                        <FormLabel>¿Le han realizado cirugías? *</FormLabel>
+                        <FormControl>
+                            <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="flex items-center gap-4"
+                            >
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="Sí" />
+                                </FormControl>
+                                <FormLabel className="font-normal">Sí</FormLabel>
+                            </FormItem>
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="No" />
+                                </FormControl>
+                                <FormLabel className="font-normal">No</FormLabel>
+                            </FormItem>
+                            </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                {watchedCirugias === 'Sí' && (
+                    <FormField
+                    control={form.control}
+                    name="cirugiasEspecificar"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Describa las cirugías</FormLabel>
+                        <FormControl>
+                            <Textarea
+                            placeholder="Describa el tipo de procedimiento, a que edad se realizó, si hubo complicaciones, etc."
+                            className="resize-y"
+                            {...field}
+                            />
+                        </FormControl>
+                        <FormDescription>Conteste solo si marcó SI en la pregunta anterior.</FormDescription>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+                )}
+                 <FormField
+                    control={form.control}
+                    name="accidentes"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>¿Ha tenido algún tipo de accidente? (automovilístico, laboral o de otro tipo)</FormLabel>
+                        <FormControl>
+                            <Textarea
+                            placeholder="Describa los accidentes..."
+                            className="resize-y"
+                            {...field}
+                            />
+                        </FormControl>
+                        <FormDescription>Aunque haya sido un accidente leve, indique el número de veces y describa cada uno de ellos.</FormDescription>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
+                    name="traumatismoCraneoencefalico"
+                    render={({ field }) => (
+                        <FormItem className="space-y-3">
+                        <FormLabel>¿Ha tenido traumatismo cráneo encefálico? *</FormLabel>
+                        <FormControl>
+                            <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="flex items-center gap-4"
+                            >
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="Sí" />
+                                </FormControl>
+                                <FormLabel className="font-normal">Sí</FormLabel>
+                            </FormItem>
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="No" />
+                                </FormControl>
+                                <FormLabel className="font-normal">No</FormLabel>
+                            </FormItem>
+                            </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
+                    name="hospitalizaciones"
+                    render={({ field }) => (
+                        <FormItem className="space-y-3">
+                        <FormLabel>¿Ha estado hospitalizado? *</FormLabel>
+                        <FormControl>
+                            <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="flex items-center gap-4"
+                            >
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="Sí" />
+                                </FormControl>
+                                <FormLabel className="font-normal">Sí</FormLabel>
+                            </FormItem>
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="No" />
+                                </FormControl>
+                                <FormLabel className="font-normal">No</FormLabel>
+                            </FormItem>
+                            </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                {watchedHospitalizaciones === 'Sí' && (
+                    <FormField
+                    control={form.control}
+                    name="hospitalizacionesEspecificar"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Describa las hospitalizaciones</FormLabel>
+                        <FormControl>
+                            <Textarea
+                            placeholder="Describir la causa, a que edad, etc."
+                            className="resize-y"
+                            {...field}
+                            />
+                        </FormControl>
+                        <FormDescription>Conteste solo si marcó SI en la pregunta anterior.</FormDescription>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+                )}
+            </div>
 
 
             <FormField
