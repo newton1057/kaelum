@@ -1,4 +1,3 @@
-
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -16,6 +15,7 @@ import {
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -30,6 +30,8 @@ import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { Calendar } from '../ui/calendar';
 import { useEffect, useState } from 'react';
+import { Textarea } from '../ui/textarea';
+
 
 const mexicanStates = [
   'Aguascalientes', 'Baja California', 'Baja California Sur', 'Campeche', 'Chiapas',
@@ -81,6 +83,7 @@ const screeningSchema = z.object({
   }),
   numeroHijos: z.coerce.number().int().min(0, { message: "El número no puede ser negativo."}),
   religion: z.string().optional(),
+  motivoConsulta: z.string().min(10, { message: 'El motivo de consulta es obligatorio y debe tener al menos 10 caracteres.' }),
 }).refine((data) => {
     if (data.channel === 'Otro') {
         return data.channelOther && data.channelOther.length > 0;
@@ -124,7 +127,8 @@ export function ScreeningQuestionnaireDialog({
       telefono: '',
       ocupacion: '',
       numeroHijos: 0,
-      religion: ''
+      religion: '',
+      motivoConsulta: '',
     },
   });
 
@@ -223,7 +227,7 @@ export function ScreeningQuestionnaireDialog({
                                 )}
                                 >
                                 {field.value ? (
-                                    format(field.value, "PPP")
+                                    format(field.value, "PPP", { locale: form.control.locale })
                                 ) : (
                                     <span>Seleccionar fecha</span>
                                 )}
@@ -431,7 +435,27 @@ export function ScreeningQuestionnaireDialog({
                     )}
                 />
             </div>
-
+            
+            <FormField
+              control={form.control}
+              name="motivoConsulta"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Motivo de Consulta</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Describa el motivo de la consulta..."
+                      className="resize-y"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Describa el motivo de consulta, cuándo iniciaron los  síntomas, a qué atribuye el inicio de los síntomas,  tratamientos previos utilizados y especialistas consultados con anterioridad.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <FormField
               control={form.control}
