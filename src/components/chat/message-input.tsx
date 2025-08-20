@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useRef, type FormEvent, type ChangeEvent, type DragEvent } from 'react';
@@ -10,9 +9,10 @@ import { cn } from '@/lib/utils';
 
 interface MessageInputProps {
   onSendMessage: (content: string, file?: File) => void;
+  disabled?: boolean;
 }
 
-export default function MessageInput({ onSendMessage }: MessageInputProps) {
+export default function MessageInput({ onSendMessage, disabled }: MessageInputProps) {
   const [inputValue, setInputValue] = useState('');
   const [attachment, setAttachment] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -61,6 +61,7 @@ export default function MessageInput({ onSendMessage }: MessageInputProps) {
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (disabled) return;
     if (inputValue.trim() || attachment) {
       onSendMessage(inputValue.trim(), attachment ?? undefined);
       setInputValue('');
@@ -85,6 +86,7 @@ export default function MessageInput({ onSendMessage }: MessageInputProps) {
   const handleDragEnter = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
+    if (disabled) return;
     setIsDraggingOver(true);
   };
 
@@ -102,6 +104,7 @@ export default function MessageInput({ onSendMessage }: MessageInputProps) {
   const handleDrop = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
+    if (disabled) return;
     setIsDraggingOver(false);
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       handleFileChange(e.dataTransfer.files[0]);
@@ -160,13 +163,14 @@ export default function MessageInput({ onSendMessage }: MessageInputProps) {
       )}
       <form
         onSubmit={handleSubmit}
-        className={cn('relative flex w-full items-end gap-2', isDraggingOver && 'opacity-50')}
+        className={cn('relative flex w-full items-end gap-2', (isDraggingOver || disabled) && 'opacity-50')}
       >
         <input
           type="file"
           ref={fileInputRef}
           onChange={handleFileInputChange}
           className="hidden"
+          disabled={disabled}
         />
         <Button
           type="button"
@@ -174,6 +178,7 @@ export default function MessageInput({ onSendMessage }: MessageInputProps) {
           variant="ghost"
           onClick={handleAttachmentClick}
           className="absolute bottom-2 left-2 h-9 w-9 text-muted-foreground hover:bg-primary/10 hover:text-primary"
+          disabled={disabled}
         >
           <Paperclip />
           <span className="sr-only">Adjuntar archivo</span>
@@ -183,16 +188,17 @@ export default function MessageInput({ onSendMessage }: MessageInputProps) {
           value={inputValue}
           onInput={handleInputChange}
           onKeyDown={handleKeyDown}
-          placeholder="Pregúntale a ima..."
+          placeholder={disabled ? "Inicia o selecciona una consulta para comenzar" : "Pregúntale a ima..."}
           className="max-h-48 min-h-12 resize-none overflow-y-auto rounded-2xl border-2 border-border bg-background pl-12 pr-12"
           rows={1}
+          disabled={disabled}
         />
         <Button
           type="submit"
           size="icon"
           variant="ghost"
           className="absolute bottom-2 right-2 h-9 w-9 text-primary hover:bg-primary/10 hover:text-primary disabled:opacity-50"
-          disabled={!inputValue.trim() && !attachment}
+          disabled={(!inputValue.trim() && !attachment) || disabled}
         >
           <SendHorizontal />
           <span className="sr-only">Enviar mensaje</span>

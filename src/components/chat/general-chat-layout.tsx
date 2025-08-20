@@ -232,6 +232,7 @@ export default function GeneralChatLayout() {
               onSendSuggestedQuestion={() => {}}
               suggestedQuestions={[]}
               className="flex-1 flex flex-col"
+              disabled={!activeChatId}
             />
           </div>
         </SidebarInset>

@@ -328,6 +328,7 @@ export default function AppLayout() {
                 activeChat?.messages.length === 1 ? SUGGESTED_QUESTIONS : []
               }
               className="flex-1 flex flex-col"
+              disabled={!activeChatId}
             />
           </div>
         </SidebarInset>

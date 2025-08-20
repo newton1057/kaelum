@@ -12,6 +12,7 @@ interface ChatPanelProps {
   onSendSuggestedQuestion: (question: SuggestedQuestion) => void;
   suggestedQuestions: SuggestedQuestion[];
   className?: string;
+  disabled?: boolean;
 }
 
 export default function ChatPanel({
@@ -20,6 +21,7 @@ export default function ChatPanel({
   onSendSuggestedQuestion,
   suggestedQuestions,
   className,
+  disabled,
 }: ChatPanelProps) {
   return (
     <div className={cn('flex flex-col h-full', className)}>
@@ -34,7 +36,7 @@ export default function ChatPanel({
               onSelectQuestion={onSendSuggestedQuestion}
             />
           )}
-          <MessageInput onSendMessage={onSendMessage} />
+          <MessageInput onSendMessage={onSendMessage} disabled={disabled} />
         </div>
       </div>
     </div>
