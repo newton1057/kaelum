@@ -126,6 +126,42 @@ const screeningSchema = z.object({
     required_error: 'Debes seleccionar una opción.',
   }),
   enfermedadesCronicasEspecificar: z.string().optional(),
+  tratamientoPrevio: z.enum(['Tratamiento Psiquiátrico', 'Tratamiento Psicológico', 'Ninguno'], {
+    required_error: 'Debes seleccionar una opción.',
+  }),
+  tratamientoPrevioEspecificar: z.string().optional(),
+  especialistasPrevios: z.string().min(2, "Debes especificar."),
+  consumoAlcoholTabaco: z.enum(['Sí', 'No'], {
+    required_error: 'Debes seleccionar una opción.',
+  }),
+  consumoInicio: z.string().optional(),
+  consumoFrecuencia: z.string().optional(),
+  ultimoConsumo: z.string().optional(),
+  medicamentosActuales: z.string().min(2, "Debes especificar los medicamentos o indicar 'Ninguno'."),
+  estudiosPrevios: z.string().min(2, "Debes especificar los estudios o indicar 'Ninguno'."),
+  eegTomografia: z.enum(['Sí', 'No', 'No sé'], {
+    required_error: 'Debes seleccionar una opción.',
+  }),
+  actividadFisica: z.string().min(2, "Debes especificar la actividad o indicar 'Ninguna'."),
+  duermeBien: z.enum(['Sí', 'No'], {
+    required_error: 'Debes seleccionar una opción.',
+  }),
+  dificultadDormir: z.enum(['Sí', 'No'], {
+    required_error: 'Debes seleccionar una opción.',
+  }),
+  despiertaNoche: z.enum(['Sí', 'No'], {
+    required_error: 'Debes seleccionar una opción.',
+  }),
+  despiertaTemprano: z.enum(['Sí', 'No'], {
+    required_error: 'Debes seleccionar una opción.',
+  }),
+  ronca: z.enum(['Sí', 'No'], {
+    required_error: 'Debes seleccionar una opción.',
+  }),
+  horasSueno: z.coerce.number().min(0, "Debe ser un número positivo.").max(24, "No puedes dormir más de 24 horas."),
+  comidasDia: z.coerce.number().min(0, "Debe ser un número positivo."),
+  alimentacionCotidiana: z.string().min(10, { message: 'La descripción de tu alimentación debe tener al menos 10 caracteres.' }),
+
 }).refine((data) => {
     if (data.channel === 'Otro') {
         return data.channelOther && data.channelOther.length > 0;
@@ -206,6 +242,24 @@ const screeningSchema = z.object({
 }, {
     message: 'Por favor, especifique las enfermedades.',
     path: ['enfermedadesCronicasEspecificar'],
+}).refine((data) => {
+    if (data.tratamientoPrevio !== 'Ninguno') {
+        return data.tratamientoPrevioEspecificar && data.tratamientoPrevioEspecificar.length > 0;
+    }
+    return true;
+}, {
+    message: 'Por favor, especifique el tratamiento.',
+    path: ['tratamientoPrevioEspecificar'],
+}).refine((data) => {
+    if (data.consumoAlcoholTabaco === 'Sí') {
+        return data.consumoInicio && data.consumoInicio.length > 0 &&
+               data.consumoFrecuencia && data.consumoFrecuencia.length > 0 &&
+               data.ultimoConsumo && data.ultimoConsumo.length > 0;
+    }
+    return true;
+}, {
+    message: 'Debe completar todos los campos de consumo.',
+    path: ['consumoInicio'],
 });
 
 
@@ -255,6 +309,25 @@ export function ScreeningQuestionnaireDialog({
       enfermedadesInfectoContagiosasEspecificar: '',
       enfermedadesCronicas: undefined,
       enfermedadesCronicasEspecificar: '',
+      tratamientoPrevio: 'Ninguno',
+      tratamientoPrevioEspecificar: '',
+      especialistasPrevios: '',
+      consumoAlcoholTabaco: undefined,
+      consumoInicio: '',
+      consumoFrecuencia: '',
+      ultimoConsumo: '',
+      medicamentosActuales: '',
+      estudiosPrevios: '',
+      eegTomografia: undefined,
+      actividadFisica: '',
+      duermeBien: undefined,
+      dificultadDormir: undefined,
+      despiertaNoche: undefined,
+      despiertaTemprano: undefined,
+      ronca: undefined,
+      horasSueno: undefined,
+      comidasDia: undefined,
+      alimentacionCotidiana: '',
     },
   });
 
@@ -269,6 +342,9 @@ export function ScreeningQuestionnaireDialog({
   const watchedObesidad = form.watch('obesidad');
   const watchedEnfermedadesInfectoContagiosas = form.watch('enfermedadesInfectoContagiosas');
   const watchedEnfermedadesCronicas = form.watch('enfermedadesCronicas');
+  const watchedTratamientoPrevio = form.watch('tratamientoPrevio');
+  const watchedConsumo = form.watch('consumoAlcoholTabaco');
+
   const [age, setAge] = useState<number | null>(null);
 
   useEffect(() => {
@@ -881,7 +957,7 @@ export function ScreeningQuestionnaireDialog({
                             {...field}
                             />
                         </FormControl>
-                        <FormDescription>Conteste solo si marcó SI en la pregunta anterior.</FormDescription>
+                        <FormDescription>Solo si marcó SI en la pregunta anterior.</FormDescription>
                         <FormMessage />
                         </FormItem>
                     )}
@@ -932,7 +1008,7 @@ export function ScreeningQuestionnaireDialog({
                             {...field}
                             />
                         </FormControl>
-                        <FormDescription>Conteste solo si marcó SI en la pregunta anterior.</FormDescription>
+                        <FormDescription>Solo si marcó SI en la pregunta anterior.</FormDescription>
                         <FormMessage />
                         </FormItem>
                     )}
@@ -979,7 +1055,7 @@ export function ScreeningQuestionnaireDialog({
                         <FormControl>
                             <Input placeholder="Especifique la edad..." {...field} />
                         </FormControl>
-                        <FormDescription>Conteste solo si marcó SI en la pregunta anterior.</FormDescription>
+                        <FormDescription>Conteste sólo si marcó SI en la pregunta anterior.</FormDescription>
                         <FormMessage />
                         </FormItem>
                     )}
@@ -1087,6 +1163,447 @@ export function ScreeningQuestionnaireDialog({
                     )}
                     />
                 )}
+
+                <FormField
+                    control={form.control}
+                    name="tratamientoPrevio"
+                    render={({ field }) => (
+                        <FormItem className="space-y-3">
+                        <FormLabel>Antecedente de tratamiento psiquiátrico o psicológico, actual o previo *</FormLabel>
+                         <FormControl>
+                            <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="flex flex-col gap-2"
+                            >
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="Tratamiento Psiquiátrico" />
+                                </FormControl>
+                                <FormLabel className="font-normal">Tratamiento Psiquiátrico</FormLabel>
+                            </FormItem>
+                             <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="Tratamiento Psicológico" />
+                                </FormControl>
+                                <FormLabel className="font-normal">Tratamiento Psicológico</FormLabel>
+                            </FormItem>
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="Ninguno" />
+                                </FormControl>
+                                <FormLabel className="font-normal">Ninguno</FormLabel>
+                            </FormItem>
+                            </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                {watchedTratamientoPrevio !== 'Ninguno' && (
+                    <FormField
+                    control={form.control}
+                    name="tratamientoPrevioEspecificar"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Especifique el tratamiento</FormLabel>
+                        <FormControl>
+                            <Textarea
+                            placeholder="Especifique..."
+                            className="resize-y"
+                            {...field}
+                            />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                )}
+                
+                <FormField
+                    control={form.control}
+                    name="especialistasPrevios"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>¿Ha consultado a otros especialistas para atender su padecimiento actual? *</FormLabel>
+                        <FormControl>
+                            <Textarea
+                            placeholder="Especifique..."
+                            className="resize-y"
+                            {...field}
+                            />
+                        </FormControl>
+                         <FormDescription>Especificar especialistas consultados, tipo y tiempo en tratamiento.</FormDescription>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
+                    name="consumoAlcoholTabaco"
+                    render={({ field }) => (
+                        <FormItem className="space-y-3">
+                        <FormLabel>Antecedente de consumo de alcohol, tabaco u otras substancias *</FormLabel>
+                        <FormControl>
+                            <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="flex items-center gap-4"
+                            >
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="Sí" />
+                                </FormControl>
+                                <FormLabel className="font-normal">Sí</FormLabel>
+                            </FormItem>
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="No" />
+                                </FormControl>
+                                <FormLabel className="font-normal">No</FormLabel>
+                            </FormItem>
+                            </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                {watchedConsumo === 'Sí' && (
+                    <div className='space-y-4 pl-4 border-l'>
+                        <FormField
+                        control={form.control}
+                        name="consumoInicio"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>Edad de inicio del consumo</FormLabel>
+                            <FormControl>
+                                <Input placeholder="Especifique edad de inicio del consumo de alcohol, tabaco u otras sustancias." {...field} />
+                            </FormControl>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                        />
+                         <FormField
+                        control={form.control}
+                        name="consumoFrecuencia"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>Frecuencia y cantidad</FormLabel>
+                            <FormControl>
+                                <Textarea placeholder="Especificar frecuencia de consumo y cantidad" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                        />
+                         <FormField
+                        control={form.control}
+                        name="ultimoConsumo"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>Fecha de último consumo</FormLabel>
+                            <FormControl>
+                                <Input placeholder="Especifique la fecha" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                        />
+                    </div>
+                )}
+                 <FormField
+                    control={form.control}
+                    name="medicamentosActuales"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>¿Utiliza actualmente algún medicamento? *</FormLabel>
+                        <FormControl>
+                            <Textarea
+                            placeholder="Especifique los medicamentos o escriba 'Ninguno'."
+                            className="resize-y"
+                            {...field}
+                            />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                 <FormField
+                    control={form.control}
+                    name="estudiosPrevios"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>¿Le han realizado algún estudio de laboratorio, gabinete, imagen o pruebas psicológicas? *</FormLabel>
+                        <FormControl>
+                            <Textarea
+                            placeholder="Especifique los estudios o escriba 'Ninguno'."
+                            className="resize-y"
+                            {...field}
+                            />
+                        </FormControl>
+                        <FormDescription>Acudir a consulta con su reporte de resultados.</FormDescription>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                 <FormField
+                    control={form.control}
+                    name="eegTomografia"
+                    render={({ field }) => (
+                        <FormItem className="space-y-3">
+                        <FormLabel>¿Le han realizado Electroencefalograma, tomografía, resonancia magnética? *</FormLabel>
+                        <FormControl>
+                            <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="flex items-center gap-4"
+                            >
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="Sí" />
+                                </FormControl>
+                                <FormLabel className="font-normal">Sí</FormLabel>
+                            </FormItem>
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="No" />
+                                </FormControl>
+                                <FormLabel className="font-normal">No</FormLabel>
+                            </FormItem>
+                             <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="No sé" />
+                                </FormControl>
+                                <FormLabel className="font-normal">No sé</FormLabel>
+                            </FormItem>
+                            </RadioGroup>
+                        </FormControl>
+                         <FormDescription>En caso de marcar SI, acudir a la consulta con su reporte de resultado.</FormDescription>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                 <FormField
+                    control={form.control}
+                    name="actividadFisica"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>¿Realiza alguna actividad física? *</FormLabel>
+                        <FormControl>
+                            <Textarea
+                            placeholder="Especifique..."
+                            className="resize-y"
+                            {...field}
+                            />
+                        </FormControl>
+                        <FormDescription>Especifique el tipo de actividad y la frecuencia semanal.</FormDescription>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <Separator />
+                <div className='space-y-2'>
+                    <h4 className="text-md font-semibold">Hábitos de Sueño</h4>
+                </div>
+                 <FormField
+                    control={form.control}
+                    name="duermeBien"
+                    render={({ field }) => (
+                        <FormItem className="space-y-3">
+                        <FormLabel>¿Duerme bien? *</FormLabel>
+                        <FormControl>
+                            <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="flex items-center gap-4"
+                            >
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="Sí" />
+                                </FormControl>
+                                <FormLabel className="font-normal">Sí</FormLabel>
+                            </FormItem>
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="No" />
+                                </FormControl>
+                                <FormLabel className="font-normal">No</FormLabel>
+                            </FormItem>
+                            </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                 <FormField
+                    control={form.control}
+                    name="dificultadDormir"
+                    render={({ field }) => (
+                        <FormItem className="space-y-3">
+                        <FormLabel>¿Le cuesta trabajo quedarse dormido? *</FormLabel>
+                        <FormControl>
+                            <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="flex items-center gap-4"
+                            >
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="Sí" />
+                                </FormControl>
+                                <FormLabel className="font-normal">Sí</FormLabel>
+                            </FormItem>
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="No" />
+                                </FormControl>
+                                <FormLabel className="font-normal">No</FormLabel>
+                            </FormItem>
+                            </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                 <FormField
+                    control={form.control}
+                    name="despiertaNoche"
+                    render={({ field }) => (
+                        <FormItem className="space-y-3">
+                        <FormLabel>¿Se despierta a lo largo de la noche? *</FormLabel>
+                        <FormControl>
+                            <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="flex items-center gap-4"
+                            >
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="Sí" />
+                                </FormControl>
+                                <FormLabel className="font-normal">Sí</FormLabel>
+                            </FormItem>
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="No" />
+                                </FormControl>
+                                <FormLabel className="font-normal">No</FormLabel>
+                            </FormItem>
+                            </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="despiertaTemprano"
+                    render={({ field }) => (
+                        <FormItem className="space-y-3">
+                        <FormLabel>¿Se despierta antes de lo esperado? (Una hora) *</FormLabel>
+                        <FormControl>
+                            <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="flex items-center gap-4"
+                            >
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="Sí" />
+                                </FormControl>
+                                <FormLabel className="font-normal">Sí</FormLabel>
+                            </FormItem>
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="No" />
+                                </FormControl>
+                                <FormLabel className="font-normal">No</FormLabel>
+                            </FormItem>
+                            </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                 <FormField
+                    control={form.control}
+                    name="ronca"
+                    render={({ field }) => (
+                        <FormItem className="space-y-3">
+                        <FormLabel>¿Usted ronca? *</FormLabel>
+                        <FormControl>
+                            <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="flex items-center gap-4"
+                            >
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="Sí" />
+                                </FormControl>
+                                <FormLabel className="font-normal">Sí</FormLabel>
+                            </FormItem>
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="No" />
+                                </FormControl>
+                                <FormLabel className="font-normal">No</FormLabel>
+                            </FormItem>
+                            </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                 <FormField
+                    control={form.control}
+                    name="horasSueno"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>¿Cuántas horas duerme de manera continua al día? *</FormLabel>
+                        <FormControl>
+                            <Input type="number" placeholder="Ej. 7" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <Separator />
+                <div className='space-y-2'>
+                    <h4 className="text-md font-semibold">Hábitos Alimenticios</h4>
+                </div>
+                 <FormField
+                    control={form.control}
+                    name="comidasDia"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>¿Cuántas veces come al día? *</FormLabel>
+                        <FormControl>
+                            <Input type="number" placeholder="Ej. 3" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                 <FormField
+                    control={form.control}
+                    name="alimentacionCotidiana"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Especifique en qué consiste su alimentación cotidianamente *</FormLabel>
+                        <FormControl>
+                            <Textarea
+                            placeholder="Describa su desayuno, comida, cena, etc."
+                            className="resize-y"
+                            {...field}
+                            />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+
             </div>
 
 
