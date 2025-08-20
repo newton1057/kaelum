@@ -202,6 +202,14 @@ const screeningSchema = z.object({
   }),
   numeroParejasSexuales: z.coerce.number().int().min(0, "Debe ser un número positivo.").optional(),
   metodoAnticonceptivo: z.string().optional(),
+  // Ginecologicos
+  menstruacionInicio: z.coerce.number().int().positive().optional(),
+  menstruacionFrecuencia: z.string().optional(),
+  menstruacionDolor: z.enum(['Sí', 'No']).optional(),
+  menstruacionFechaUltima: z.date().optional(),
+  papanicolao: z.enum(['Sí', 'No']).optional(),
+  papanicolaoResultados: z.string().optional(),
+  vph: z.enum(['Sí', 'No']).optional(),
 }).refine((data) => {
     if (data.channel === 'Otro') {
         return data.channelOther && data.channelOther.length > 0;
@@ -451,6 +459,8 @@ export function ScreeningQuestionnaireDialog({
       inicioVidaSexual: undefined,
       numeroParejasSexuales: undefined,
       metodoAnticonceptivo: '',
+      menstruacionFrecuencia: '',
+      papanicolaoResultados: '',
     },
   });
 
@@ -2304,6 +2314,183 @@ export function ScreeningQuestionnaireDialog({
                     </div>
                 )}
             </div>
+
+            {watchedSexo === 'Mujer' && (
+              <div className="space-y-8 rounded-lg border p-6">
+                  <div className="space-y-2">
+                      <h3 className="text-lg font-semibold">Antecedentes Gineco Obstétricos</h3>
+                      <p className="text-sm text-muted-foreground">Esta sección es solo para pacientes mujeres.</p>
+                  </div>
+                   <FormField
+                      control={form.control}
+                      name="menstruacionInicio"
+                      render={({ field }) => (
+                          <FormItem>
+                          <FormLabel>Edad de inicio de menstruación</FormLabel>
+                          <FormControl>
+                              <Input type="number" placeholder="Ej. 12" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                          </FormItem>
+                      )}
+                  />
+                  <FormField
+                      control={form.control}
+                      name="menstruacionFrecuencia"
+                      render={({ field }) => (
+                          <FormItem>
+                          <FormLabel>Frecuencia y duración de menstruación</FormLabel>
+                          <FormControl>
+                              <Input placeholder="Ej. Regular, cada 28 días, dura 5 días" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                          </FormItem>
+                      )}
+                  />
+                  <FormField
+                      control={form.control}
+                      name="menstruacionDolor"
+                      render={({ field }) => (
+                          <FormItem className="space-y-3">
+                          <FormLabel>Dolor durante la menstruación</FormLabel>
+                          <FormControl>
+                              <RadioGroup
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                              className="flex items-center gap-4"
+                              >
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                  <FormControl>
+                                  <RadioGroupItem value="Sí" />
+                                  </FormControl>
+                                  <FormLabel className="font-normal">Sí</FormLabel>
+                              </FormItem>
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                  <FormControl>
+                                  <RadioGroupItem value="No" />
+                                  </FormControl>
+                                  <FormLabel className="font-normal">No</FormLabel>
+                              </FormItem>
+                              </RadioGroup>
+                          </FormControl>
+                          <FormMessage />
+                          </FormItem>
+                      )}
+                  />
+                  <FormField
+                      control={form.control}
+                      name="menstruacionFechaUltima"
+                      render={({ field }) => (
+                          <FormItem className="flex flex-col">
+                          <FormLabel>Fecha última menstruación</FormLabel>
+                          <Popover>
+                              <PopoverTrigger asChild>
+                              <FormControl>
+                                  <Button
+                                  variant={"outline"}
+                                  className={cn(
+                                      "w-full pl-3 text-left font-normal",
+                                      !field.value && "text-muted-foreground"
+                                  )}
+                                  >
+                                  {field.value ? (
+                                      format(field.value, "PPP", { locale: es })
+                                  ) : (
+                                      <span>Seleccionar fecha</span>
+                                  )}
+                                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                  </Button>
+                              </FormControl>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-auto p-0" align="start">
+                              <Calendar
+                                  mode="single"
+                                  selected={field.value}
+                                  onSelect={field.onChange}
+                                  disabled={(date) => date > new Date()}
+                                  initialFocus
+                              />
+                              </PopoverContent>
+                          </Popover>
+                          <FormMessage />
+                          </FormItem>
+                      )}
+                  />
+                  <FormField
+                      control={form.control}
+                      name="papanicolao"
+                      render={({ field }) => (
+                          <FormItem className="space-y-3">
+                          <FormLabel>¿Se ha realizado Papanicolao?</FormLabel>
+                          <FormControl>
+                              <RadioGroup
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                              className="flex items-center gap-4"
+                              >
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                  <FormControl>
+                                  <RadioGroupItem value="Sí" />
+                                  </FormControl>
+                                  <FormLabel className="font-normal">Sí</FormLabel>
+                              </FormItem>
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                  <FormControl>
+                                  <RadioGroupItem value="No" />
+                                  </FormControl>
+                                  <FormLabel className="font-normal">No</FormLabel>
+                              </FormItem>
+                              </RadioGroup>
+                          </FormControl>
+                          <FormMessage />
+                          </FormItem>
+                      )}
+                  />
+                  <FormField
+                      control={form.control}
+                      name="papanicolaoResultados"
+                      render={({ field }) => (
+                          <FormItem>
+                          <FormLabel>¿Conoce los resultados? Especifique.</FormLabel>
+                          <FormControl>
+                              <Textarea placeholder="Especifique los resultados..." {...field} />
+                          </FormControl>
+                          <FormMessage />
+                          </FormItem>
+                      )}
+                  />
+                  <FormField
+                      control={form.control}
+                      name="vph"
+                      render={({ field }) => (
+                          <FormItem className="space-y-3">
+                          <FormLabel>Aplicación de vacuna para Virus de Papiloma Humano</FormLabel>
+                          <FormControl>
+                              <RadioGroup
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                              className="flex items-center gap-4"
+                              >
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                  <FormControl>
+                                  <RadioGroupItem value="Sí" />
+                                  </FormControl>
+                                  <FormLabel className="font-normal">Sí</FormLabel>
+                              </FormItem>
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                  <FormControl>
+                                  <RadioGroupItem value="No" />
+                                  </FormControl>
+                                  <FormLabel className="font-normal">No</FormLabel>
+                              </FormItem>
+                              </RadioGroup>
+                          </FormControl>
+                          <FormMessage />
+                          </FormItem>
+                      )}
+                  />
+              </div>
+            )}
 
             <FormField
               control={form.control}
