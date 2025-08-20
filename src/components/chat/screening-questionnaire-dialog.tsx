@@ -175,6 +175,28 @@ const screeningSchema = z.object({
   llegaTardeCitas: z.enum(['Sí', 'No'], {
     required_error: 'Debes seleccionar una opción.',
   }),
+  dificultadesFinanzas: z.enum(['Sí', 'No'], {
+    required_error: 'Debes seleccionar una opción.',
+  }),
+  dificultadesFinanzasEspecificar: z.string().optional(),
+  problemasLegales: z.enum(['Sí', 'No'], {
+    required_error: 'Debes seleccionar una opción.',
+  }),
+  problemasLegalesEspecificar: z.string().optional(),
+  estudiandoActualmente: z.string().optional(),
+  repitioCiclo: z.string().optional(),
+  abandonoEscuela: z.enum(['Sí', 'No'], {
+    required_error: 'Debes seleccionar una opción.',
+  }),
+  abandonoEscuelaEdad: z.string().optional(),
+  abandonoEscuelaMotivos: z.string().optional(),
+  ultimoGradoEstudios: z.string().min(2, 'Debes especificar el último grado.'),
+  cambioCarrera: z.string().optional(),
+  expulsion: z.string().optional(),
+  acosoEscolar: z.enum(['Sí', 'No'], {
+    required_error: 'Debes seleccionar una opción.',
+  }),
+  acosoEscolarRol: z.enum(['Agresor', 'Víctima']).optional(),
 }).refine((data) => {
     if (data.channel === 'Otro') {
         return data.channelOther && data.channelOther.length > 0;
@@ -281,6 +303,39 @@ const screeningSchema = z.object({
 }, {
     message: 'Por favor, describa la actividad económica.',
     path: ['actividadEconomica'],
+}).refine((data) => {
+    if (data.dificultadesFinanzas === 'Sí') {
+        return data.dificultadesFinanzasEspecificar && data.dificultadesFinanzasEspecificar.length > 0;
+    }
+    return true;
+}, {
+    message: 'Por favor, especifique las dificultades.',
+    path: ['dificultadesFinanzasEspecificar'],
+}).refine((data) => {
+    if (data.problemasLegales === 'Sí') {
+        return data.problemasLegalesEspecificar && data.problemasLegalesEspecificar.length > 0;
+    }
+    return true;
+}, {
+    message: 'Por favor, especifique los problemas.',
+    path: ['problemasLegalesEspecificar'],
+}).refine((data) => {
+    if (data.abandonoEscuela === 'Sí') {
+        return data.abandonoEscuelaEdad && data.abandonoEscuelaEdad.length > 0 &&
+               data.abandonoEscuelaMotivos && data.abandonoEscuelaMotivos.length > 0;
+    }
+    return true;
+}, {
+    message: 'Debe especificar la edad y los motivos.',
+    path: ['abandonoEscuelaEdad'],
+}).refine((data) => {
+    if (data.acosoEscolar === 'Sí') {
+        return data.acosoEscolarRol !== undefined;
+    }
+    return true;
+}, {
+    message: 'Debe seleccionar un rol.',
+    path: ['acosoEscolarRol'],
 });
 
 type ScreeningFormValues = z.infer<typeof screeningSchema>;
@@ -358,6 +413,20 @@ export function ScreeningQuestionnaireDialog({
       empleosAnteriores: '',
       periodosSinEmpleo: '',
       llegaTardeCitas: undefined,
+      dificultadesFinanzas: undefined,
+      dificultadesFinanzasEspecificar: '',
+      problemasLegales: undefined,
+      problemasLegalesEspecificar: '',
+      estudiandoActualmente: '',
+      repitioCiclo: '',
+      abandonoEscuela: undefined,
+      abandonoEscuelaEdad: '',
+      abandonoEscuelaMotivos: '',
+      ultimoGradoEstudios: '',
+      cambioCarrera: '',
+      expulsion: '',
+      acosoEscolar: undefined,
+      acosoEscolarRol: undefined,
     },
   });
 
@@ -375,6 +444,10 @@ export function ScreeningQuestionnaireDialog({
   const watchedTratamientoPrevio = form.watch('tratamientoPrevio');
   const watchedConsumo = form.watch('consumoAlcoholTabaco');
   const watchedEconomicamenteActivo = form.watch('economicamenteActivo');
+  const watchedDificultadesFinanzas = form.watch('dificultadesFinanzas');
+  const watchedProblemasLegales = form.watch('problemasLegales');
+  const watchedAbandonoEscuela = form.watch('abandonoEscuela');
+  const watchedAcosoEscolar = form.watch('acosoEscolar');
 
   const [age, setAge] = useState<number | null>(null);
 
@@ -1809,7 +1882,7 @@ export function ScreeningQuestionnaireDialog({
                     name="llegaTardeCitas"
                     render={({ field }) => (
                         <FormItem className="space-y-3">
-                        <FormLabel>¿Regularmente llega tarde a sus citas?</FormLabel>
+                        <FormLabel>¿Regularmente llega tarde a sus citas? *</FormLabel>
                         <FormControl>
                             <RadioGroup
                             onValueChange={field.onChange}
@@ -1834,7 +1907,311 @@ export function ScreeningQuestionnaireDialog({
                         </FormItem>
                     )}
                 />
+                <FormField
+                    control={form.control}
+                    name="dificultadesFinanzas"
+                    render={({ field }) => (
+                        <FormItem className="space-y-3">
+                        <FormLabel>¿Considera que tiene dificultades para organizar sus finanzas? *</FormLabel>
+                        <FormControl>
+                            <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="flex items-center gap-4"
+                            >
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="Sí" />
+                                </FormControl>
+                                <FormLabel className="font-normal">Sí</FormLabel>
+                            </FormItem>
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="No" />
+                                </FormControl>
+                                <FormLabel className="font-normal">No</FormLabel>
+                            </FormItem>
+                            </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                {watchedDificultadesFinanzas === 'Sí' && (
+                    <FormField
+                    control={form.control}
+                    name="dificultadesFinanzasEspecificar"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Especifique las dificultades</FormLabel>
+                        <FormControl>
+                            <Textarea
+                            placeholder="Especifique..."
+                            className="resize-y"
+                            {...field}
+                            />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+                )}
+                 <FormField
+                    control={form.control}
+                    name="problemasLegales"
+                    render={({ field }) => (
+                        <FormItem className="space-y-3">
+                        <FormLabel>¿Ha tenido problemas legales? *</FormLabel>
+                        <FormControl>
+                            <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="flex items-center gap-4"
+                            >
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="Sí" />
+                                </FormControl>
+                                <FormLabel className="font-normal">Sí</FormLabel>
+                            </FormItem>
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="No" />
+                                </FormControl>
+                                <FormLabel className="font-normal">No</FormLabel>
+                            </FormItem>
+                            </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                {watchedProblemasLegales === 'Sí' && (
+                    <FormField
+                    control={form.control}
+                    name="problemasLegalesEspecificar"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Especifique los problemas</FormLabel>
+                        <FormControl>
+                            <Textarea
+                            placeholder="Especifique..."
+                            className="resize-y"
+                            {...field}
+                            />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+                )}
 
+            </div>
+            
+            <div className="space-y-8 rounded-lg border p-6">
+                <div className="space-y-2">
+                    <h3 className="text-lg font-semibold">Antecedentes Escolares</h3>
+                </div>
+                 <FormField
+                    control={form.control}
+                    name="estudiandoActualmente"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>¿Actualmente se encuentra estudiando? Especifique</FormLabel>
+                        <FormControl>
+                            <Input placeholder="Especifique..." {...field} />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                 <FormField
+                    control={form.control}
+                    name="repitioCiclo"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>¿Alguna vez repitió algún ciclo escolar? ¿Cuál?</FormLabel>
+                        <FormControl>
+                            <Input placeholder="Especifique..." {...field} />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                 <FormField
+                    control={form.control}
+                    name="abandonoEscuela"
+                    render={({ field }) => (
+                        <FormItem className="space-y-3">
+                        <FormLabel>¿Alguna vez abandonó la escuela? *</FormLabel>
+                        <FormControl>
+                            <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="flex items-center gap-4"
+                            >
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="Sí" />
+                                </FormControl>
+                                <FormLabel className="font-normal">Sí</FormLabel>
+                            </FormItem>
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="No" />
+                                </FormControl>
+                                <FormLabel className="font-normal">No</FormLabel>
+                            </FormItem>
+                            </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                {watchedAbandonoEscuela === 'Sí' && (
+                    <div className="space-y-4 pl-4 border-l">
+                         <FormField
+                            control={form.control}
+                            name="abandonoEscuelaEdad"
+                            render={({ field }) => (
+                                <FormItem>
+                                <FormLabel>¿A qué edad?</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="Especifique..." {...field} />
+                                </FormControl>
+                                <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                         <FormField
+                            control={form.control}
+                            name="abandonoEscuelaMotivos"
+                            render={({ field }) => (
+                                <FormItem>
+                                <FormLabel>Especifique los motivos</FormLabel>
+                                <FormControl>
+                                    <Textarea placeholder="Especifique..." {...field} />
+                                </FormControl>
+                                <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+                )}
+                 <FormField
+                    control={form.control}
+                    name="ultimoGradoEstudios"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Especifique su último grado de estudios *</FormLabel>
+                        <FormControl>
+                            <Textarea
+                             placeholder="Si tiene un título universitario o posgrado, especifique en qué carrera."
+                             className="resize-y"
+                             {...field}
+                            />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                 <FormField
+                    control={form.control}
+                    name="cambioCarrera"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>¿Alguna vez cambió de carrera universitaria?</FormLabel>
+                        <FormControl>
+                            <Textarea
+                             placeholder="Especifique los motivos, y el tiempo que estuvo sin asistir en la escuela."
+                             className="resize-y"
+                             {...field}
+                            />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                 <FormField
+                    control={form.control}
+                    name="expulsion"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>¿Fue expulsado o suspendido de la escuela?</FormLabel>
+                        <FormControl>
+                            <Textarea
+                             placeholder="Especifique los motivos."
+                             className="resize-y"
+                             {...field}
+                            />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                 <FormField
+                    control={form.control}
+                    name="acosoEscolar"
+                    render={({ field }) => (
+                        <FormItem className="space-y-3">
+                        <FormLabel>¿Vivió acoso escolar? *</FormLabel>
+                        <FormControl>
+                            <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="flex items-center gap-4"
+                            >
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="Sí" />
+                                </FormControl>
+                                <FormLabel className="font-normal">Sí</FormLabel>
+                            </FormItem>
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="No" />
+                                </FormControl>
+                                <FormLabel className="font-normal">No</FormLabel>
+                            </FormItem>
+                            </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                {watchedAcosoEscolar === 'Sí' && (
+                    <FormField
+                    control={form.control}
+                    name="acosoEscolarRol"
+                    render={({ field }) => (
+                        <FormItem className="space-y-3">
+                        <FormLabel>En caso de que haya vivido acoso escolar. ¿Usted fue agresor o víctima?</FormLabel>
+                        <FormControl>
+                            <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="flex items-center gap-4"
+                            >
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="Agresor" />
+                                </FormControl>
+                                <FormLabel className="font-normal">Agresor</FormLabel>
+                            </FormItem>
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="Víctima" />
+                                </FormControl>
+                                <FormLabel className="font-normal">Víctima</FormLabel>
+                            </FormItem>
+                            </RadioGroup>
+                        </FormControl>
+                        <FormDescription>Sólo si contestó SI en la pergunta anterior.</FormDescription>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+                )}
             </div>
 
 
