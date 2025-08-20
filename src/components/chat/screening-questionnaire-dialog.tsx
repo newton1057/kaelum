@@ -23,12 +23,16 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Info } from 'lucide-react';
+import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
 
 const screeningSchema = z.object({
   curp: z.string().min(18, {
     message: 'La CURP debe tener 18 caracteres.',
   }).max(18, {
     message: 'La CURP debe tener 18 caracteres.',
+  }),
+  doctor: z.enum(['Dra. Yariela Delgadillo', 'Dr. Carlos Chicalote'], {
+    required_error: 'Debes seleccionar un doctor.',
   }),
 });
 
@@ -79,6 +83,40 @@ export function ScreeningQuestionnaireDialog({
                   <FormLabel>CURP</FormLabel>
                   <FormControl>
                     <Input placeholder="Introduce la CURP de 18 caracteres" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="doctor"
+              render={({ field }) => (
+                <FormItem className="space-y-3">
+                  <FormLabel>Asistiré a consulta con:</FormLabel>
+                  <FormControl>
+                    <RadioGroup
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      className="flex flex-col space-y-1"
+                    >
+                      <FormItem className="flex items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="Dra. Yariela Delgadillo" />
+                        </FormControl>
+                        <FormLabel className="font-normal">
+                          Dra. Yariela Delgadillo
+                        </FormLabel>
+                      </FormItem>
+                      <FormItem className="flex items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="Dr. Carlos Chicalote" />
+                        </FormControl>
+                        <FormLabel className="font-normal">
+                          Dr. Carlos Chicalote
+                        </FormLabel>
+                      </FormItem>
+                    </RadioGroup>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
