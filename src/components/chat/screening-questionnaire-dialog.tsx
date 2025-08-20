@@ -260,7 +260,7 @@ const screeningSchema = z.object({
 }, {
     message: 'Debe completar todos los campos de consumo.',
     path: ['consumoInicio'],
-});
+}));
 
 type ScreeningFormValues = z.infer<typeof screeningSchema>;
 
@@ -1689,3 +1689,5 @@ export function ScreeningQuestionnaireDialog({
     </Dialog>
   );
 }
+
+    
