@@ -67,7 +67,11 @@ function Calendar({
         Dropdown: (props: DropdownProps) => {
           const { fromYear, toYear, fromMonth, toMonth, fromDate, toDate } = props;
           const options = [];
+          
+          let selectedValue: string | undefined;
+
           if (props.name === "months") {
+             selectedValue = props.displayMonth.getMonth().toString();
             for (let i = 0; i < 12; i++) {
               options.push(
                 <SelectItem key={i} value={i.toString()}>
@@ -76,6 +80,7 @@ function Calendar({
               );
             }
           } else if (props.name === "years") {
+            selectedValue = props.displayMonth.getFullYear().toString();
             const earliestYear = fromYear || fromDate?.getFullYear() || new Date().getFullYear();
             const latestYear = toYear || toDate?.getFullYear() || new Date().getFullYear();
             if (earliestYear && latestYear) {
@@ -91,9 +96,9 @@ function Calendar({
 
           return (
             <Select
-              value={props.value?.toString()}
+              value={selectedValue}
               onValueChange={(newValue) => {
-                const newDate = new Date();
+                 const newDate = new Date(props.displayMonth);
                 if (props.name === "months") {
                   newDate.setMonth(parseInt(newValue));
                 } else if (props.name === "years") {
@@ -102,7 +107,7 @@ function Calendar({
                 props.onChange?.(newDate);
               }}
             >
-              <SelectTrigger>{props.value}</SelectTrigger>
+              <SelectTrigger>{selectedValue}</SelectTrigger>
               <SelectContent>
                 <ScrollArea className="h-48">
                   {options}
