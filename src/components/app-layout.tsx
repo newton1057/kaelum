@@ -54,6 +54,8 @@ export default function AppLayout() {
 
         if (loadedChats.length > 0) {
           setActiveChatId(loadedChats[0].id);
+        } else {
+            setIsNewConsultationTypeDialogOpen(true);
         }
       } catch (error) {
         console.error('Error loading chats:', error);
