@@ -262,7 +262,6 @@ const screeningSchema = z.object({
     path: ['consumoInicio'],
 });
 
-
 type ScreeningFormValues = z.infer<typeof screeningSchema>;
 
 interface ScreeningQuestionnaireDialogProps {
@@ -1690,5 +1689,3 @@ export function ScreeningQuestionnaireDialog({
     </Dialog>
   );
 }
-
-    
