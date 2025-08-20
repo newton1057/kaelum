@@ -36,6 +36,7 @@ import { es } from 'date-fns/locale';
 import { FamilyHistoryGrid } from './family-history-grid';
 import type { FamilyHistoryData } from './family-history-grid';
 import { Separator } from '../ui/separator';
+import { Checkbox } from '../ui/checkbox';
 
 const mexicanStates = [
   'Aguascalientes', 'Baja California', 'Baja California Sur', 'Campeche', 'Chiapas',
@@ -50,6 +51,16 @@ const educationLevels = [
     "Sin escolaridad", "Preescolar", "Primaria", "Secundaria", "Preparatoria o Bachillerato",
     "Carrera técnica", "Licenciatura", "Maestría", "Doctorado"
 ];
+
+const violenceTypes = [
+    { id: 'Física', label: 'Física' },
+    { id: 'Sexual', label: 'Sexual' },
+    { id: 'Económica', label: 'Económica' },
+    { id: 'Psicológica', label: 'Psicológica' },
+    { id: 'Patrimonial', label: 'Patrimonial (documentos oficiales, bienes)' },
+    { id: 'Omisión', label: 'Omisión (falta de reciprocidad o responsabilidad en la relación)' },
+    { id: 'Alienación parental', label: 'Alienación parental (Manipulación de los hijos)' },
+] as const;
 
 
 const screeningSchema = z.object({
@@ -210,6 +221,14 @@ const screeningSchema = z.object({
   papanicolao: z.enum(['Sí', 'No']).optional(),
   papanicolaoResultados: z.string().optional(),
   vph: z.enum(['Sí', 'No']).optional(),
+  // Pareja
+  numeroNoviazgos: z.coerce.number().int().min(0, "Debe ser un número positivo."),
+  duracionPromedioNoviazgo: z.string().min(1, 'Este campo es obligatorio.'),
+  violenciaPareja: z.enum(['Sí', 'No'], {
+    required_error: 'Debes seleccionar una opción.',
+  }),
+  violenciaParejaTipos: z.array(z.string()).optional(),
+  violenciaParejaRol: z.enum(['Emisor', 'Receptor', 'Ambos']).optional(),
 }).refine((data) => {
     if (data.channel === 'Otro') {
         return data.channelOther && data.channelOther.length > 0;
@@ -365,6 +384,22 @@ const screeningSchema = z.object({
 }, {
     message: 'Debe especificar el método anticonceptivo o indicar "Ninguno".',
     path: ['metodoAnticonceptivo'],
+}).refine((data) => {
+    if (data.violenciaPareja === 'Sí') {
+        return data.violenciaParejaTipos && data.violenciaParejaTipos.length > 0;
+    }
+    return true;
+}, {
+    message: 'Debe seleccionar al menos un tipo de violencia.',
+    path: ['violenciaParejaTipos'],
+}).refine((data) => {
+    if (data.violenciaPareja === 'Sí') {
+        return !!data.violenciaParejaRol;
+    }
+    return true;
+}, {
+    message: 'Debe especificar si fue emisor, receptor o ambos.',
+    path: ['violenciaParejaRol'],
 });
 
 type ScreeningFormValues = z.infer<typeof screeningSchema>;
@@ -461,6 +496,11 @@ export function ScreeningQuestionnaireDialog({
       metodoAnticonceptivo: '',
       menstruacionFrecuencia: '',
       papanicolaoResultados: '',
+      numeroNoviazgos: undefined,
+      duracionPromedioNoviazgo: '',
+      violenciaPareja: undefined,
+      violenciaParejaTipos: [],
+      violenciaParejaRol: undefined,
     },
   });
 
@@ -483,6 +523,8 @@ export function ScreeningQuestionnaireDialog({
   const watchedAbandonoEscuela = form.watch('abandonoEscuela');
   const watchedAcosoEscolar = form.watch('acosoEscolar');
   const watchedInicioVidaSexual = form.watch('inicioVidaSexual');
+  const watchedViolenciaPareja = form.watch('violenciaPareja');
+
 
   const [age, setAge] = useState<number | null>(null);
 
@@ -2491,6 +2533,157 @@ export function ScreeningQuestionnaireDialog({
                   />
               </div>
             )}
+            
+            <div className="space-y-8 rounded-lg border p-6">
+                <div className="space-y-2">
+                    <h3 className="text-lg font-semibold">Pareja y relaciones de noviazgo</h3>
+                </div>
+                 <FormField
+                    control={form.control}
+                    name="numeroNoviazgos"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Número de relaciones de noviazgo *</FormLabel>
+                        <FormControl>
+                            <Input type="number" placeholder="0" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="duracionPromedioNoviazgo"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Especifique la duración promedio de sus relaciones de noviazgo.</FormLabel>
+                        <FormControl>
+                            <Input placeholder="Ej. 1 año, 6 meses..." {...field} />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                 <FormField
+                    control={form.control}
+                    name="violenciaPareja"
+                    render={({ field }) => (
+                        <FormItem className="space-y-3">
+                        <FormLabel>¿Ha vivido violencia en la pareja? *</FormLabel>
+                        <FormControl>
+                            <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="flex items-center gap-4"
+                            >
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="Sí" />
+                                </FormControl>
+                                <FormLabel className="font-normal">Sí</FormLabel>
+                            </FormItem>
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="No" />
+                                </FormControl>
+                                <FormLabel className="font-normal">No</FormLabel>
+                            </FormItem>
+                            </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                {watchedViolenciaPareja === 'Sí' && (
+                  <div className="space-y-4 pl-4 border-l">
+                    <FormField
+                      control={form.control}
+                      name="violenciaParejaTipos"
+                      render={() => (
+                        <FormItem>
+                          <div className="mb-4">
+                            <FormLabel className="text-base">Especifique</FormLabel>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {violenceTypes.map((item) => (
+                              <FormField
+                                key={item.id}
+                                control={form.control}
+                                name="violenciaParejaTipos"
+                                render={({ field }) => {
+                                  return (
+                                    <FormItem
+                                      key={item.id}
+                                      className="flex flex-row items-start space-x-3 space-y-0"
+                                    >
+                                      <FormControl>
+                                        <Checkbox
+                                          checked={field.value?.includes(item.id)}
+                                          onCheckedChange={(checked) => {
+                                            return checked
+                                              ? field.onChange([...(field.value || []), item.id])
+                                              : field.onChange(
+                                                  (field.value || []).filter(
+                                                    (value) => value !== item.id
+                                                  )
+                                                )
+                                          }}
+                                        />
+                                      </FormControl>
+                                      <FormLabel className="font-normal">
+                                        {item.label}
+                                      </FormLabel>
+                                    </FormItem>
+                                  )
+                                }}
+                              />
+                            ))}
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="violenciaParejaRol"
+                      render={({ field }) => (
+                          <FormItem className="space-y-3">
+                          <FormLabel>Especifique si fue emisor, receptor de violencia o ambos.</FormLabel>
+                          <FormControl>
+                              <RadioGroup
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                              className="flex items-center gap-4"
+                              >
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                  <FormControl>
+                                  <RadioGroupItem value="Emisor" />
+                                  </FormControl>
+                                  <FormLabel className="font-normal">Emisor</FormLabel>
+                              </FormItem>
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                  <FormControl>
+                                  <RadioGroupItem value="Receptor" />
+                                  </FormControl>
+                                  <FormLabel className="font-normal">Receptor</FormLabel>
+                              </FormItem>
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                  <FormControl>
+                                  <RadioGroupItem value="Ambos" />
+                                  </FormControl>
+                                  <FormLabel className="font-normal">Ambos</FormLabel>
+                              </FormItem>
+                              </RadioGroup>
+                          </FormControl>
+                          <FormDescription>Solo si marcó SI en la pregunta anterior.</FormDescription>
+                          <FormMessage />
+                          </FormItem>
+                      )}
+                  />
+                  </div>
+                )}
+            </div>
 
             <FormField
               control={form.control}
