@@ -555,7 +555,7 @@ export function ScreeningQuestionnaireDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:w-[80vw] sm:max-w-[80vw] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="flex flex-col sm:w-[90vw] sm:max-w-[80vw] max-h-[90vh] overflow-y-auto overflow-x-hidden">
         <DialogHeader>
           <DialogTitle>Cuestionario de Tamizaje Adultos</DialogTitle>
           <DialogDescription>
@@ -854,21 +854,26 @@ export function ScreeningQuestionnaireDialog({
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="antecedentesFamiliares"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <FamilyHistoryGrid
-                      value={field.value || {}}
-                      onChange={field.onChange}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+            
+<FormField
+  control={form.control}
+  name="antecedentesFamiliares"
+  render={({ field }) => (
+    <FormItem>
+      <FormControl>
+        {/* Contenedor que SÍ puede scrollear en X */}
+        <div className="overflow-x-scroll [-webkit-overflow-scrolling:touch]">
+          {/* Este wrapper fuerza que el contenido sea más ancho que el contenedor */}
+          <FamilyHistoryGrid
+              value={field.value || {}}
+              onChange={field.onChange}
             />
+        </div>
+      </FormControl>
+      <FormMessage />
+    </FormItem>
+  )}
+/>
             
             <FormField
               control={form.control}
@@ -2760,7 +2765,7 @@ export function ScreeningQuestionnaireDialog({
             )}
             
             <DialogFooter>
-              <Button type="submit">Iniciar Cuestionario</Button>
+              <Button type="submit">Terminar</Button>
             </DialogFooter>
           </form>
         </Form>

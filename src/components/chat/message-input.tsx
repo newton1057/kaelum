@@ -1,11 +1,12 @@
 
 'use client';
 
-import { useState, useRef, type FormEvent, type ChangeEvent } from 'react';
+import { useState, useRef, type FormEvent, type ChangeEvent, type DragEvent } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { SendHorizontal, Paperclip, X, File as FileIcon } from 'lucide-react';
+import { SendHorizontal, Paperclip, X, File as FileIcon, Upload } from 'lucide-react';
 import Image from 'next/image';
+import { cn } from '@/lib/utils';
 
 interface MessageInputProps {
   onSendMessage: (content: string, file?: File) => void;
@@ -15,6 +16,7 @@ export default function MessageInput({ onSendMessage }: MessageInputProps) {
   const [inputValue, setInputValue] = useState('');
   const [attachment, setAttachment] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isDraggingOver, setIsDraggingOver] = useState(false);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -24,6 +26,25 @@ export default function MessageInput({ onSendMessage }: MessageInputProps) {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
       textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  };
+
+  const handleFileChange = (file: File) => {
+    setAttachment(file);
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
+    if (file.type.startsWith('image/')) {
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
+    } else {
+      setPreviewUrl(null);
+    }
+  };
+
+  const handleFileInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      handleFileChange(e.target.files[0]);
     }
   };
 
@@ -61,23 +82,52 @@ export default function MessageInput({ onSendMessage }: MessageInputProps) {
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
-      setAttachment(file);
+  const handleDragEnter = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingOver(true);
+  };
 
-      if (file.type.startsWith('image/')) {
-        const url = URL.createObjectURL(file);
-        setPreviewUrl(url);
-      } else {
-        setPreviewUrl(null);
-      }
+  const handleDragLeave = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingOver(false);
+  };
+
+  const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingOver(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleFileChange(e.dataTransfer.files[0]);
+      e.dataTransfer.clearData();
     }
   };
 
   return (
-    <div className="flex flex-col">
-       {attachment && (
+    <div
+      className={cn(
+        'relative flex flex-col transition-colors duration-200 rounded-2xl p-2 border-2 border-dashed border-transparent',
+        isDraggingOver && 'border-primary bg-primary/10'
+      )}
+      onDragEnter={handleDragEnter}
+      onDragLeave={handleDragLeave}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+    >
+      {isDraggingOver && (
+        <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-primary/10 rounded-2xl">
+          <Upload className="h-8 w-8 text-primary" />
+          <p className="font-medium text-primary">Suelta el archivo para adjuntarlo</p>
+        </div>
+      )}
+
+      {attachment && (
         <div className="relative mb-2 w-fit rounded-lg border bg-muted/50 p-2">
           <div className="flex items-center gap-2">
             {previewUrl ? (
@@ -110,12 +160,12 @@ export default function MessageInput({ onSendMessage }: MessageInputProps) {
       )}
       <form
         onSubmit={handleSubmit}
-        className="relative flex w-full items-end gap-2"
+        className={cn('relative flex w-full items-end gap-2', isDraggingOver && 'opacity-50')}
       >
         <input
           type="file"
           ref={fileInputRef}
-          onChange={handleFileChange}
+          onChange={handleFileInputChange}
           className="hidden"
         />
         <Button
