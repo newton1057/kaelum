@@ -51,7 +51,7 @@ export function FamilyHistoryGrid({ value, onChange }: FamilyHistoryGridProps) {
       </CardHeader>
       <CardContent>
         <ScrollArea className="w-full">
-          <table className="w-full border-collapse text-sm whitespace-nowrap">
+          <table className="border-collapse text-sm whitespace-nowrap">
             <thead>
               <tr className="border-b">
                 <th className="sticky left-0 bg-background p-2 text-left font-semibold">Familiar</th>
