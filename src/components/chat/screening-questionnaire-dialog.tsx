@@ -80,7 +80,18 @@ export function ScreeningQuestionnaireDialog({
               name="curp"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>CURP</FormLabel>
+                  <div className="flex justify-between items-center">
+                    <FormLabel>CURP</FormLabel>
+                    <a
+                      href="https://consultas.curp.gob.mx/CurpSP/gobmx/inicio.jsp"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center text-xs text-muted-foreground hover:text-primary"
+                    >
+                      <Info className="mr-1 h-3 w-3" />
+                      Consulta tu CURP aquí
+                    </a>
+                  </div>
                   <FormControl>
                     <Input placeholder="Introduce la CURP de 18 caracteres" {...field} />
                   </FormControl>
@@ -122,15 +133,6 @@ export function ScreeningQuestionnaireDialog({
                 </FormItem>
               )}
             />
-            <a
-              href="https://consultas.curp.gob.mx/CurpSP/gobmx/inicio.jsp"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center text-sm text-muted-foreground hover:text-primary"
-            >
-              <Info className="mr-2 h-4 w-4" />
-              Consulta tu CURP aquí
-            </a>
             <DialogFooter>
               <Button type="submit">Iniciar Cuestionario</Button>
             </DialogFooter>
