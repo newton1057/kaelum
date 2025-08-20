@@ -50,8 +50,8 @@ export function FamilyHistoryGrid({ value, onChange }: FamilyHistoryGridProps) {
         <CardDescription>Marque si su familiar tiene o tuvo antecedentes de las siguientes condiciones.</CardDescription>
       </CardHeader>
       <CardContent>
-        <ScrollArea className="w-full whitespace-nowrap">
-          <table className="w-full border-collapse text-sm">
+        <ScrollArea className="w-full">
+          <table className="w-full border-collapse text-sm whitespace-nowrap">
             <thead>
               <tr className="border-b">
                 <th className="sticky left-0 bg-background p-2 text-left font-semibold">Familiar</th>
