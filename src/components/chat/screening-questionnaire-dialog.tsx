@@ -197,6 +197,11 @@ const screeningSchema = z.object({
     required_error: 'Debes seleccionar una opción.',
   }),
   acosoEscolarRol: z.enum(['Agresor', 'Víctima']).optional(),
+  inicioVidaSexual: z.enum(['Sí', 'No'], {
+    required_error: 'Debes seleccionar una opción.',
+  }),
+  numeroParejasSexuales: z.coerce.number().int().min(0, "Debe ser un número positivo.").optional(),
+  metodoAnticonceptivo: z.string().optional(),
 }).refine((data) => {
     if (data.channel === 'Otro') {
         return data.channelOther && data.channelOther.length > 0;
@@ -336,6 +341,22 @@ const screeningSchema = z.object({
 }, {
     message: 'Debe seleccionar un rol.',
     path: ['acosoEscolarRol'],
+}).refine((data) => {
+    if (data.inicioVidaSexual === 'Sí') {
+        return data.numeroParejasSexuales !== undefined && data.numeroParejasSexuales >= 0;
+    }
+    return true;
+}, {
+    message: 'Debe especificar el número de parejas sexuales.',
+    path: ['numeroParejasSexuales'],
+}).refine((data) => {
+    if (data.inicioVidaSexual === 'Sí') {
+        return data.metodoAnticonceptivo && data.metodoAnticonceptivo.length > 0;
+    }
+    return true;
+}, {
+    message: 'Debe especificar el método anticonceptivo o indicar "Ninguno".',
+    path: ['metodoAnticonceptivo'],
 });
 
 type ScreeningFormValues = z.infer<typeof screeningSchema>;
@@ -427,6 +448,9 @@ export function ScreeningQuestionnaireDialog({
       expulsion: '',
       acosoEscolar: undefined,
       acosoEscolarRol: undefined,
+      inicioVidaSexual: undefined,
+      numeroParejasSexuales: undefined,
+      metodoAnticonceptivo: '',
     },
   });
 
@@ -448,6 +472,7 @@ export function ScreeningQuestionnaireDialog({
   const watchedProblemasLegales = form.watch('problemasLegales');
   const watchedAbandonoEscuela = form.watch('abandonoEscuela');
   const watchedAcosoEscolar = form.watch('acosoEscolar');
+  const watchedInicioVidaSexual = form.watch('inicioVidaSexual');
 
   const [age, setAge] = useState<number | null>(null);
 
@@ -2214,6 +2239,71 @@ export function ScreeningQuestionnaireDialog({
                 )}
             </div>
 
+            <div className="space-y-8 rounded-lg border p-6">
+                <div className="space-y-2">
+                    <h3 className="text-lg font-semibold">Área Sexual</h3>
+                </div>
+                <FormField
+                    control={form.control}
+                    name="inicioVidaSexual"
+                    render={({ field }) => (
+                        <FormItem className="space-y-3">
+                        <FormLabel>¿Ha iniciado vida sexual? *</FormLabel>
+                        <FormControl>
+                            <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="flex items-center gap-4"
+                            >
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="Sí" />
+                                </FormControl>
+                                <FormLabel className="font-normal">Sí</FormLabel>
+                            </FormItem>
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="No" />
+                                </FormControl>
+                                <FormLabel className="font-normal">No</FormLabel>
+                            </FormItem>
+                            </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                {watchedInicioVidaSexual === 'Sí' && (
+                    <div className="space-y-4 pl-4 border-l">
+                         <FormField
+                            control={form.control}
+                            name="numeroParejasSexuales"
+                            render={({ field }) => (
+                                <FormItem>
+                                <FormLabel>Número de parejas sexuales</FormLabel>
+                                <FormControl>
+                                    <Input type="number" placeholder="0" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                         <FormField
+                            control={form.control}
+                            name="metodoAnticonceptivo"
+                            render={({ field }) => (
+                                <FormItem>
+                                <FormLabel>¿Utiliza algún método anticonceptivo? ¿Cuál?</FormLabel>
+                                <FormControl>
+                                    <Textarea placeholder="Especifique el método o 'Ninguno'..." {...field} />
+                                </FormControl>
+                                <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+                )}
+            </div>
 
             <FormField
               control={form.control}
