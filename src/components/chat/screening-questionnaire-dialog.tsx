@@ -38,7 +38,17 @@ const screeningSchema = z.object({
   channel: z.enum(['Iniciativa propia', 'Trabajo', 'Internet', 'Otro'], {
     required_error: 'Debes seleccionar un canal.',
   }),
+  channelOther: z.string().optional(),
+}).refine((data) => {
+    if (data.channel === 'Otro') {
+        return data.channelOther && data.channelOther.length > 0;
+    }
+    return true;
+}, {
+    message: 'Por favor, especifica el canal.',
+    path: ['channelOther'],
 });
+
 
 type ScreeningFormValues = z.infer<typeof screeningSchema>;
 
@@ -57,8 +67,11 @@ export function ScreeningQuestionnaireDialog({
     resolver: zodResolver(screeningSchema),
     defaultValues: {
       curp: '',
+      channelOther: '',
     },
   });
+
+  const watchedChannel = form.watch('channel');
 
   const handleFormSubmit = (values: ScreeningFormValues) => {
     onSubmit(values);
@@ -160,6 +173,23 @@ export function ScreeningQuestionnaireDialog({
                 </FormItem>
               )}
             />
+
+            {watchedChannel === 'Otro' && (
+                <FormField
+                control={form.control}
+                name="channelOther"
+                render={({ field }) => (
+                    <FormItem>
+                    <FormLabel>Especificar canal</FormLabel>
+                    <FormControl>
+                        <Input placeholder="Especifique..." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                    </FormItem>
+                )}
+                />
+            )}
+            
             <DialogFooter>
               <Button type="submit">Iniciar Cuestionario</Button>
             </DialogFooter>
