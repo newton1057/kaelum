@@ -402,7 +402,7 @@ const screeningSchema = z.object({
     path: ['violenciaParejaRol'],
 });
 
-type ScreeningFormValues = z.infer<typeof screeningSchema>;
+export type ScreeningFormValues = z.infer<typeof screeningSchema>;
 
 interface ScreeningQuestionnaireDialogProps {
   isOpen: boolean;
@@ -496,7 +496,10 @@ export function ScreeningQuestionnaireDialog({
       metodoAnticonceptivo: '',
       menstruacionInicio: '',
       menstruacionFrecuencia: '',
+      menstruacionDolor: undefined,
+      papanicolao: undefined,
       papanicolaoResultados: '',
+      vph: undefined,
       numeroNoviazgos: '',
       duracionPromedioNoviazgo: '',
       violenciaPareja: undefined,

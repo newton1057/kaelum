@@ -14,11 +14,12 @@ import type { PatientData } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { NewConsultationTypeDialog } from './chat/new-consultation-type-dialog';
 import { ScreeningQuestionnaireDialog } from './chat/screening-questionnaire-dialog';
+import type { ScreeningFormValues } from './chat/screening-questionnaire-dialog';
 
 const initialChats: Chat[] = [];
 
 function transformSessionToChat(session: any): Chat {
-  const patientName = session.data?.name || session.data?.full_name;
+  const patientName = session.data?.name || session.data?.full_name || session.data?.nombre;
   return {
     id: session.session_id,
     title: patientName ? `Consulta de ${patientName}` : `Chat ${new Date(session.created_at * 1000).toLocaleString()}`,
@@ -307,6 +308,43 @@ export default function AppLayout() {
       setIsScreeningQuestionnaireDialogOpen(true);
     }
   };
+  
+  const handleNewScreeningChat = async (formData: ScreeningFormValues) => {
+    const dataToSend = {
+      data: formData
+    }
+    
+    const response = await fetch('https://kaelumapi-703555916890.northamerica-south1.run.app/chat/start', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(dataToSend),
+    });
+
+
+    const result = await response.json();
+    
+    const patientName = formData.nombre;
+    const initialMessage = `Iniciando consulta para **${patientName}** con el Cuestionario de Tamizaje para Adultos. \n\n ¿En qué puedo ayudarte hoy?`;
+    
+    const newChat: Chat = {
+      id: result.session_id,
+      title: `Tamizaje de ${patientName}`,
+      messages: [
+        {
+          id: uuidv4(),
+          role: 'bot',
+          content: initialMessage,
+        },
+      ],
+    };
+
+    setChats([newChat, ...chats]);
+    setActiveChatId(newChat.id);
+    setIsScreeningQuestionnaireDialogOpen(false);
+  };
+
 
   return (
     <SidebarProvider defaultOpen>
@@ -346,10 +384,7 @@ export default function AppLayout() {
       <ScreeningQuestionnaireDialog
         isOpen={isScreeningQuestionnaireDialogOpen}
         onOpenChange={setIsScreeningQuestionnaireDialogOpen}
-        onSubmit={() => {
-          // Handle submit logic
-          setIsScreeningQuestionnaireDialogOpen(false);
-        }}
+        onSubmit={handleNewScreeningChat}
       />
     </SidebarProvider>
   );
