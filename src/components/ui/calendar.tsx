@@ -68,10 +68,13 @@ function Calendar({
           const { fromYear, toYear, fromMonth, toMonth, fromDate, toDate } = props;
           const options = [];
           
+          const selectedDate = props.value ? new Date(props.value as string) : new Date();
+          const displayMonth = props.displayMonth || selectedDate;
+          
           let selectedValue: string | undefined;
 
           if (props.name === "months") {
-             selectedValue = props.displayMonth.getMonth().toString();
+            selectedValue = displayMonth.getMonth().toString();
             for (let i = 0; i < 12; i++) {
               options.push(
                 <SelectItem key={i} value={i.toString()}>
@@ -80,7 +83,7 @@ function Calendar({
               );
             }
           } else if (props.name === "years") {
-            selectedValue = props.displayMonth.getFullYear().toString();
+            selectedValue = displayMonth.getFullYear().toString();
             const earliestYear = fromYear || fromDate?.getFullYear() || new Date().getFullYear();
             const latestYear = toYear || toDate?.getFullYear() || new Date().getFullYear();
             if (earliestYear && latestYear) {
@@ -98,7 +101,7 @@ function Calendar({
             <Select
               value={selectedValue}
               onValueChange={(newValue) => {
-                 const newDate = new Date(props.displayMonth);
+                const newDate = new Date(displayMonth);
                 if (props.name === "months") {
                   newDate.setMonth(parseInt(newValue));
                 } else if (props.name === "years") {
@@ -107,7 +110,7 @@ function Calendar({
                 props.onChange?.(newDate);
               }}
             >
-              <SelectTrigger>{selectedValue}</SelectTrigger>
+              <SelectTrigger>{selectedValue ? (props.name === 'months' ? format(new Date(displayMonth.getFullYear(), parseInt(selectedValue)), 'MMM') : selectedValue) : ''}</SelectTrigger>
               <SelectContent>
                 <ScrollArea className="h-48">
                   {options}
