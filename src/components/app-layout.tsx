@@ -13,6 +13,7 @@ import { NewPatientDialog } from './chat/new-patient-dialog';
 import type { PatientData } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { NewConsultationTypeDialog } from './chat/new-consultation-type-dialog';
+import { ScreeningQuestionnaireDialog } from './chat/screening-questionnaire-dialog';
 
 const initialChats: Chat[] = [];
 
@@ -36,6 +37,7 @@ export default function AppLayout() {
   const [activeChatId, setActiveChatId] = useState<string | null>(null);
   const [isNewPatientDialogOpen, setIsNewPatientDialogOpen] = useState(false);
   const [isNewConsultationTypeDialogOpen, setIsNewConsultationTypeDialogOpen] = useState(false);
+  const [isScreeningQuestionnaireDialogOpen, setIsScreeningQuestionnaireDialogOpen] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -300,11 +302,7 @@ export default function AppLayout() {
     if (type === 'general') {
       setIsNewPatientDialogOpen(true);
     } else {
-      // Handle screening questionnaire logic here in the future
-      toast({
-        title: 'Próximamente',
-        description: 'El cuestionario de tamizaje para adultos estará disponible pronto.',
-      });
+      setIsScreeningQuestionnaireDialogOpen(true);
     }
   };
 
@@ -341,6 +339,14 @@ export default function AppLayout() {
         isOpen={isNewPatientDialogOpen}
         onOpenChange={setIsNewPatientDialogOpen}
         onSubmit={handleNewChat}
+      />
+      <ScreeningQuestionnaireDialog
+        isOpen={isScreeningQuestionnaireDialogOpen}
+        onOpenChange={setIsScreeningQuestionnaireDialogOpen}
+        onSubmit={() => {
+          // Handle submit logic
+          setIsScreeningQuestionnaireDialogOpen(false);
+        }}
       />
     </SidebarProvider>
   );

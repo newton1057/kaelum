@@ -48,15 +48,15 @@ export function NewConsultationTypeDialog({
             </CardHeader>
           </Card>
           <Card
-            className="cursor-not-allowed opacity-50 transition-all"
+            className="cursor-pointer transition-all hover:border-primary hover:shadow-md"
             onClick={() => onSelectType('screening')}
           >
             <CardHeader className="flex flex-row items-center gap-4">
-              <FileText className="h-8 w-8 text-muted-foreground" />
+              <FileText className="h-8 w-8 text-primary" />
               <div>
                 <CardTitle>Cuestionario de Tamizaje Adultos</CardTitle>
                 <CardDescription>
-                  Realiza una evaluación inicial estandarizada. (Próximamente)
+                  Realiza una evaluación inicial estandarizada.
                 </CardDescription>
               </div>
             </CardHeader>
