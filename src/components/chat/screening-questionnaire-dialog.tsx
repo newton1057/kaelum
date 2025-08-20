@@ -88,6 +88,7 @@ const screeningSchema = z.object({
   religion: z.string().optional(),
   motivoConsulta: z.string().min(10, { message: 'El motivo de consulta es obligatorio y debe tener al menos 10 caracteres.' }),
   antecedentesFamiliares: z.record(z.array(z.string())).optional(),
+  antecedentesOtros: z.string().optional(),
 }).refine((data) => {
     if (data.channel === 'Otro') {
         return data.channelOther && data.channelOther.length > 0;
@@ -134,6 +135,7 @@ export function ScreeningQuestionnaireDialog({
       religion: '',
       motivoConsulta: '',
       antecedentesFamiliares: {},
+      antecedentesOtros: '',
     },
   });
 
@@ -471,6 +473,24 @@ export function ScreeningQuestionnaireDialog({
                     <FamilyHistoryGrid
                       value={field.value || {}}
                       onChange={field.onChange}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="antecedentesOtros"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>¿Cuenta con antecedentes familiares de enfermedades crónicas o psiquiátricas no especificadas en el cuadro anterior?</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Especifique otros antecedentes relevantes aquí..."
+                      className="resize-y"
+                      {...field}
                     />
                   </FormControl>
                   <FormMessage />
