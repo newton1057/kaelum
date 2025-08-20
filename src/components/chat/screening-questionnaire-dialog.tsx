@@ -161,7 +161,20 @@ const screeningSchema = z.object({
   horasSueno: z.coerce.number().min(0, "Debe ser un número positivo.").max(24, "No puedes dormir más de 24 horas."),
   comidasDia: z.coerce.number().min(0, "Debe ser un número positivo."),
   alimentacionCotidiana: z.string().min(10, { message: 'La descripción de tu alimentación debe tener al menos 10 caracteres.' }),
-
+  tiempoLibreHoras: z.coerce.number().min(0).optional(),
+  actividadesTiempoLibre: z.string().optional(),
+  diaLaboralCotidiano: z.string().optional(),
+  organizacionTiempo: z.string().optional(),
+  ambienteFamiliar: z.string().min(10, { message: 'La descripción debe tener al menos 10 caracteres.' }),
+  economicamenteActivo: z.enum(['Sí', 'No'], {
+    required_error: 'Debes seleccionar una opción.',
+  }),
+  actividadEconomica: z.string().optional(),
+  empleosAnteriores: z.string().optional(),
+  periodosSinEmpleo: z.string().optional(),
+  llegaTardeCitas: z.enum(['Sí', 'No'], {
+    required_error: 'Debes seleccionar una opción.',
+  }),
 }).refine((data) => {
     if (data.channel === 'Otro') {
         return data.channelOther && data.channelOther.length > 0;
@@ -260,7 +273,15 @@ const screeningSchema = z.object({
 }, {
     message: 'Debe completar todos los campos de consumo.',
     path: ['consumoInicio'],
-}));
+}).refine((data) => {
+    if (data.economicamenteActivo === 'Sí') {
+        return data.actividadEconomica && data.actividadEconomica.length > 0;
+    }
+    return true;
+}, {
+    message: 'Por favor, describa la actividad económica.',
+    path: ['actividadEconomica'],
+});
 
 type ScreeningFormValues = z.infer<typeof screeningSchema>;
 
@@ -327,6 +348,16 @@ export function ScreeningQuestionnaireDialog({
       horasSueno: undefined,
       comidasDia: undefined,
       alimentacionCotidiana: '',
+      tiempoLibreHoras: undefined,
+      actividadesTiempoLibre: '',
+      diaLaboralCotidiano: '',
+      organizacionTiempo: '',
+      ambienteFamiliar: '',
+      economicamenteActivo: undefined,
+      actividadEconomica: '',
+      empleosAnteriores: '',
+      periodosSinEmpleo: '',
+      llegaTardeCitas: undefined,
     },
   });
 
@@ -343,6 +374,7 @@ export function ScreeningQuestionnaireDialog({
   const watchedEnfermedadesCronicas = form.watch('enfermedadesCronicas');
   const watchedTratamientoPrevio = form.watch('tratamientoPrevio');
   const watchedConsumo = form.watch('consumoAlcoholTabaco');
+  const watchedEconomicamenteActivo = form.watch('economicamenteActivo');
 
   const [age, setAge] = useState<number | null>(null);
 
@@ -1201,21 +1233,22 @@ export function ScreeningQuestionnaireDialog({
                 />
                 {watchedTratamientoPrevio !== 'Ninguno' && (
                     <FormField
-                    control={form.control}
-                    name="tratamientoPrevioEspecificar"
-                    render={({ field }) => (
-                        <FormItem>
-                        <FormLabel>Especifique el tratamiento</FormLabel>
-                        <FormControl>
-                            <Textarea
-                            placeholder="Especifique..."
-                            className="resize-y"
-                            {...field}
-                            />
-                        </FormControl>
-                        <FormMessage />
-                        </FormItem>
-                    )}
+                        control={form.control}
+                        name="tratamientoPrevioEspecificar"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>Especifique el tratamiento</FormLabel>
+                            <FormControl>
+                                <Textarea
+                                placeholder="Especifique..."
+                                className="resize-y"
+                                {...field}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                    />
                 )}
                 
                 <FormField
@@ -1601,7 +1634,206 @@ export function ScreeningQuestionnaireDialog({
                         </FormItem>
                     )}
                 />
-
+                <Separator />
+                <div className='space-y-2'>
+                    <h4 className="text-md font-semibold">Otros Hábitos</h4>
+                </div>
+                <FormField
+                    control={form.control}
+                    name="tiempoLibreHoras"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>¿Cuántas horas tiene como "Tiempo libre" a la semana?</FormLabel>
+                        <FormControl>
+                            <Input type="number" placeholder="Ej. 10" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="actividadesTiempoLibre"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>¿Qué hace en su tiempo libre? *</FormLabel>
+                        <FormControl>
+                            <Textarea
+                            placeholder="Describa sus actividades..."
+                            className="resize-y"
+                            {...field}
+                            />
+                        </FormControl>
+                         <FormDescription>Mencione actividades culturales y recreativas.</FormDescription>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="diaLaboralCotidiano"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Describa un día laboral cotidiano.</FormLabel>
+                        <FormControl>
+                            <Textarea
+                            placeholder="Describa sus actividades laborales diarias..."
+                            className="resize-y"
+                            {...field}
+                            />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                 <FormField
+                    control={form.control}
+                    name="organizacionTiempo"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>¿De qué manera organiza su tiempo? *</FormLabel>
+                        <FormControl>
+                            <Textarea
+                            placeholder="Describa cómo organiza su tiempo..."
+                            className="resize-y"
+                            {...field}
+                            />
+                        </FormControl>
+                        <FormDescription>Especifique si usa agenda, lista de tareas, planificación desde un día antes, ninguno, etc.</FormDescription>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="ambienteFamiliar"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Describa brevemente su ambiente familiar. *</FormLabel>
+                        <FormControl>
+                            <Textarea
+                            placeholder="Describa su ambiente familiar..."
+                            className="resize-y"
+                            {...field}
+                            />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="economicamenteActivo"
+                    render={({ field }) => (
+                        <FormItem className="space-y-3">
+                        <FormLabel>¿Es económicamente activo? *</FormLabel>
+                        <FormControl>
+                            <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="flex items-center gap-4"
+                            >
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="Sí" />
+                                </FormControl>
+                                <FormLabel className="font-normal">Sí</FormLabel>
+                            </FormItem>
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="No" />
+                                </FormControl>
+                                <FormLabel className="font-normal">No</FormLabel>
+                            </FormItem>
+                            </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                 {watchedEconomicamenteActivo === 'Sí' && (
+                    <FormField
+                    control={form.control}
+                    name="actividadEconomica"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Describa la actividad económica que realiza</FormLabel>
+                        <FormControl>
+                            <Textarea
+                            placeholder="Si es empleado qué puesto desempeña, describir si trabaja de manera independiente..."
+                            className="resize-y"
+                            {...field}
+                            />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+                )}
+                 <FormField
+                    control={form.control}
+                    name="empleosAnteriores"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Describa empleos en los que ha laborado y por cuánto tiempo.</FormLabel>
+                        <FormControl>
+                            <Textarea
+                            placeholder="Describa sus empleos anteriores..."
+                            className="resize-y"
+                            {...field}
+                            />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                 <FormField
+                    control={form.control}
+                    name="periodosSinEmpleo"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Describa en qué momento de su vida ha permanecido sin empleo y por cuánto tiempo.</FormLabel>
+                        <FormControl>
+                            <Textarea
+                            placeholder="Describa los períodos sin empleo..."
+                            className="resize-y"
+                            {...field}
+                            />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="llegaTardeCitas"
+                    render={({ field }) => (
+                        <FormItem className="space-y-3">
+                        <FormLabel>¿Regularmente llega tarde a sus citas?</FormLabel>
+                        <FormControl>
+                            <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="flex items-center gap-4"
+                            >
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="Sí" />
+                                </FormControl>
+                                <FormLabel className="font-normal">Sí</FormLabel>
+                            </FormItem>
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="No" />
+                                </FormControl>
+                                <FormLabel className="font-normal">No</FormLabel>
+                            </FormItem>
+                            </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
 
             </div>
 
@@ -1689,5 +1921,3 @@ export function ScreeningQuestionnaireDialog({
     </Dialog>
   );
 }
-
-    
