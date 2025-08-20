@@ -1,3 +1,4 @@
+
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -31,7 +32,9 @@ import { format } from 'date-fns';
 import { Calendar } from '../ui/calendar';
 import { useEffect, useState } from 'react';
 import { Textarea } from '../ui/textarea';
-
+import { es } from 'date-fns/locale';
+import { FamilyHistoryGrid } from './family-history-grid';
+import type { FamilyHistoryData } from './family-history-grid';
 
 const mexicanStates = [
   'Aguascalientes', 'Baja California', 'Baja California Sur', 'Campeche', 'Chiapas',
@@ -84,6 +87,7 @@ const screeningSchema = z.object({
   numeroHijos: z.coerce.number().int().min(0, { message: "El número no puede ser negativo."}),
   religion: z.string().optional(),
   motivoConsulta: z.string().min(10, { message: 'El motivo de consulta es obligatorio y debe tener al menos 10 caracteres.' }),
+  antecedentesFamiliares: z.record(z.array(z.string())).optional(),
 }).refine((data) => {
     if (data.channel === 'Otro') {
         return data.channelOther && data.channelOther.length > 0;
@@ -129,6 +133,7 @@ export function ScreeningQuestionnaireDialog({
       numeroHijos: 0,
       religion: '',
       motivoConsulta: '',
+      antecedentesFamiliares: {},
     },
   });
 
@@ -227,7 +232,7 @@ export function ScreeningQuestionnaireDialog({
                                 )}
                                 >
                                 {field.value ? (
-                                    format(field.value, "PPP", { locale: form.control.locale })
+                                    format(field.value, "PPP", { locale: es })
                                 ) : (
                                     <span>Seleccionar fecha</span>
                                 )}
@@ -456,6 +461,23 @@ export function ScreeningQuestionnaireDialog({
                 </FormItem>
               )}
             />
+
+            <FormField
+              control={form.control}
+              name="antecedentesFamiliares"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <FamilyHistoryGrid
+                      value={field.value || {}}
+                      onChange={field.onChange}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
 
             <FormField
               control={form.control}
