@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -10,6 +11,7 @@ import { NewPatientDialog } from '@/components/chat/new-patient-dialog';
 import type { PatientData } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
+import { NewConsultationTypeDialog } from '@/components/chat/new-consultation-type-dialog';
 
 const initialChats: Chat[] = [];
 
@@ -35,6 +37,7 @@ export default function DashboardLayout({
   const [chats, setChats] = useState<Chat[]>(initialChats);
   const [activeChatId, setActiveChatId] = useState<string | null>(null);
   const [isNewPatientDialogOpen, setIsNewPatientDialogOpen] = useState(false);
+  const [isNewConsultationTypeDialogOpen, setIsNewConsultationTypeDialogOpen] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
 
@@ -55,19 +58,6 @@ export default function DashboardLayout({
 
     fetchChats();
   }, []);
-
-  const handleNewChat = () => {
-    // For dashboard, new chat should probably open the dialog, 
-    // which is handled by onNewChat in the sidebar
-     router.push('/chat');
-     // We can't directly open the dialog here as it belongs to AppLayout.
-     // A better approach would be to use a global state manager, but for now
-     // redirecting to the chat page where a new chat can be created is a
-     // reasonable UX. Or, we can just trigger the dialog if we move the dialog logic up.
-     // For now, let's keep it simple. The user can click "New Chat" on the /chat page.
-     // The button in the sidebar now has a single responsibility.
-     setIsNewPatientDialogOpen(true);
-  };
 
   const handleSelectChat = (chatId: string) => {
     setActiveChatId(chatId);
@@ -98,6 +88,19 @@ export default function DashboardLayout({
     router.push('/chat');
     setIsNewPatientDialogOpen(false);
   };
+  
+  const handleSelectConsultationType = (type: 'general' | 'screening') => {
+    setIsNewConsultationTypeDialogOpen(false);
+    if (type === 'general') {
+      setIsNewPatientDialogOpen(true);
+    } else {
+      // Handle screening questionnaire logic here in the future
+      toast({
+        title: 'Próximamente',
+        description: 'El cuestionario de tamizaje para adultos estará disponible pronto.',
+      });
+    }
+  };
 
   return (
     <SidebarProvider defaultOpen>
@@ -105,7 +108,7 @@ export default function DashboardLayout({
         <ChatSidebar
           chats={chats}
           activeChatId={activeChatId}
-          onNewChat={() => setIsNewPatientDialogOpen(true)}
+          onNewChat={() => setIsNewConsultationTypeDialogOpen(true)}
           onSelectChat={handleSelectChat}
         />
         <SidebarInset className="flex flex-col p-0">
@@ -115,6 +118,11 @@ export default function DashboardLayout({
           </div>
         </SidebarInset>
       </div>
+       <NewConsultationTypeDialog
+        isOpen={isNewConsultationTypeDialogOpen}
+        onOpenChange={setIsNewConsultationTypeDialogOpen}
+        onSelectType={handleSelectConsultationType}
+      />
       <NewPatientDialog
         isOpen={isNewPatientDialogOpen}
         onOpenChange={setIsNewPatientDialogOpen}

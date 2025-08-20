@@ -12,6 +12,7 @@ import { SUGGESTED_QUESTIONS } from '@/lib/questions';
 import { NewPatientDialog } from './chat/new-patient-dialog';
 import type { PatientData } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
+import { NewConsultationTypeDialog } from './chat/new-consultation-type-dialog';
 
 const initialChats: Chat[] = [];
 
@@ -34,6 +35,7 @@ export default function AppLayout() {
   const [chats, setChats] = useState<Chat[]>(initialChats);
   const [activeChatId, setActiveChatId] = useState<string | null>(null);
   const [isNewPatientDialogOpen, setIsNewPatientDialogOpen] = useState(false);
+  const [isNewConsultationTypeDialogOpen, setIsNewConsultationTypeDialogOpen] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -292,6 +294,19 @@ export default function AppLayout() {
       }, 25); // Interval per character
     }, randomDelay);
   };
+  
+  const handleSelectConsultationType = (type: 'general' | 'screening') => {
+    setIsNewConsultationTypeDialogOpen(false);
+    if (type === 'general') {
+      setIsNewPatientDialogOpen(true);
+    } else {
+      // Handle screening questionnaire logic here in the future
+      toast({
+        title: 'Próximamente',
+        description: 'El cuestionario de tamizaje para adultos estará disponible pronto.',
+      });
+    }
+  };
 
   return (
     <SidebarProvider defaultOpen>
@@ -299,7 +314,7 @@ export default function AppLayout() {
         <ChatSidebar
           chats={chats}
           activeChatId={activeChatId}
-          onNewChat={() => setIsNewPatientDialogOpen(true)}
+          onNewChat={() => setIsNewConsultationTypeDialogOpen(true)}
           onSelectChat={handleSelectChat}
         />
         <SidebarInset className="flex flex-col p-0">
@@ -317,6 +332,11 @@ export default function AppLayout() {
           </div>
         </SidebarInset>
       </div>
+       <NewConsultationTypeDialog
+        isOpen={isNewConsultationTypeDialogOpen}
+        onOpenChange={setIsNewConsultationTypeDialogOpen}
+        onSelectType={handleSelectConsultationType}
+      />
       <NewPatientDialog
         isOpen={isNewPatientDialogOpen}
         onOpenChange={setIsNewPatientDialogOpen}
