@@ -4,6 +4,7 @@ import * as React from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { DayPicker, DropdownProps } from "react-day-picker"
 import { format } from "date-fns"
+import { es } from 'date-fns/locale';
 
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
@@ -20,6 +21,7 @@ function Calendar({
 }: CalendarProps) {
   return (
     <DayPicker
+      locale={es}
       showOutsideDays={showOutsideDays}
       className={cn("p-3", className)}
       classNames={{
@@ -64,56 +66,43 @@ function Calendar({
         IconRight: ({ className, ...props }) => (
           <ChevronRight className={cn("h-4 w-4", className)} {...props} />
         ),
-        Dropdown: (props: DropdownProps) => {
-          const { fromYear, toYear, fromMonth, toMonth, fromDate, toDate, onMonthChange, onYearChange } = props;
-          const options = [];
+        Dropdown: ({
+          value,
+          onChange,
+          children,
+          ...props
+        }: DropdownProps) => {
+          const options = React.Children.toArray(
+            children
+          ) as React.ReactElement<React.HTMLProps<HTMLOptionElement>>[];
           
-          const selectedDate = props.value ? new Date(props.value as string) : new Date();
-          const displayMonth = props.displayMonth || selectedDate;
+          const selected = options.find((child) => child.props.value === value);
           
-          let selectedValue: string | undefined;
-
-          if (props.name === "months") {
-            selectedValue = displayMonth.getMonth().toString();
-            for (let i = 0; i < 12; i++) {
-              options.push(
-                <SelectItem key={i} value={i.toString()}>
-                  {format(new Date(new Date().getFullYear(), i, 1), "MMM")}
-                </SelectItem>
-              );
-            }
-          } else if (props.name === "years") {
-            selectedValue = displayMonth.getFullYear().toString();
-            const earliestYear = fromYear || fromDate?.getFullYear();
-            const latestYear = toYear || toDate?.getFullYear();
-
-            if (earliestYear && latestYear) {
-              for (let i = latestYear; i >= earliestYear; i--) {
-                options.push(
-                  <SelectItem key={i} value={i.toString()}>
-                    {i}
-                  </SelectItem>
-                );
-              }
-            }
-          }
+          const handleChange = (value: string) => {
+            const changeEvent = {
+              target: { value },
+            } as React.ChangeEvent<HTMLSelectElement>;
+            onChange?.(changeEvent);
+          };
 
           return (
             <Select
-              value={selectedValue}
-              onValueChange={(newValue) => {
-                const newDate = new Date(displayMonth);
-                if (props.name === "months") {
-                  onMonthChange?.(new Date(displayMonth.getFullYear(), parseInt(newValue)));
-                } else if (props.name === "years") {
-                  onYearChange?.(new Date(parseInt(newValue), displayMonth.getMonth()));
-                }
+              value={value?.toString()}
+              onValueChange={(value) => {
+                handleChange(value);
               }}
             >
-              <SelectTrigger>{selectedValue ? (props.name === 'months' ? format(new Date(displayMonth.getFullYear(), parseInt(selectedValue)), 'MMM') : selectedValue) : ''}</SelectTrigger>
+              <SelectTrigger>{selected?.props?.children}</SelectTrigger>
               <SelectContent>
-                <ScrollArea className="h-48">
-                  {options}
+                <ScrollArea className="h-80">
+                  {options.map((option, id: number) => (
+                    <SelectItem
+                      key={`${option.props.value}-${id}`}
+                      value={option.props.value?.toString() ?? ""}
+                    >
+                      {option.props.children}
+                    </SelectItem>
+                  ))}
                 </ScrollArea>
               </SelectContent>
             </Select>
