@@ -24,6 +24,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Info } from 'lucide-react';
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 
 const screeningSchema = z.object({
   curp: z.string().min(18, {
@@ -33,6 +34,9 @@ const screeningSchema = z.object({
   }),
   doctor: z.enum(['Dra. Yariela Delgadillo', 'Dr. Carlos Chicalote'], {
     required_error: 'Debes seleccionar un doctor.',
+  }),
+  channel: z.enum(['Iniciativa propia', 'Trabajo', 'Internet', 'Otro'], {
+    required_error: 'Debes seleccionar un canal.',
   }),
 });
 
@@ -129,6 +133,29 @@ export function ScreeningQuestionnaireDialog({
                       </FormItem>
                     </RadioGroup>
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="channel"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Canalizado por:</FormLabel>
+                   <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Seleccionar..." />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="Iniciativa propia">Iniciativa propia</SelectItem>
+                      <SelectItem value="Trabajo">Trabajo</SelectItem>
+                      <SelectItem value="Internet">Internet</SelectItem>
+                      <SelectItem value="Otro">Otro</SelectItem>
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
