@@ -2,16 +2,16 @@
 
 import { useEffect, useRef } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import type { Message } from '@/lib/types';
+import type { Chat, Message } from '@/lib/types';
 import ChatMessage from './chat-message';
 import { AppLogo } from '../icons';
 
 interface ChatMessagesProps {
-  messages: Message[];
+  chat?: Chat;
   activeChatId: string | null;
 }
 
-export default function ChatMessages({ messages, activeChatId }: ChatMessagesProps) {
+export default function ChatMessages({ chat, activeChatId }: ChatMessagesProps) {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
 
@@ -23,12 +23,15 @@ export default function ChatMessages({ messages, activeChatId }: ChatMessagesPro
         }
       }, 0);
     }
-  }, [messages, activeChatId]);
+  }, [chat?.messages, activeChatId]);
+
+  const messages = chat?.messages ?? [];
+  const hasContent = messages.length > 0 || (chat?.pendingFiles ?? []).length > 0;
 
   return (
     <ScrollArea className="h-full" ref={scrollAreaRef} viewportRef={viewportRef}>
       <div className="p-4 md:p-6 w-full">
-        {messages.length === 0 ? (
+        {!hasContent ? (
           <div className="flex h-[calc(100vh-10rem)] flex-col items-center justify-center gap-4 text-center">
             <AppLogo />
             <p className="text-lg text-muted-foreground">

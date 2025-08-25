@@ -1,3 +1,10 @@
+export type PendingFile = {
+  name: string;
+  contentType: string;
+  url: string;
+  size: number;
+};
+
 export type Message = {
   id: string;
   role: 'user' | 'bot';
@@ -19,6 +26,7 @@ export type Chat = {
   title: string;
   messages: Message[];
   mode?: 'general' | 'patient';
+  pendingFiles?: PendingFile[];
 };
 
 export type SuggestedQuestion = {

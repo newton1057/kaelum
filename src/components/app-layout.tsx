@@ -3,7 +3,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import ChatPanel from './chat/chat-panel';
-import type { Chat, Message, SuggestedQuestion } from '@/lib/types';
+import type { Chat, Message, SuggestedQuestion, PendingFile } from '@/lib/types';
 import { AppHeader } from './app-header';
 import { SidebarProvider, SidebarInset } from './ui/sidebar';
 import ChatSidebar from './chat/chat-sidebar';
@@ -20,6 +20,14 @@ const initialChats: Chat[] = [];
 
 function transformSessionToChat(session: any): Chat {
   const patientName = session.data?.name || session.data?.full_name || session.data?.nombre;
+  
+  const pendingFiles: PendingFile[] = (session.data?.pending_files || []).map((file: any) => ({
+    name: file.name,
+    contentType: file.contentType,
+    size: file.size,
+    url: file.gsUri.replace('gs://', 'https://storage.googleapis.com/'),
+  }));
+
   return {
     id: session.session_id,
     title: patientName ? `Consulta de ${patientName}` : `Chat ${new Date(session.created_at * 1000).toLocaleString()}`,
@@ -30,6 +38,7 @@ function transformSessionToChat(session: any): Chat {
       timestamp: msg.timestamp,
       attachment: msg.attachment,
     })),
+    pendingFiles: pendingFiles.length > 0 ? pendingFiles : undefined,
   };
 }
 
