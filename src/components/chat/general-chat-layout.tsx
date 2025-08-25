@@ -15,7 +15,7 @@ function transformSessionToChat(session: any): Chat {
     name: file.name,
     contentType: file.contentType,
     size: file.size,
-    url: file.gsUri.replace('gs://', 'https://storage.googleapis.com/'),
+    url: file.url,
   }));
   
   return {
