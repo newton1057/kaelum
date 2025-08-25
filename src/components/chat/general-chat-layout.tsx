@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import type { Chat, Message, PatientData } from '@/lib/types';
+import type { Chat, Message, PatientData, PendingFile } from '@/lib/types';
 import { v4 as uuidv4 } from 'uuid';
 import ChatSidebar from './chat-sidebar';
 import ChatPanel from './chat-panel';
@@ -11,6 +11,13 @@ import { AppHeader } from '../app-header';
 import { useToast } from '@/hooks/use-toast';
 
 function transformSessionToChat(session: any): Chat {
+  const pendingFiles: PendingFile[] = (session.data?.pending_files || []).map((file: any) => ({
+    name: file.name,
+    contentType: file.contentType,
+    size: file.size,
+    url: file.gsUri.replace('gs://', 'https://storage.googleapis.com/'),
+  }));
+  
   return {
     id: session.session_id,
     title: session.data?.title || `Chat General ${new Date(session.created_at * 1000).toLocaleString()}`,
@@ -22,6 +29,7 @@ function transformSessionToChat(session: any): Chat {
       attachment: msg.attachment,
     })),
     mode: 'general',
+    pendingFiles: pendingFiles.length > 0 ? pendingFiles : undefined,
   };
 }
 
@@ -38,6 +46,7 @@ export default function GeneralChatLayout() {
            throw new Error(`HTTP error! status: ${res.status}`);
         }
         const result = await res.json();
+        alert(JSON.stringify(result, null, 2));
         
         const loadedChats: Chat[] = result.sessions.map(transformSessionToChat);
         setChats(loadedChats);
