@@ -60,6 +60,7 @@ export default function DashboardLayout({
            throw new Error(`HTTP error! status: ${res.status}`);
         }
         const result = await res.json();
+        alert(JSON.stringify(result, null, 2));
         const loadedChats: Chat[] = result.sessions.map(transformSessionToChat);
         setChats(loadedChats);
       } catch (error) {
