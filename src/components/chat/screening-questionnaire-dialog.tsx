@@ -172,7 +172,7 @@ const screeningSchema = z.object({
   horasSueno: z.coerce.number().min(0, "Debe ser un número positivo.").max(24, "No puedes dormir más de 24 horas."),
   comidasDia: z.coerce.number().min(0, "Debe ser un número positivo."),
   alimentacionCotidiana: z.string().min(10, { message: 'La descripción de tu alimentación debe tener al menos 10 caracteres.' }),
-  tiempoLibreHoras: z.coerce.number().min(0).optional(),
+  tiempoLibreHoras: z.coerce.number().min(0).optional().or(z.literal('')),
   actividadesTiempoLibre: z.string().optional(),
   diaLaboralCotidiano: z.string().optional(),
   organizacionTiempo: z.string().optional(),
@@ -211,10 +211,10 @@ const screeningSchema = z.object({
   inicioVidaSexual: z.enum(['Sí', 'No'], {
     required_error: 'Debes seleccionar una opción.',
   }),
-  numeroParejasSexuales: z.coerce.number().int().min(0, "Debe ser un número positivo.").optional(),
+  numeroParejasSexuales: z.coerce.number().int().min(0, "Debe ser un número positivo.").optional().or(z.literal('')),
   metodoAnticonceptivo: z.string().optional(),
   // Ginecologicos
-  menstruacionInicio: z.coerce.number().int().positive().optional(),
+  menstruacionInicio: z.coerce.number().int().positive().optional().or(z.literal('')),
   menstruacionFrecuencia: z.string().optional(),
   menstruacionDolor: z.enum(['Sí', 'No']).optional(),
   menstruacionFechaUltima: z.date().optional(),
@@ -370,7 +370,7 @@ const screeningSchema = z.object({
     path: ['acosoEscolarRol'],
 }).refine((data) => {
     if (data.inicioVidaSexual === 'Sí') {
-        return data.numeroParejasSexuales !== undefined && data.numeroParejasSexuales >= 0;
+        return data.numeroParejasSexuales !== undefined && (data.numeroParejasSexuales as number) >= 0;
     }
     return true;
 }, {
@@ -500,7 +500,7 @@ export function ScreeningQuestionnaireDialog({
       papanicolao: undefined,
       papanicolaoResultados: '',
       vph: undefined,
-      numeroNoviazgos: '',
+      numeroNoviazgos: 0,
       duracionPromedioNoviazgo: '',
       violenciaPareja: undefined,
       violenciaParejaTipos: [],
