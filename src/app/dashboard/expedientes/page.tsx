@@ -23,6 +23,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { MoreHorizontal, PlusCircle, SlidersHorizontal } from 'lucide-react';
+import { ImportPatientsDialog } from '@/components/dashboard/import-patients-dialog';
 
 const patients = [
   {
@@ -70,6 +71,7 @@ const patients = [
 export default function ExpedientesPage() {
   const router = useRouter();
   const [isAuth, setIsAuth] = useState(false);
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
 
   useEffect(() => {
     const isAuthenticated = localStorage.getItem('isAuthenticated');
@@ -95,6 +97,7 @@ export default function ExpedientesPage() {
   }
 
   return (
+    <>
     <div className="flex-1 space-y-4 p-8 pt-6">
       <div className="flex items-center justify-between space-y-2">
         <h2 className="text-3xl font-bold tracking-tight">
@@ -113,7 +116,9 @@ export default function ExpedientesPage() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-              <DropdownMenuItem>Importar Pacientes</DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setIsImportDialogOpen(true)}>
+                Importar Pacientes
+              </DropdownMenuItem>
               <DropdownMenuItem>Exportar Pacientes</DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem>Configuración</DropdownMenuItem>
@@ -189,5 +194,7 @@ export default function ExpedientesPage() {
         </Table>
       </div>
     </div>
+    <ImportPatientsDialog isOpen={isImportDialogOpen} onOpenChange={setIsImportDialogOpen} />
+    </>
   );
 }
