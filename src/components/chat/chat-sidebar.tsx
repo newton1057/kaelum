@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -10,7 +11,7 @@ import {
   SidebarMenuButton,
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
-import { LogOut, MessageSquare, Plus, LayoutDashboard, MessageCircle } from 'lucide-react';
+import { LogOut, MessageSquare, Plus, LayoutDashboard, MessageCircle, FolderKanban } from 'lucide-react';
 import type { Chat } from '@/lib/types';
 import { AppLogo } from '../icons';
 import { useRouter, usePathname } from 'next/navigation';
@@ -62,6 +63,16 @@ export default function ChatSidebar({
       </SidebarHeader>
       <SidebarContent className="px-2">
          <SidebarMenu>
+            <SidebarMenuItem>
+            <SidebarMenuButton
+              onClick={() => router.push('/expedientes')}
+              isActive={pathname === '/expedientes'}
+              className="w-full justify-start"
+            >
+              <FolderKanban />
+              <span>Expedientes</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton
               onClick={() => router.push('/dashboard')}
