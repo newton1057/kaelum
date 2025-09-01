@@ -22,7 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { MoreHorizontal, PlusCircle } from 'lucide-react';
+import { MoreHorizontal, PlusCircle, SlidersHorizontal } from 'lucide-react';
 
 const patients = [
   {
@@ -100,10 +100,26 @@ export default function ExpedientesPage() {
         <h2 className="text-3xl font-bold tracking-tight">
           Expedientes de Pacientes
         </h2>
-        <Button>
-          <PlusCircle className="mr-2 h-4 w-4" />
-          Añadir Paciente
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button>
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Añadir Paciente
+          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="icon">
+                <SlidersHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+              <DropdownMenuItem>Importar Pacientes</DropdownMenuItem>
+              <DropdownMenuItem>Exportar Pacientes</DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>Configuración</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
       <div className="rounded-md border">
         <Table>
