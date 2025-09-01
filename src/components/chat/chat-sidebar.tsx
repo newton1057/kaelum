@@ -65,8 +65,8 @@ export default function ChatSidebar({
          <SidebarMenu>
             <SidebarMenuItem>
             <SidebarMenuButton
-              onClick={() => router.push('/expedientes')}
-              isActive={pathname === '/expedientes'}
+              onClick={() => router.push('/dashboard/expedientes')}
+              isActive={pathname === '/dashboard/expedientes'}
               className="w-full justify-start"
             >
               <FolderKanban />
