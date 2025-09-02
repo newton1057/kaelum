@@ -24,54 +24,23 @@ import {
 } from '@/components/ui/table';
 import { MoreHorizontal, PlusCircle, SlidersHorizontal } from 'lucide-react';
 import { ImportPatientsDialog } from '@/components/dashboard/import-patients-dialog';
+import { format } from 'date-fns';
 
-const patients = [
-  {
-    id: 'p001',
-    name: 'Ana García Pérez',
-    age: 34,
-    gender: 'Femenino',
-    lastConsultation: '2024-08-15',
-    status: 'Activo',
-  },
-  {
-    id: 'p002',
-    name: 'Luis Martínez Rodríguez',
-    age: 45,
-    gender: 'Masculino',
-    lastConsultation: '2024-07-22',
-    status: 'Activo',
-  },
-  {
-    id: 'p003',
-    name: 'Sofía Hernández López',
-    age: 28,
-    gender: 'Femenino',
-    lastConsultation: '2024-05-10',
-    status: 'Seguimiento',
-  },
-  {
-    id: 'p004',
-    name: 'Carlos Sánchez Morales',
-    age: 52,
-    gender: 'Masculino',
-    lastConsultation: '2023-11-30',
-    status: 'Inactivo',
-  },
-  {
-    id: 'p005',
-    name: 'Elena Ramirez Diaz',
-    age: 61,
-    gender: 'Femenino',
-    lastConsultation: '2024-08-20',
-    status: 'Activo',
-  },
-];
+type Patient = {
+  id: string;
+  name: string;
+  age: number | string;
+  gender: string;
+  lastConsultation: string;
+  status: string;
+};
 
 export default function ExpedientesPage() {
   const router = useRouter();
   const [isAuth, setIsAuth] = useState(false);
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+  const [patients, setPatients] = useState<Patient[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const isAuthenticated = localStorage.getItem('isAuthenticated');
@@ -79,8 +48,36 @@ export default function ExpedientesPage() {
       router.replace('/login');
     } else {
       setIsAuth(true);
+      fetchPatients();
     }
   }, [router]);
+
+  const fetchPatients = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch('https://kaelumapi-703555916890.northamerica-south1.run.app/medicalRecords/getRecords');
+      if (!response.ok) {
+        throw new Error('Error al obtener los expedientes');
+      }
+      const result = await response.json();
+      
+      const formattedPatients = result.data.map((record: any) => ({
+        id: record.id,
+        name: record.Nombre,
+        age: record.Edad,
+        gender: record.Sexo,
+        lastConsultation: record['Fecha de Nacimiento'] ? format(new Date(record['Fecha de Nacimiento']), 'yyyy-MM-dd') : 'N/A',
+        status: 'Activo', // Placeholder status
+      }));
+      
+      setPatients(formattedPatients);
+    } catch (error) {
+      console.error(error);
+      // Handle error (e.g., show a toast message)
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   if (!isAuth) {
     return (
@@ -134,7 +131,7 @@ export default function ExpedientesPage() {
               <TableHead className="hidden sm:table-cell">Género</TableHead>
               <TableHead className="hidden sm:table-cell">Edad</TableHead>
               <TableHead className="hidden md:table-cell">
-                Última Consulta
+                Fecha de Nacimiento
               </TableHead>
               <TableHead>Estado</TableHead>
               <TableHead>
@@ -143,53 +140,60 @@ export default function ExpedientesPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {patients.map((patient) => (
-              <TableRow key={patient.id}>
-                <TableCell className="font-medium">{patient.name}</TableCell>
-                <TableCell className="hidden sm:table-cell">
-                  {patient.gender}
-                </TableCell>
-                <TableCell className="hidden sm:table-cell">
-                  {patient.age}
-                </TableCell>
-                <TableCell className="hidden md:table-cell">
-                  {patient.lastConsultation}
-                </TableCell>
-                <TableCell>
-                  <Badge
-                    variant={
-                      patient.status === 'Activo'
-                        ? 'default'
-                        : patient.status === 'Seguimiento'
-                          ? 'secondary'
-                          : 'outline'
-                    }
-                  >
-                    {patient.status}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button aria-haspopup="true" size="icon" variant="ghost">
-                        <MoreHorizontal className="h-4 w-4" />
-                        <span className="sr-only">Toggle menu</span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                      <DropdownMenuItem>Ver Expediente</DropdownMenuItem>
-                      <DropdownMenuItem>Iniciar Consulta</DropdownMenuItem>
-                      <DropdownMenuItem>Editar Paciente</DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem className="text-destructive">
-                        Archivar Paciente
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))}
+            {isLoading ? (
+              Array.from({ length: 5 }).map((_, index) => (
+                <TableRow key={index}>
+                  <TableCell><Skeleton className="h-5 w-32" /></TableCell>
+                  <TableCell className="hidden sm:table-cell"><Skeleton className="h-5 w-20" /></TableCell>
+                  <TableCell className="hidden sm:table-cell"><Skeleton className="h-5 w-10" /></TableCell>
+                  <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-24" /></TableCell>
+                  <TableCell><Skeleton className="h-6 w-20 rounded-full" /></TableCell>
+                  <TableCell><Skeleton className="h-8 w-8" /></TableCell>
+                </TableRow>
+              ))
+            ) : (
+              patients.map((patient) => (
+                <TableRow key={patient.id}>
+                  <TableCell className="font-medium">{patient.name}</TableCell>
+                  <TableCell className="hidden sm:table-cell">
+                    {patient.gender}
+                  </TableCell>
+                  <TableCell className="hidden sm:table-cell">
+                    {patient.age}
+                  </TableCell>
+                  <TableCell className="hidden md:table-cell">
+                    {patient.lastConsultation}
+                  </TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={'default'}
+                    >
+                      {patient.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button aria-haspopup="true" size="icon" variant="ghost">
+                          <MoreHorizontal className="h-4 w-4" />
+                          <span className="sr-only">Toggle menu</span>
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+                        <DropdownMenuItem>Ver Expediente</DropdownMenuItem>
+                        <DropdownMenuItem>Iniciar Consulta</DropdownMenuItem>
+                        <DropdownMenuItem>Editar Paciente</DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem className="text-destructive">
+                          Archivar Paciente
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>
