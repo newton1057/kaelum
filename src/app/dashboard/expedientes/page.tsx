@@ -62,7 +62,7 @@ export default function ExpedientesPage() {
       const result = await response.json();
       
       const formattedPatients = result.data.map((record: any) => ({
-        id: record['CURP del paciente'] || record.id || Math.random().toString(),
+        id: record['CURP del paciente'] || record.id || Math.random().toString(36).substring(2, 15),
         name: record.Nombre,
         age: record.Edad,
         gender: record.Sexo,
