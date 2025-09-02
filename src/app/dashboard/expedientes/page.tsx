@@ -22,7 +22,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { MoreHorizontal, PlusCircle, SlidersHorizontal } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { MoreHorizontal, PlusCircle, SlidersHorizontal, Search } from 'lucide-react';
 import { ImportPatientsDialog } from '@/components/dashboard/import-patients-dialog';
 import { PatientDetailsDialog } from '@/components/dashboard/patient-details-dialog';
 import { format } from 'date-fns';
@@ -43,6 +44,8 @@ export default function ExpedientesPage() {
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
   const [patients, setPatients] = useState<Patient[]>([]);
+  const [filteredPatients, setFilteredPatients] = useState<Patient[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -54,6 +57,14 @@ export default function ExpedientesPage() {
       fetchPatients();
     }
   }, [router]);
+
+  useEffect(() => {
+    const lowercasedQuery = searchQuery.toLowerCase();
+    const filtered = patients.filter((patient) =>
+      patient.name.toLowerCase().includes(lowercasedQuery)
+    );
+    setFilteredPatients(filtered);
+  }, [searchQuery, patients]);
 
   const fetchPatients = async () => {
     try {
@@ -131,6 +142,15 @@ export default function ExpedientesPage() {
           </DropdownMenu>
         </div>
       </div>
+       <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+        <Input
+          placeholder="Buscar por nombre..."
+          className="w-full max-w-sm pl-10"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </div>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -160,7 +180,7 @@ export default function ExpedientesPage() {
                 </TableRow>
               ))
             ) : (
-              patients.map((patient) => (
+              filteredPatients.map((patient) => (
                 <TableRow key={patient.id}>
                   <TableCell className="font-medium">{patient.name}</TableCell>
                   <TableCell className="hidden sm:table-cell">
