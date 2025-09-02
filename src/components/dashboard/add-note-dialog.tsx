@@ -79,84 +79,88 @@ export function AddNoteDialog({ isOpen, onOpenChange, patientId }: AddNoteDialog
             Rellene los campos para añadir una nueva nota al expediente del paciente.
           </DialogDescription>
         </DialogHeader>
-        <ScrollArea className="flex-1 pr-6 -mr-6">
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(handleFormSubmit)}
-              className="space-y-4"
-            >
-              <FormField
-                control={form.control}
-                name="mentalExam"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Examen mental</FormLabel>
-                    <FormControl>
-                      <Textarea placeholder="Describa el examen mental..." {...field} rows={4} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="presumptiveDiagnosis"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Diagnóstico presuntivo</FormLabel>
-                    <FormControl>
-                      <Textarea placeholder="Describa el diagnóstico presuntivo..." {...field} rows={4} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="treatmentPlan"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Plan de tratamiento</FormLabel>
-                    <FormControl>
-                      <Textarea placeholder="Describa el plan de tratamiento..." {...field} rows={4} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="evolutionNotes"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Notas de evolución</FormLabel>
-                    <FormControl>
-                      <Textarea placeholder="Describa las notas de evolución..." {...field} rows={4} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="additionalObservations"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Observaciones adicionales (Opcional)</FormLabel>
-                    <FormControl>
-                      <Textarea placeholder="Añada cualquier observación adicional..." {...field} rows={4} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-               <DialogFooter className="pt-4 sticky bottom-0 bg-background">
-                  <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
-                  <Button type="submit">Guardar Nota</Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </ScrollArea>
+        <div className="flex-1 overflow-y-auto pr-6 -mr-6">
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(handleFormSubmit)}
+                className="space-y-4 h-full flex flex-col"
+              >
+              <ScrollArea className="flex-1">
+                <div className="space-y-4 pr-6">
+                    <FormField
+                      control={form.control}
+                      name="mentalExam"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Examen mental</FormLabel>
+                          <FormControl>
+                            <Textarea placeholder="Describa el examen mental..." {...field} rows={4} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="presumptiveDiagnosis"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Diagnóstico presuntivo</FormLabel>
+                          <FormControl>
+                            <Textarea placeholder="Describa el diagnóstico presuntivo..." {...field} rows={4} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="treatmentPlan"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Plan de tratamiento</FormLabel>
+                          <FormControl>
+                            <Textarea placeholder="Describa el plan de tratamiento..." {...field} rows={4} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="evolutionNotes"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Notas de evolución</FormLabel>
+                          <FormControl>
+                            <Textarea placeholder="Describa las notas de evolución..." {...field} rows={4} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="additionalObservations"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Observaciones adicionales (Opcional)</FormLabel>
+                          <FormControl>
+                            <Textarea placeholder="Añada cualquier observación adicional..." {...field} rows={4} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                </div>
+                </ScrollArea>
+                 <DialogFooter className="pt-4 sticky bottom-0 bg-background">
+                    <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
+                    <Button type="submit">Guardar Nota</Button>
+                </DialogFooter>
+              </form>
+            </Form>
+        </div>
       </DialogContent>
     </Dialog>
   );
