@@ -142,7 +142,7 @@ export default function ExpedientesPage() {
           <TableBody>
             {isLoading ? (
               Array.from({ length: 5 }).map((_, index) => (
-                <TableRow key={index}>
+                <TableRow key={`skeleton-row-${index}`}>
                   <TableCell><Skeleton className="h-5 w-32" /></TableCell>
                   <TableCell className="hidden sm:table-cell"><Skeleton className="h-5 w-20" /></TableCell>
                   <TableCell className="hidden sm:table-cell"><Skeleton className="h-5 w-10" /></TableCell>
