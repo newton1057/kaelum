@@ -36,6 +36,7 @@ type Patient = {
   gender: string;
   lastConsultation: string;
   status: string;
+  [key: string]: any; // Allow other properties
 };
 
 export default function ExpedientesPage() {
@@ -78,6 +79,7 @@ export default function ExpedientesPage() {
       const result = await response.json();
       
       const formattedPatients = result.data.map((record: any) => ({
+        ...record, // Keep all original data
         id: record.id || record['CURP del paciente'] || Math.random().toString(36).substring(2, 15),
         name: record.Nombre,
         age: record.Edad,
@@ -106,11 +108,7 @@ export default function ExpedientesPage() {
 
     try {
       const dataToSend = {
-        data: {
-          name: patient.name,
-          age: patient.age,
-          gender: patient.gender,
-        },
+        data: patient, // Send the whole patient object
       };
 
       const response = await fetch('https://kaelumapi-703555916890.northamerica-south1.run.app/chat/start', {
