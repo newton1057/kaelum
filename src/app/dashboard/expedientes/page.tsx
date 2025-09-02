@@ -27,6 +27,7 @@ import { MoreHorizontal, PlusCircle, SlidersHorizontal, Search } from 'lucide-re
 import { ImportPatientsDialog } from '@/components/dashboard/import-patients-dialog';
 import { PatientDetailsDialog } from '@/components/dashboard/patient-details-dialog';
 import { format } from 'date-fns';
+import { useToast } from '@/hooks/use-toast';
 
 type Patient = {
   id: string;
@@ -39,6 +40,7 @@ type Patient = {
 
 export default function ExpedientesPage() {
   const router = useRouter();
+  const { toast } = useToast();
   const [isAuth, setIsAuth] = useState(false);
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
@@ -97,6 +99,49 @@ export default function ExpedientesPage() {
     setSelectedPatientId(patientId);
     setIsDetailsDialogOpen(true);
   }
+
+  const handleStartChat = async (patientId: string) => {
+    const patient = patients.find((p) => p.id === patientId);
+    if (!patient) return;
+
+    try {
+      const dataToSend = {
+        data: {
+          name: patient.name,
+          age: patient.age,
+          gender: patient.gender,
+        },
+      };
+
+      const response = await fetch('https://kaelumapi-703555916890.northamerica-south1.run.app/chat/start', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dataToSend),
+      });
+
+      if (!response.ok) {
+        throw new Error('No se pudo iniciar el chat.');
+      }
+
+      await response.json();
+
+      toast({
+        title: 'Chat iniciado',
+        description: `Se ha iniciado una nueva consulta para ${patient.name}.`,
+      });
+
+      router.push('/chat');
+    } catch (error) {
+      console.error('Error al iniciar el chat:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Hubo un problema al iniciar el chat. Inténtalo de nuevo.',
+      });
+    }
+  };
 
   if (!isAuth) {
     return (
@@ -210,7 +255,7 @@ export default function ExpedientesPage() {
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Acciones</DropdownMenuLabel>
                         <DropdownMenuItem onSelect={() => handleViewDetails(patient.id)}>Ver Expediente</DropdownMenuItem>
-                        <DropdownMenuItem>Iniciar Chat</DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => handleStartChat(patient.id)}>Iniciar Chat</DropdownMenuItem>
                         <DropdownMenuItem>Editar Paciente</DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className="text-destructive">
