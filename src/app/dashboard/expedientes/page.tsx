@@ -28,6 +28,7 @@ import { ImportPatientsDialog } from '@/components/dashboard/import-patients-dia
 import { PatientDetailsDialog } from '@/components/dashboard/patient-details-dialog';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
+import { AddNoteDialog } from '@/components/dashboard/add-note-dialog';
 
 type Patient = {
   id: string;
@@ -45,6 +46,7 @@ export default function ExpedientesPage() {
   const [isAuth, setIsAuth] = useState(false);
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
+  const [isAddNoteDialogOpen, setIsAddNoteDialogOpen] = useState(false);
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
   const [patients, setPatients] = useState<Patient[]>([]);
   const [filteredPatients, setFilteredPatients] = useState<Patient[]>([]);
@@ -100,6 +102,11 @@ export default function ExpedientesPage() {
   const handleViewDetails = (patientId: string) => {
     setSelectedPatientId(patientId);
     setIsDetailsDialogOpen(true);
+  }
+  
+  const handleAddNote = (patientId: string) => {
+    setSelectedPatientId(patientId);
+    setIsAddNoteDialogOpen(true);
   }
 
   const handleStartChat = async (patientId: string) => {
@@ -254,6 +261,7 @@ export default function ExpedientesPage() {
                         <DropdownMenuLabel>Acciones</DropdownMenuLabel>
                         <DropdownMenuItem onSelect={() => handleViewDetails(patient.id)}>Ver Expediente</DropdownMenuItem>
                         <DropdownMenuItem onSelect={() => handleStartChat(patient.id)}>Iniciar Chat</DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => handleAddNote(patient.id)}>Añadir Nota Clínica</DropdownMenuItem>
                         <DropdownMenuItem>Editar Paciente</DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className="text-destructive">
@@ -271,6 +279,7 @@ export default function ExpedientesPage() {
     </div>
     <ImportPatientsDialog isOpen={isImportDialogOpen} onOpenChange={setIsImportDialogOpen} />
     <PatientDetailsDialog isOpen={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen} patientId={selectedPatientId} />
+    <AddNoteDialog isOpen={isAddNoteDialogOpen} onOpenChange={setIsAddNoteDialogOpen} patientId={selectedPatientId} />
     </>
   );
 }
