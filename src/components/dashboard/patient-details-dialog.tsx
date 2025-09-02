@@ -63,6 +63,9 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId }: Patien
     const lineHeight = 7;
     let y = margin;
     const pageHeight = doc.internal.pageSize.height;
+    const pageWidth = doc.internal.pageSize.width;
+    const valueStartMargin = margin + 40;
+    const maxTextWidth = pageWidth - valueStartMargin - margin;
 
     // Set font to Arial
     doc.setFont('Arial', 'normal');
@@ -81,20 +84,23 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId }: Patien
     y += lineHeight * 1.5;
     
     doc.setLineWidth(0.5);
-    doc.line(margin, y - 5, doc.internal.pageSize.width - margin, y - 5);
-
+    doc.line(margin, y - 5, pageWidth - margin, y - 5);
 
     doc.setFontSize(10);
 
-    const checkPageBreak = () => {
-        if (y + lineHeight > pageHeight - margin) {
+    const checkPageBreak = (neededHeight: number) => {
+        if (y + neededHeight > pageHeight - margin) {
             doc.addPage();
             y = margin;
         }
     };
 
     for (const [key, value] of Object.entries(patientData)) {
-        checkPageBreak();
+        const valueText = String(value) || 'N/A';
+        const splitValue = doc.splitTextToSize(valueText, maxTextWidth);
+        const neededHeight = splitValue.length * lineHeight;
+
+        checkPageBreak(neededHeight);
 
         // Key (Bold)
         doc.setFont('Arial', 'bold');
@@ -103,13 +109,10 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId }: Patien
 
         // Value (Normal) - handle long text
         doc.setFont('Arial', 'normal');
-        const valueText = String(value) || 'N/A';
-        const splitValue = doc.splitTextToSize(valueText, doc.internal.pageSize.width - margin - margin - 40);
-        
-        doc.text(splitValue, margin + 40, y);
+        doc.text(splitValue, valueStartMargin, y);
 
         // Move y position down based on number of lines in value
-        y += splitValue.length * lineHeight;
+        y += neededHeight;
         
         y += lineHeight * 0.5; // Extra space between entries
     }
