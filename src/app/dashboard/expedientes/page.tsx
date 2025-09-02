@@ -210,7 +210,7 @@ export default function ExpedientesPage() {
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Acciones</DropdownMenuLabel>
                         <DropdownMenuItem onSelect={() => handleViewDetails(patient.id)}>Ver Expediente</DropdownMenuItem>
-                        <DropdownMenuItem>Iniciar Consulta</DropdownMenuItem>
+                        <DropdownMenuItem>Iniciar Chat</DropdownMenuItem>
                         <DropdownMenuItem>Editar Paciente</DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className="text-destructive">
