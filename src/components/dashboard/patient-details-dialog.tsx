@@ -3,7 +3,6 @@
 
 import { useEffect, useRef, useState } from 'react';
 import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 import {
   Dialog,
   DialogContent,
@@ -57,27 +56,65 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId }: Patien
   }, [isOpen, patientId]);
   
   const handlePrint = () => {
-    if (!contentRef.current) return;
+    if (!patientData) return;
 
-    html2canvas(contentRef.current, { scale: 2 }).then((canvas) => {
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-      const canvasWidth = canvas.width;
-      const canvasHeight = canvas.height;
-      const ratio = canvasWidth / canvasHeight;
-      const width = pdfWidth - 20; // with margin
-      const height = width / ratio;
+    const doc = new jsPDF();
+    const margin = 15;
+    const lineHeight = 7;
+    let y = margin;
+    const pageHeight = doc.internal.pageSize.height;
 
-      let position = 0;
-      if (height > pdfHeight) {
-         // handle long content, not implemented for brevity
-      }
-      
-      pdf.addImage(imgData, 'PNG', 10, 10, width, height);
-      pdf.save(`expediente-${patientData?.Nombre || patientId}.pdf`);
-    });
+    // Set font to Arial
+    doc.setFont('Arial', 'normal');
+
+    // Title
+    doc.setFontSize(18);
+    doc.setFont('Arial', 'bold');
+    doc.text('Expediente del Paciente', margin, y);
+    y += lineHeight * 2;
+
+    // Patient Name as subtitle
+    doc.setFontSize(14);
+    doc.setFont('Arial', 'normal');
+    const patientName = patientData.Nombre || 'Desconocido';
+    doc.text(patientName, margin, y);
+    y += lineHeight * 1.5;
+    
+    doc.setLineWidth(0.5);
+    doc.line(margin, y - 5, doc.internal.pageSize.width - margin, y - 5);
+
+
+    doc.setFontSize(10);
+
+    const checkPageBreak = () => {
+        if (y + lineHeight > pageHeight - margin) {
+            doc.addPage();
+            y = margin;
+        }
+    };
+
+    for (const [key, value] of Object.entries(patientData)) {
+        checkPageBreak();
+
+        // Key (Bold)
+        doc.setFont('Arial', 'bold');
+        const formattedKey = `${key.replace(/_/g, ' ')}:`;
+        doc.text(formattedKey, margin, y);
+
+        // Value (Normal) - handle long text
+        doc.setFont('Arial', 'normal');
+        const valueText = String(value) || 'N/A';
+        const splitValue = doc.splitTextToSize(valueText, doc.internal.pageSize.width - margin - margin - 40);
+        
+        doc.text(splitValue, margin + 40, y);
+
+        // Move y position down based on number of lines in value
+        y += splitValue.length * lineHeight;
+        
+        y += lineHeight * 0.5; // Extra space between entries
+    }
+
+    doc.save(`expediente-${patientName.replace(/\s/g, '_') || patientId}.pdf`);
   };
 
 
