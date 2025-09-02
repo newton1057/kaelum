@@ -64,8 +64,7 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId }: Patien
     let y = margin;
     const pageHeight = doc.internal.pageSize.height;
     const pageWidth = doc.internal.pageSize.width;
-    const valueStartMargin = margin + 40;
-    const maxTextWidth = pageWidth - valueStartMargin - margin;
+    const contentWidth = pageWidth - margin * 2;
 
     // Set font to Arial
     doc.setFont('Arial', 'normal');
@@ -86,8 +85,6 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId }: Patien
     doc.setLineWidth(0.5);
     doc.line(margin, y - 5, pageWidth - margin, y - 5);
 
-    doc.setFontSize(10);
-
     const checkPageBreak = (neededHeight: number) => {
         if (y + neededHeight > pageHeight - margin) {
             doc.addPage();
@@ -95,24 +92,29 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId }: Patien
         }
     };
 
-    for (const [key, value] of Object.entries(patientData)) {
-        const valueText = String(value) || 'N/A';
-        const splitValue = doc.splitTextToSize(valueText, maxTextWidth);
-        const neededHeight = splitValue.length * lineHeight;
+    doc.setFontSize(10);
 
-        checkPageBreak(neededHeight);
+    for (const [key, value] of Object.entries(patientData)) {
+        if (key === 'id' || key === 'Marca temporal') continue; // Skip unnecessary fields
+
+        const valueText = String(value) || 'N/A';
+        const splitValue = doc.splitTextToSize(valueText, contentWidth);
+        const keyHeight = lineHeight;
+        const valueHeight = splitValue.length * lineHeight;
+        const totalNeededHeight = keyHeight + valueHeight + (lineHeight * 0.5);
+
+        checkPageBreak(totalNeededHeight);
 
         // Key (Bold)
         doc.setFont('Arial', 'bold');
         const formattedKey = `${key.replace(/_/g, ' ')}:`;
         doc.text(formattedKey, margin, y);
+        y += keyHeight;
 
         // Value (Normal) - handle long text
         doc.setFont('Arial', 'normal');
-        doc.text(splitValue, valueStartMargin, y);
-
-        // Move y position down based on number of lines in value
-        y += neededHeight;
+        doc.text(splitValue, margin, y);
+        y += valueHeight;
         
         y += lineHeight * 0.5; // Extra space between entries
     }
