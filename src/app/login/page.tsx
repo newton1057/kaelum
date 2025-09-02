@@ -9,30 +9,53 @@ import { useToast } from '@/hooks/use-toast';
 import { AppLogo } from '@/components/icons';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 
-const CORRECT_PASSWORD = '123456';
-
 export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (password === CORRECT_PASSWORD) {
-      localStorage.setItem('isAuthenticated', 'true');
-      toast({
-        title: '¡Bienvenido!',
-        description: 'Has iniciado sesión correctamente.',
+    setIsLoading(true);
+    setError('');
+
+    try {
+      const response = await fetch('https://kaelumapi-703555916890.northamerica-south1.run.app/access/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ code: password }),
       });
-      router.push('/chat');
-    } else {
-      setError('La contraseña es incorrecta.');
+
+      if (response.ok) {
+        localStorage.setItem('isAuthenticated', 'true');
+        toast({
+          title: '¡Bienvenido!',
+          description: 'Has iniciado sesión correctamente.',
+        });
+        router.push('/chat');
+      } else {
+        const errorText = 'Acceso no autorizado. Verifica tu PIN e inténtalo de nuevo.';
+        setError(errorText);
+        toast({
+          variant: 'destructive',
+          title: 'Error de autenticación',
+          description: errorText,
+        });
+      }
+    } catch (err) {
+      const errorText = 'No se pudo conectar con el servidor. Por favor, intenta más tarde.';
+      setError(errorText);
       toast({
         variant: 'destructive',
-        title: 'Error de autenticación',
-        description: 'La contraseña que ingresaste es incorrecta. Inténtalo de nuevo.',
+        title: 'Error de Red',
+        description: errorText,
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -60,13 +83,14 @@ export default function LoginPage() {
                 maxLength={6}
                 placeholder="••••••"
                 className="text-center text-lg tracking-[0.5em]"
+                disabled={isLoading}
               />
             </div>
             {error && <p className="text-sm text-destructive">{error}</p>}
           </CardContent>
           <CardFooter>
-            <Button type="submit" className="w-full">
-              Ingresar
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? 'Ingresando...' : 'Ingresar'}
             </Button>
           </CardFooter>
         </form>
