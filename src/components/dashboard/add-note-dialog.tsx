@@ -150,7 +150,7 @@ export function AddNoteDialog({ isOpen, onOpenChange, patientId }: AddNoteDialog
                   </FormItem>
                 )}
               />
-               <DialogFooter className="pt-4">
+               <DialogFooter className="pt-4 sticky bottom-0 bg-background">
                   <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
                   <Button type="submit">Guardar Nota</Button>
               </DialogFooter>
