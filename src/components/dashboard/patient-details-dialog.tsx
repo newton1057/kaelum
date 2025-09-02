@@ -66,16 +66,13 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId }: Patien
     const pageWidth = doc.internal.pageSize.width;
     const contentWidth = pageWidth - margin * 2;
 
-    // Set font to Arial
     doc.setFont('Arial', 'normal');
 
-    // Title
     doc.setFontSize(18);
     doc.setFont('Arial', 'bold');
     doc.text('Expediente del Paciente', margin, y);
     y += lineHeight * 2;
 
-    // Patient Name as subtitle
     doc.setFontSize(14);
     doc.setFont('Arial', 'normal');
     const patientName = patientData.Nombre || 'Desconocido';
@@ -95,28 +92,29 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId }: Patien
     doc.setFontSize(10);
 
     for (const [key, value] of Object.entries(patientData)) {
-        if (key === 'id' || key === 'Marca temporal') continue; // Skip unnecessary fields
+        if (key === 'id' || key === 'Marca temporal') continue;
 
+        const keyText = `${key.replace(/_/g, ' ')}:`;
         const valueText = String(value) || 'N/A';
+
+        const splitKey = doc.splitTextToSize(keyText, contentWidth);
         const splitValue = doc.splitTextToSize(valueText, contentWidth);
-        const keyHeight = lineHeight;
+
+        const keyHeight = splitKey.length * lineHeight;
         const valueHeight = splitValue.length * lineHeight;
         const totalNeededHeight = keyHeight + valueHeight + (lineHeight * 0.5);
 
         checkPageBreak(totalNeededHeight);
 
-        // Key (Bold)
         doc.setFont('Arial', 'bold');
-        const formattedKey = `${key.replace(/_/g, ' ')}:`;
-        doc.text(formattedKey, margin, y);
+        doc.text(splitKey, margin, y);
         y += keyHeight;
 
-        // Value (Normal) - handle long text
         doc.setFont('Arial', 'normal');
         doc.text(splitValue, margin, y);
         y += valueHeight;
         
-        y += lineHeight * 0.5; // Extra space between entries
+        y += lineHeight * 0.5;
     }
 
     doc.save(`expediente-${patientName.replace(/\s/g, '_') || patientId}.pdf`);
