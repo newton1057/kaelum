@@ -24,6 +24,7 @@ import {
 } from '@/components/ui/table';
 import { MoreHorizontal, PlusCircle, SlidersHorizontal } from 'lucide-react';
 import { ImportPatientsDialog } from '@/components/dashboard/import-patients-dialog';
+import { PatientDetailsDialog } from '@/components/dashboard/patient-details-dialog';
 import { format } from 'date-fns';
 
 type Patient = {
@@ -39,6 +40,8 @@ export default function ExpedientesPage() {
   const router = useRouter();
   const [isAuth, setIsAuth] = useState(false);
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+  const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
+  const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
   const [patients, setPatients] = useState<Patient[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -78,6 +81,11 @@ export default function ExpedientesPage() {
       setIsLoading(false);
     }
   };
+
+  const handleViewDetails = (patientId: string) => {
+    setSelectedPatientId(patientId);
+    setIsDetailsDialogOpen(true);
+  }
 
   if (!isAuth) {
     return (
@@ -181,7 +189,7 @@ export default function ExpedientesPage() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                        <DropdownMenuItem>Ver Expediente</DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => handleViewDetails(patient.id)}>Ver Expediente</DropdownMenuItem>
                         <DropdownMenuItem>Iniciar Consulta</DropdownMenuItem>
                         <DropdownMenuItem>Editar Paciente</DropdownMenuItem>
                         <DropdownMenuSeparator />
@@ -199,6 +207,7 @@ export default function ExpedientesPage() {
       </div>
     </div>
     <ImportPatientsDialog isOpen={isImportDialogOpen} onOpenChange={setIsImportDialogOpen} />
+    <PatientDetailsDialog isOpen={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen} patientId={selectedPatientId} />
     </>
   );
 }
