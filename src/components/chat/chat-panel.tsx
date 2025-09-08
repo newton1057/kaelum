@@ -80,12 +80,12 @@ export default function ChatPanel({
 }: ChatPanelProps) {
   return (
     <div className={cn('flex flex-col h-full', className)}>
-      {chat?.pendingFiles && chat.pendingFiles.length > 0 && (
-        <div className="p-4 border-b">
-          <PendingFilesSection files={chat.pendingFiles} />
-        </div>
-      )}
       <div className="flex-1 overflow-y-auto">
+        {chat?.pendingFiles && chat.pendingFiles.length > 0 && (
+          <div className="p-4 border-b">
+            <PendingFilesSection files={chat.pendingFiles} />
+          </div>
+        )}
         <ChatMessages chat={chat} activeChatId={chat?.id ?? null} />
       </div>
       <div className="border-t bg-background">

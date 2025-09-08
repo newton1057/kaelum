@@ -192,7 +192,7 @@ export function ChatDialog({ isOpen, onOpenChange, patient }: ChatDialogProps) {
               onSendMessage={handleSendMessage}
               onSendSuggestedQuestion={handleSendSuggestedQuestion}
               suggestedQuestions={[]}
-              className="h-full"
+              className="flex-1 flex flex-col"
               disabled={false}
             />
     );
@@ -204,7 +204,7 @@ export function ChatDialog({ isOpen, onOpenChange, patient }: ChatDialogProps) {
         <DialogHeader className="p-4 border-b">
           <DialogTitle>{chat?.title || 'Cargando...'}</DialogTitle>
         </DialogHeader>
-        <div className="flex-1 min-h-0">
+        <div className="flex-1 min-h-0 flex flex-col">
            {renderContent()}
         </div>
       </DialogContent>
