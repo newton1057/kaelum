@@ -236,7 +236,6 @@ export default function ExpedientesPage() {
                         <DropdownMenuItem onSelect={() => handleViewDetails(patient.id)}>Ver Expediente</DropdownMenuItem>
                         <DropdownMenuItem onSelect={() => handleStartChat(patient.id)}>Chat</DropdownMenuItem>
                         <DropdownMenuItem onSelect={() => handleAddNote(patient.id)}>Añadir Nota Clínica</DropdownMenuItem>
-                        <DropdownMenuItem>Editar Paciente</DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className="text-destructive">
                           Archivar Paciente
@@ -258,5 +257,3 @@ export default function ExpedientesPage() {
     </>
   );
 }
-
-    
