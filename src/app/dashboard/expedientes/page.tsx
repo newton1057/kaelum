@@ -29,6 +29,7 @@ import { PatientDetailsDialog } from '@/components/dashboard/patient-details-dia
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { AddNoteDialog } from '@/components/dashboard/add-note-dialog';
+import { ChatDialog } from '@/components/dashboard/chat-dialog';
 
 type Patient = {
   id: string;
@@ -47,7 +48,8 @@ export default function ExpedientesPage() {
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
   const [isAddNoteDialogOpen, setIsAddNoteDialogOpen] = useState(false);
-  const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
+  const [isChatDialogOpen, setIsChatDialogOpen] = useState(false);
+  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [patients, setPatients] = useState<Patient[]>([]);
   const [filteredPatients, setFilteredPatients] = useState<Patient[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -100,52 +102,24 @@ export default function ExpedientesPage() {
   };
 
   const handleViewDetails = (patientId: string) => {
-    setSelectedPatientId(patientId);
+    const patient = patients.find(p => p.id === patientId);
+    setSelectedPatient(patient || null);
     setIsDetailsDialogOpen(true);
   }
   
   const handleAddNote = (patientId: string) => {
-    setSelectedPatientId(patientId);
+    const patient = patients.find(p => p.id === patientId);
+    setSelectedPatient(patient || null);
     setIsAddNoteDialogOpen(true);
   }
 
   const handleStartChat = async (patientId: string) => {
     const patient = patients.find((p) => p.id === patientId);
     if (!patient) return;
-
-    try {
-      const dataToSend = {
-        data: patient, // Send the whole patient object
-      };
-
-      const response = await fetch('https://kaelumapi-703555916890.northamerica-south1.run.app/chat/start', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(dataToSend),
-      });
-
-      if (!response.ok) {
-        throw new Error('No se pudo iniciar el chat.');
-      }
-
-      await response.json();
-
-      toast({
-        title: 'Chat iniciado',
-        description: `Se ha iniciado una nueva consulta para ${patient.name}.`,
-      });
-
-      router.push('/chat');
-    } catch (error) {
-      console.error('Error al iniciar el chat:', error);
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Hubo un problema al iniciar el chat. Inténtalo de nuevo.',
-      });
-    }
+    setSelectedPatient(patient);
+    setIsChatDialogOpen(true);
+    // The previous logic to hit the /chat/start endpoint can be moved
+    // inside the ChatDialog component when it opens.
   };
 
   if (!isAuth) {
@@ -278,8 +252,9 @@ export default function ExpedientesPage() {
       </div>
     </div>
     <ImportPatientsDialog isOpen={isImportDialogOpen} onOpenChange={setIsImportDialogOpen} />
-    <PatientDetailsDialog isOpen={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen} patientId={selectedPatientId} />
-    <AddNoteDialog isOpen={isAddNoteDialogOpen} onOpenChange={setIsAddNoteDialogOpen} patientId={selectedPatientId} />
+    {selectedPatient && <PatientDetailsDialog isOpen={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen} patientId={selectedPatient.id} />}
+    {selectedPatient && <AddNoteDialog isOpen={isAddNoteDialogOpen} onOpenChange={setIsAddNoteDialogOpen} patientId={selectedPatient.id} />}
+    {selectedPatient && <ChatDialog isOpen={isChatDialogOpen} onOpenChange={setIsChatDialogOpen} patient={selectedPatient} />}
     </>
   );
 }
