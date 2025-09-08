@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import jsPDF from 'jspdf';
 import {
   Dialog,
@@ -13,10 +13,9 @@ import {
 } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
-import { AlertTriangle, Printer, ChevronDown } from 'lucide-react';
+import { AlertTriangle, Printer } from 'lucide-react';
 import { ScrollArea } from '../ui/scroll-area';
 import { Button } from '../ui/button';
-import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { Checkbox } from '../ui/checkbox';
 import { Label } from '../ui/label';
 
@@ -47,8 +46,10 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId }: Patien
             throw new Error(errorData.message || 'Error al obtener los detalles del paciente.');
           }
           const result = await response.json();
-          setPatientData(result.data);
-          setSelectedFields(Object.keys(result.data)); // Select all fields by default
+          const data = result.data;
+          setPatientData(data);
+          // Initialize with all fields selected, excluding ones we never want to print like id
+          setSelectedFields(Object.keys(data).filter(key => key !== 'id' && key !== 'Marca temporal'));
         } catch (err: any) {
           setError(err.message);
         } finally {
@@ -59,12 +60,12 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId }: Patien
     }
   }, [isOpen, patientId]);
 
-  const handleFieldSelectionChange = (field: string, checked: boolean) => {
-    setSelectedFields(prev => 
-      checked ? [...prev, field] : prev.filter(f => f !== field)
+  const handleFieldSelectionChange = (field: string) => {
+    setSelectedFields(prev =>
+      prev.includes(field) ? prev.filter(f => f !== field) : [...prev, field]
     );
   };
-  
+
   const handlePrint = () => {
     if (!patientData) return;
 
@@ -88,49 +89,48 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId }: Patien
     const patientName = patientData.Nombre || 'Desconocido';
     doc.text(patientName, margin, y);
     y += lineHeight * 1.5;
-    
+
     doc.setLineWidth(0.5);
     doc.line(margin, y - 5, pageWidth - margin, y - 5);
 
     const checkPageBreak = (neededHeight: number) => {
-        if (y + neededHeight > pageHeight - margin) {
-            doc.addPage();
-            y = margin;
-        }
+      if (y + neededHeight > pageHeight - margin) {
+        doc.addPage();
+        y = margin;
+      }
     };
 
     doc.setFontSize(10);
 
-    for (const key of selectedFields) {
-        if (!patientData.hasOwnProperty(key) || key === 'id' || key === 'Marca temporal') continue;
-        
-        const value = patientData[key];
-        const keyText = `${key.replace(/_/g, ' ')}:`;
-        const valueText = String(value) || 'N/A';
+    for (const key of Object.keys(patientData)) {
+      if (!selectedFields.includes(key)) continue;
 
-        const splitKey = doc.splitTextToSize(keyText, contentWidth);
-        const splitValue = doc.splitTextToSize(valueText, contentWidth);
+      const value = patientData[key];
+      const keyText = `${key.replace(/_/g, ' ')}:`;
+      const valueText = String(value) || 'N/A';
 
-        const keyHeight = splitKey.length * lineHeight;
-        const valueHeight = splitValue.length * lineHeight;
-        const totalNeededHeight = keyHeight + valueHeight + (lineHeight * 0.5);
+      const splitKey = doc.splitTextToSize(keyText, contentWidth);
+      const splitValue = doc.splitTextToSize(valueText, contentWidth);
 
-        checkPageBreak(totalNeededHeight);
+      const keyHeight = splitKey.length * lineHeight;
+      const valueHeight = splitValue.length * lineHeight;
+      const totalNeededHeight = keyHeight + valueHeight + (lineHeight * 0.5);
 
-        doc.setFont('Arial', 'bold');
-        doc.text(splitKey, margin, y);
-        y += keyHeight;
+      checkPageBreak(totalNeededHeight);
 
-        doc.setFont('Arial', 'normal');
-        doc.text(splitValue, margin, y);
-        y += valueHeight;
-        
-        y += lineHeight * 0.5;
+      doc.setFont('Arial', 'bold');
+      doc.text(splitKey, margin, y);
+      y += keyHeight;
+
+      doc.setFont('Arial', 'normal');
+      doc.text(splitValue, margin, y);
+      y += valueHeight;
+
+      y += lineHeight * 0.5;
     }
 
     doc.save(`expediente-${patientName.replace(/\s/g, '_') || patientId}.pdf`);
   };
-
 
   const renderContent = () => {
     if (isLoading) {
@@ -160,12 +160,29 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId }: Patien
       return <p className="text-muted-foreground text-center">No hay datos para mostrar.</p>;
     }
 
+    const fieldsToDisplay = Object.entries(patientData).filter(
+      ([key]) => key !== 'id' && key !== 'Marca temporal'
+    );
+
     return (
       <div id="patient-details-content" className="space-y-2 p-2">
-        {Object.entries(patientData).map(([key, value]) => (
-          <div key={key} className="grid grid-cols-1 md:grid-cols-3 gap-x-4 border-b py-2 text-sm">
-            <span className="font-semibold text-muted-foreground capitalize">{key.replace(/_/g, ' ')}</span>
-            <span className="md:col-span-2 break-words">{String(value) || 'N/A'}</span>
+        <div className="grid grid-cols-[auto_1fr_2fr] items-center gap-x-4 border-b py-2 text-sm font-bold text-muted-foreground">
+          <div />
+          <span>Campo</span>
+          <span>Valor</span>
+        </div>
+        {fieldsToDisplay.map(([key, value]) => (
+          <div key={key} className="grid grid-cols-[auto_1fr_2fr] items-start gap-x-4 border-b py-2 text-sm">
+            <Checkbox
+              id={`field-${key}`}
+              checked={selectedFields.includes(key)}
+              onCheckedChange={() => handleFieldSelectionChange(key)}
+              className="mt-1"
+            />
+            <Label htmlFor={`field-${key}`} className="font-semibold capitalize cursor-pointer">
+              {key.replace(/_/g, ' ')}
+            </Label>
+            <span className="break-words">{String(value) || 'N/A'}</span>
           </div>
         ))}
       </div>
@@ -178,7 +195,7 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId }: Patien
         <DialogHeader>
           <DialogTitle>Detalles del Expediente</DialogTitle>
           <DialogDescription>
-            Información completa del paciente seleccionado.
+            Información completa del paciente. Selecciona los campos que deseas incluir en el PDF.
           </DialogDescription>
         </DialogHeader>
         <div className="flex-1 overflow-y-auto pr-6 -mr-6">
@@ -186,43 +203,10 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId }: Patien
             {renderContent()}
           </ScrollArea>
         </div>
-         <DialogFooter>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline">
-                Seleccionar Campos <ChevronDown className="ml-2 h-4 w-4" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-80">
-                <div className="grid gap-4">
-                  <div className="space-y-2">
-                    <h4 className="font-medium leading-none">Campos para Imprimir</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Selecciona los campos que deseas incluir en el PDF.
-                    </p>
-                  </div>
-                   <ScrollArea className="h-64">
-                    <div className="space-y-2 p-1">
-                      {patientData && Object.keys(patientData).map(field => (
-                        <div key={field} className="flex items-center space-x-2">
-                           <Checkbox
-                            id={`field-${field}`}
-                            checked={selectedFields.includes(field)}
-                            onCheckedChange={(checked) => handleFieldSelectionChange(field, !!checked)}
-                          />
-                          <Label htmlFor={`field-${field}`} className="font-normal capitalize">
-                            {field.replace(/_/g, ' ')}
-                          </Label>
-                        </div>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                </div>
-            </PopoverContent>
-          </Popover>
+        <DialogFooter>
           <Button onClick={handlePrint} disabled={isLoading || !!error || !patientData}>
             <Printer className="mr-2 h-4 w-4" />
-            Imprimir
+            Imprimir ({selectedFields.length})
           </Button>
         </DialogFooter>
       </DialogContent>
