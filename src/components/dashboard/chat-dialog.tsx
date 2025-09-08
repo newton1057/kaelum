@@ -80,7 +80,7 @@ export function ChatDialog({ isOpen, onOpenChange, patient }: ChatDialogProps) {
                     } else {
                         // If no session exists, create a new local one to start the conversation
                         setChat({
-                            id: uuidv4(), // This will be a temporary ID
+                            id: uuidv4(), // This will be a temporary ID, API should handle session creation
                             title: `Consulta de ${patient.name}`,
                             messages: [{
                                 id: uuidv4(),
@@ -105,49 +105,94 @@ export function ChatDialog({ isOpen, onOpenChange, patient }: ChatDialogProps) {
         }
     }, [isOpen, patient, toast]);
 
+    const handleSendMessage = async (content: string, file?: File) => {
+        if (!chat) return;
 
-  // Dummy functions for now, to be replaced with API calls
-  const handleSendMessage = (content: string, file?: File) => {
-    if (!chat) return;
+        const userMessage: Message = {
+            id: uuidv4(),
+            role: 'user',
+            content,
+        };
+        // Add file handling later if needed
 
-     const userMessage: Message = {
-      id: uuidv4(),
-      role: 'user',
-      content,
-    };
+        const botLoadingMessageId = uuidv4();
+        const botLoadingMessage: Message = {
+            id: botLoadingMessageId,
+            role: 'bot',
+            content: '',
+            isLoading: true
+        };
 
-    const botLoadingMessage: Message = {
-      id: uuidv4(),
-      role: 'bot',
-      content: '',
-      isLoading: true
-    };
-    
-    setChat(prevChat => {
-        if (!prevChat) return;
-        return {
-            ...prevChat,
-            messages: [...prevChat.messages, userMessage, botLoadingMessage]
-        }
-    });
-
-    console.log(`Message: ${content}`, file);
-    // Simulate API call and response
-    setTimeout(() => {
         setChat(prevChat => {
-            if (!prevChat) return;
-            const updatedMessages = prevChat.messages.map(m => m.id === botLoadingMessage.id ? {
-                ...m,
-                isLoading: false,
-                content: "Esta es una respuesta simulada."
-            } : m)
+            if (!prevChat) return undefined;
             return {
                 ...prevChat,
-                messages: updatedMessages
+                messages: [...prevChat.messages, userMessage, botLoadingMessage]
+            };
+        });
+
+        try {
+            const response = await fetch('https://kaelumapi-703555916890.northamerica-south1.run.app/medicalRecords/chatSessionMedicalRecord/message', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    patientId: patient.id,
+                    msg: content,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('La API ha retornado un error.');
             }
-        })
-    }, 2000);
-  };
+
+            const result = await response.json();
+            const botResponseText = result.messages[result.messages.length - 1].text;
+
+            // First, update the loading message to a normal message without content
+            setChat(prevChat => {
+                if (!prevChat) return undefined;
+                const updatedMessages = prevChat.messages.map(m => m.id === botLoadingMessageId ? {
+                    ...m,
+                    isLoading: false,
+                    content: '', // Start with empty content
+                } : m);
+                return { ...prevChat, messages: updatedMessages };
+            });
+
+
+            // Then, animate the response
+            let currentText = '';
+            let charIndex = 0;
+            const interval = setInterval(() => {
+                if (charIndex < botResponseText.length) {
+                    currentText += botResponseText.charAt(charIndex);
+                    setChat(prevChat => {
+                        if (!prevChat) return undefined;
+                        const updatedMessages = prevChat.messages.map(m => m.id === botLoadingMessageId ? { ...m, content: currentText } : m);
+                        return { ...prevChat, messages: updatedMessages };
+                    });
+                    charIndex++;
+                } else {
+                    clearInterval(interval);
+                }
+            }, 25);
+
+
+        } catch (err) {
+            setChat(prevChat => {
+                if (!prevChat) return undefined;
+                const updatedMessages = prevChat.messages.map(m => m.id === botLoadingMessageId ? {
+                    ...m,
+                    isLoading: false,
+                    content: "Lo siento, tuve un problema al conectarme con la API."
+                } : m);
+                return { ...prevChat, messages: updatedMessages };
+            });
+        }
+    };
+
 
   const handleSendSuggestedQuestion = (question: SuggestedQuestion) => {
     console.log(`Suggested question: ${question.question}`);
