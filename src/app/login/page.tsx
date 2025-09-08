@@ -33,12 +33,15 @@ export default function LoginPage() {
 
       if (response.ok) {
         const result = await response.json();
-        const userType = result.type || 'No especificado';
         
         localStorage.setItem('isAuthenticated', 'true');
+        localStorage.setItem('userFullName', result.fullName || 'Usuario');
+        localStorage.setItem('userEmail', result.email || 'email@desconocido.com');
+        localStorage.setItem('userType', result.type || 'No especificado');
+
         toast({
           title: '¡Bienvenido!',
-          description: `Has iniciado sesión correctamente. Tipo de usuario: ${userType}`,
+          description: `Has iniciado sesión correctamente. Tipo de usuario: ${result.type || 'No especificado'}`,
         });
         router.push('/chat');
       } else {

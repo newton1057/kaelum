@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -13,13 +14,33 @@ import { Progress } from '../ui/progress';
 import { Separator } from '../ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { BrainCircuit, Info, User, Moon, Sun, Monitor } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTheme } from 'next-themes';
+
+interface UserProfile {
+  fullName: string;
+  email: string;
+  type: string;
+}
 
 export function UserSettingsModal() {
   const [open, setOpen] = useState(false);
   const memoryUsage = 40; // Mocked value
   const { setTheme } = useTheme();
+  const [userProfile, setUserProfile] = useState<UserProfile>({
+    fullName: 'Cargando...',
+    email: 'cargando...',
+    type: 'Cargando...',
+  });
+
+  useEffect(() => {
+    if (open) {
+      const fullName = localStorage.getItem('userFullName') || 'Usuario Invitado';
+      const email = localStorage.getItem('userEmail') || 'No disponible';
+      const type = localStorage.getItem('userType') || 'No especificado';
+      setUserProfile({ fullName, email, type });
+    }
+  }, [open]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -98,11 +119,11 @@ export function UserSettingsModal() {
                 </AvatarFallback>
               </Avatar>
               <div className="text-center">
-                <p className="text-xl font-semibold">Dr. Elara Vance</p>
+                <p className="text-xl font-semibold">{userProfile.fullName}</p>
                 <p className="text-sm text-muted-foreground">
-                  elara.vance@medmail.com
+                  {userProfile.email}
                 </p>
-                <p className="text-sm text-primary">Doctora</p>
+                <p className="text-sm text-primary">{userProfile.type}</p>
               </div>
               <Separator className="my-4" />
               <div className="text-left w-full space-y-2">
