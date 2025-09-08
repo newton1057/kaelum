@@ -4,6 +4,8 @@
 import {
   Dialog,
   DialogContent,
+  DialogHeader,
+  DialogTitle,
 } from '@/components/ui/dialog';
 import ChatPanel from '../chat/chat-panel';
 import { useState, useEffect } from 'react';
@@ -197,6 +199,9 @@ export function ChatDialog({ isOpen, onOpenChange, patient }: ChatDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-2xl max-h-[90vh] flex flex-col p-0 gap-0">
+        <DialogHeader className="p-4 border-b">
+          <DialogTitle>{chat?.title || 'Cargando...'}</DialogTitle>
+        </DialogHeader>
         <div className="flex-1 min-h-0">
            {renderContent()}
         </div>

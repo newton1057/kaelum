@@ -1,3 +1,4 @@
+
 'use client';
 
 import type { Chat, PendingFile, SuggestedQuestion } from '@/lib/types';
@@ -79,9 +80,6 @@ export default function ChatPanel({
 }: ChatPanelProps) {
   return (
     <div className={cn('flex flex-col h-full', className)}>
-      <div className="border-b px-4 py-3">
-        <h2 className="text-lg font-semibold">{chat?.title || 'Seleccione una conversación'}</h2>
-      </div>
       {chat?.pendingFiles && chat.pendingFiles.length > 0 && (
         <div className="p-4 border-b">
           <PendingFilesSection files={chat.pendingFiles} />
