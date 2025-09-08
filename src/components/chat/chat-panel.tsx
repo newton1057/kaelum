@@ -88,7 +88,7 @@ export default function ChatPanel({
         )}
         <ChatMessages chat={chat} activeChatId={chat?.id ?? null} />
       </div>
-      <div className="border-t bg-background">
+      <div className="shrink-0 border-t bg-background">
         <div className="w-full p-4">
           {suggestedQuestions.length > 0 && (
             <SuggestedQuestions

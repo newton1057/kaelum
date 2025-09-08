@@ -15,7 +15,6 @@ import { Skeleton } from '../ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 import { AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { ScrollArea } from '../ui/scroll-area';
 
 interface ChatDialogProps {
   isOpen: boolean;
@@ -187,21 +186,21 @@ export function ChatDialog({ isOpen, onOpenChange, patient }: ChatDialogProps) {
     }
     
     return (
-         <ChatPanel
-              chat={chat}
-              onSendMessage={handleSendMessage}
-              onSendSuggestedQuestion={handleSendSuggestedQuestion}
-              suggestedQuestions={[]}
-              className="flex-1 flex flex-col"
-              disabled={false}
-            />
+        <ChatPanel
+            chat={chat}
+            onSendMessage={handleSendMessage}
+            onSendSuggestedQuestion={handleSendSuggestedQuestion}
+            suggestedQuestions={[]}
+            className="flex-1 flex flex-col overflow-hidden"
+            disabled={false}
+        />
     );
   }
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-2xl max-h-[90vh] flex flex-col p-0 gap-0">
-        <DialogHeader className="p-4 border-b">
+        <DialogHeader className="p-4 border-b shrink-0">
           <DialogTitle>{chat?.title || 'Cargando...'}</DialogTitle>
         </DialogHeader>
         <div className="flex-1 min-h-0 flex flex-col">
