@@ -148,7 +148,7 @@ export function ChatDialog({ isOpen, onOpenChange, patient }: ChatDialogProps) {
             }
 
             const result = await response.json();
-            const botResponseText = result.messages[result.messages.length - 1].text;
+            const botResponseText = result.botMessage;
 
             // First, update the loading message to a normal message without content
             setChat(prevChat => {
