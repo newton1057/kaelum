@@ -252,9 +252,11 @@ export default function ExpedientesPage() {
       </div>
     </div>
     <ImportPatientsDialog isOpen={isImportDialogOpen} onOpenChange={setIsImportDialogOpen} />
-    {selectedPatient && <PatientDetailsDialog isOpen={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen} patientId={selectedPatient.id} />}
+    {selectedPatient && <PatientDetailsDialog isOpen={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen} patientId={selectedPatient.id} onPatientUpdate={fetchPatients} />}
     {selectedPatient && <AddNoteDialog isOpen={isAddNoteDialogOpen} onOpenChange={setIsAddNoteDialogOpen} patientId={selectedPatient.id} />}
     {selectedPatient && <ChatDialog isOpen={isChatDialogOpen} onOpenChange={setIsChatDialogOpen} patient={selectedPatient} />}
     </>
   );
 }
+
+    

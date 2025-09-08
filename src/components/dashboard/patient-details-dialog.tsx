@@ -13,58 +13,98 @@ import {
 } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
-import { AlertTriangle, Printer } from 'lucide-react';
+import { AlertTriangle, Printer, Pencil } from 'lucide-react';
 import { ScrollArea } from '../ui/scroll-area';
 import { Button } from '../ui/button';
 import { Checkbox } from '../ui/checkbox';
 import { Label } from '../ui/label';
+import { EditFieldDialog } from './edit-field-dialog';
 
 interface PatientDetailsDialogProps {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
   patientId: string | null;
+  onPatientUpdate: () => void;
 }
 
 const SKELETON_ITEMS = 15;
 
-export function PatientDetailsDialog({ isOpen, onOpenChange, patientId }: PatientDetailsDialogProps) {
+export function PatientDetailsDialog({ isOpen, onOpenChange, patientId, onPatientUpdate }: PatientDetailsDialogProps) {
   const [patientData, setPatientData] = useState<Record<string, any> | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedFields, setSelectedFields] = useState<string[]>([]);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [fieldToEdit, setFieldToEdit] = useState<{ key: string; value: any } | null>(null);
 
   useEffect(() => {
     if (isOpen && patientId) {
-      const fetchPatientDetails = async () => {
-        setIsLoading(true);
-        setError(null);
-        setPatientData(null);
-        try {
-          const response = await fetch(`https://kaelumapi-703555916890.northamerica-south1.run.app/medicalRecords/getRecord/${patientId}`);
-          if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Error al obtener los detalles del paciente.');
-          }
-          const result = await response.json();
-          const data = result.data;
-          setPatientData(data);
-          // Initialize with all fields selected, excluding ones we never want to print like id
-          setSelectedFields(Object.keys(data).filter(key => key !== 'id' && key !== 'Marca temporal'));
-        } catch (err: any) {
-          setError(err.message);
-        } finally {
-          setIsLoading(false);
-        }
-      };
       fetchPatientDetails();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, patientId]);
+
+  const fetchPatientDetails = async () => {
+    if (!patientId) return;
+    setIsLoading(true);
+    setError(null);
+    setPatientData(null);
+    try {
+      const response = await fetch(`https://kaelumapi-703555916890.northamerica-south1.run.app/medicalRecords/getRecord/${patientId}`);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error al obtener los detalles del paciente.');
+      }
+      const result = await response.json();
+      const data = result.data;
+      setPatientData(data);
+      // Initialize with all fields selected, excluding ones we never want to print like id
+      setSelectedFields(Object.keys(data).filter(key => key !== 'id' && key !== 'Marca temporal'));
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleFieldSelectionChange = (field: string) => {
     setSelectedFields(prev =>
       prev.includes(field) ? prev.filter(f => f !== field) : [...prev, field]
     );
   };
+  
+  const handleEditClick = (key: string, value: any) => {
+    setFieldToEdit({ key, value });
+    setIsEditModalOpen(true);
+  };
+
+  const handleUpdateField = async (key: string, newValue: any) => {
+    if (!patientData || !patientId) return;
+
+    // Optimistic UI update
+    const oldPatientData = { ...patientData };
+    setPatientData(prev => prev ? { ...prev, [key]: newValue } : null);
+
+    try {
+        const response = await fetch(`https://kaelumapi-703555916890.northamerica-south1.run.app/medicalRecords/updateRecord/${patientId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ [key]: newValue }),
+        });
+        if (!response.ok) {
+            throw new Error('Error al actualizar el campo');
+        }
+        await response.json();
+        onPatientUpdate(); // Refresh table data
+    } catch (error) {
+        console.error("Failed to update field:", error);
+        // Revert on error
+        setPatientData(oldPatientData);
+    } finally {
+        setIsEditModalOpen(false);
+    }
+  };
+
 
   const handlePrint = () => {
     if (!patientData) return;
@@ -200,13 +240,14 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId }: Patien
 
     return (
       <div id="patient-details-content" className="space-y-2 p-2">
-        <div className="grid grid-cols-[auto_1fr_2fr] items-center gap-x-4 border-b py-2 text-sm font-bold text-muted-foreground">
+        <div className="grid grid-cols-[auto_1fr_2fr_auto] items-center gap-x-4 border-b py-2 text-sm font-bold text-muted-foreground">
           <div />
           <span>Campo</span>
           <span>Valor</span>
+          <div />
         </div>
         {fieldsToDisplay.map(([key, value]) => (
-          <div key={key} className="grid grid-cols-[auto_1fr_2fr] items-start gap-x-4 border-b py-2 text-sm">
+          <div key={key} className="grid grid-cols-[auto_1fr_2fr_auto] items-start gap-x-4 border-b py-2 text-sm">
             <Checkbox
               id={`field-${key}`}
               checked={selectedFields.includes(key)}
@@ -217,6 +258,9 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId }: Patien
               {key.replace(/_/g, ' ')}
             </Label>
             <span className="break-words">{String(value) || 'N/A'}</span>
+            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleEditClick(key, value)}>
+                <Pencil className="h-4 w-4" />
+            </Button>
           </div>
         ))}
       </div>
@@ -224,6 +268,7 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId }: Patien
   };
 
   return (
+    <>
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-2xl max-h-[90vh] flex flex-col">
         <DialogHeader>
@@ -245,5 +290,17 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId }: Patien
         </DialogFooter>
       </DialogContent>
     </Dialog>
+    {fieldToEdit && (
+        <EditFieldDialog
+            isOpen={isEditModalOpen}
+            onOpenChange={setIsEditModalOpen}
+            fieldKey={fieldToEdit.key}
+            initialValue={fieldToEdit.value}
+            onUpdate={handleUpdateField}
+        />
+    )}
+    </>
   );
 }
+
+    
