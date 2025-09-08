@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, type FormEvent } from 'react';
@@ -31,10 +32,13 @@ export default function LoginPage() {
       });
 
       if (response.ok) {
+        const result = await response.json();
+        const userType = result.type || 'No especificado';
+        
         localStorage.setItem('isAuthenticated', 'true');
         toast({
           title: '¡Bienvenido!',
-          description: 'Has iniciado sesión correctamente.',
+          description: `Has iniciado sesión correctamente. Tipo de usuario: ${userType}`,
         });
         router.push('/chat');
       } else {
