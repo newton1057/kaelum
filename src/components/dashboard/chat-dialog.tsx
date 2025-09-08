@@ -28,7 +28,7 @@ interface ChatDialogProps {
 
 
 function transformSessionToChat(session: any): Chat {
-  const patientName = session.data?.name || session.data?.full_name || session.data?.nombre;
+  const patientName = session.data?.name || session.data?.full_name || session.data?.nombre || "Paciente";
   
   const pendingFiles: PendingFile[] = (session.data?.pending_files || []).map((file: any) => ({
     name: file.name,
@@ -41,10 +41,10 @@ function transformSessionToChat(session: any): Chat {
     id: session.session_id,
     title: `Consulta de ${patientName}`,
     messages: session.messages.map((msg: any, idx: number) => ({
-      id: `${session.session_id}-${idx}`,
+      id: msg.id || `${session.session_id}-${idx}`,
       role: msg.sender === 'model' ? 'bot' : 'user',
       content: msg.text,
-      timestamp: msg.timestamp,
+      timestamp: msg.created_at,
       attachment: msg.attachment,
     })),
     pendingFiles: pendingFiles.length > 0 ? pendingFiles : undefined,
@@ -66,7 +66,7 @@ export function ChatDialog({ isOpen, onOpenChange, patient }: ChatDialogProps) {
                 setChat(undefined);
                 try {
                     const url = `https://kaelumapi-703555916890.northamerica-south1.run.app/medicalRecords/chatSessionMedicalRecord?patientId=${patient.id}`;
-                    alert(url);
+                    // alert(url); // This was for debugging, can be removed
                     const response = await fetch(url);
                     
                     if (!response.ok) {
