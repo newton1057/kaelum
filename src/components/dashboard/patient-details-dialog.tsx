@@ -72,35 +72,56 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId }: Patien
     const doc = new jsPDF();
     const margin = 15;
     const lineHeight = 7;
-    let y = margin;
     const pageHeight = doc.internal.pageSize.height;
     const pageWidth = doc.internal.pageSize.width;
     const contentWidth = pageWidth - margin * 2;
-
-    doc.setFont('Arial', 'normal');
-
-    doc.setFontSize(18);
-    doc.setFont('Arial', 'bold');
-    doc.text('Expediente del Paciente', margin, y);
-    y += lineHeight * 2;
-
-    doc.setFontSize(14);
-    doc.setFont('Arial', 'normal');
     const patientName = patientData.Nombre || 'Desconocido';
-    doc.text(patientName, margin, y);
-    y += lineHeight * 1.5;
+    const primaryColor = '#1a1a1a'; 
+    const secondaryColor = '#555555';
+    const lightGray = '#E5E5E5';
 
-    doc.setLineWidth(0.5);
-    doc.line(margin, y - 5, pageWidth - margin, y - 5);
+    let y = margin;
+    let pageNumber = 1;
 
-    const checkPageBreak = (neededHeight: number) => {
-      if (y + neededHeight > pageHeight - margin) {
-        doc.addPage();
-        y = margin;
-      }
+    const addHeader = () => {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(16);
+      doc.setTextColor(primaryColor);
+      doc.text('Expediente Clínico', margin, y);
+      y += lineHeight * 1.5;
+      
+      doc.setDrawColor(lightGray);
+      doc.setLineWidth(0.5);
+      doc.line(margin, y, pageWidth - margin, y);
+      y += lineHeight * 1.5;
+    };
+    
+    const addFooter = () => {
+      doc.setFontSize(8);
+      doc.setTextColor(secondaryColor);
+      doc.text(`Página ${pageNumber}`, pageWidth - margin, pageHeight - 10, { align: 'right' });
     };
 
-    doc.setFontSize(10);
+    const checkPageBreak = (neededHeight: number) => {
+      if (y + neededHeight > pageHeight - margin - 10) { // check against footer margin
+        addFooter();
+        doc.addPage();
+        pageNumber++;
+        y = margin;
+        addHeader();
+      }
+    };
+    
+    addHeader();
+
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(secondaryColor);
+    doc.text(`Paciente:`, margin, y);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(primaryColor);
+    doc.text(patientName, margin + 20, y);
+    y += lineHeight * 2;
 
     for (const key of Object.keys(patientData)) {
       if (!selectedFields.includes(key)) continue;
@@ -109,26 +130,24 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId }: Patien
       const keyText = `${key.replace(/_/g, ' ')}:`;
       const valueText = String(value) || 'N/A';
 
-      const splitKey = doc.splitTextToSize(keyText, contentWidth);
-      const splitValue = doc.splitTextToSize(valueText, contentWidth);
+      const splitValue = doc.splitTextToSize(valueText, contentWidth - 5);
+      const neededHeight = (splitValue.length * lineHeight) + 5;
+      
+      checkPageBreak(neededHeight);
 
-      const keyHeight = splitKey.length * lineHeight;
-      const valueHeight = splitValue.length * lineHeight;
-      const totalNeededHeight = keyHeight + valueHeight + (lineHeight * 0.5);
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(primaryColor);
+      doc.text(keyText, margin, y);
 
-      checkPageBreak(totalNeededHeight);
-
-      doc.setFont('Arial', 'bold');
-      doc.text(splitKey, margin, y);
-      y += keyHeight;
-
-      doc.setFont('Arial', 'normal');
-      doc.text(splitValue, margin, y);
-      y += valueHeight;
-
-      y += lineHeight * 0.5;
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(secondaryColor);
+      doc.text(splitValue, margin, y + lineHeight);
+      
+      y += (splitValue.length * lineHeight) + 5;
     }
 
+    addFooter();
     doc.save(`expediente-${patientName.replace(/\s/g, '_') || patientId}.pdf`);
   };
 
