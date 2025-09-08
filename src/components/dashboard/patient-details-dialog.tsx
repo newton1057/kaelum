@@ -84,10 +84,25 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId }: Patien
     let pageNumber = 1;
 
     const addHeader = () => {
+      const currentDate = new Date().toLocaleDateString('es-ES', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+      
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(16);
       doc.setTextColor(primaryColor);
       doc.text('Expediente Clínico', margin, y);
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.setTextColor(secondaryColor);
+      doc.text('Mental Beat', pageWidth - margin, y - lineHeight, { align: 'right' });
+      
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Generado el: ${currentDate}`, pageWidth - margin, y, { align: 'right' });
+      
       y += lineHeight * 1.5;
       
       doc.setDrawColor(lightGray);
