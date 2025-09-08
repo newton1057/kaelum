@@ -85,7 +85,7 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId, onPatien
     setPatientData(prev => prev ? { ...prev, [key]: newValue } : null);
 
     try {
-        const body = { patientId: patientId, key: key, value: newValue };
+        const body = { parentId: patientId, key: key, value: newValue };
         alert(`Enviando a la API:\n${JSON.stringify(body, null, 2)}`);
 
         const response = await fetch(`https://kaelumapi-703555916890.northamerica-south1.run.app/medicalRecords/updateRecord`, {
@@ -304,7 +304,3 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId, onPatien
     </>
   );
 }
-
-    
-
-    
