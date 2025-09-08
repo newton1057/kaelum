@@ -148,7 +148,7 @@ export function ChatDialog({ isOpen, onOpenChange, patient }: ChatDialogProps) {
             }
 
             const result = await response.json();
-            const botResponseText = result.botMessage;
+            const botResponseText = result?.botMessage?.text || "No se recibió una respuesta válida.";
 
             // First, update the loading message to a normal message without content
             setChat(prevChat => {
