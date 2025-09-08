@@ -13,9 +13,12 @@ import {
 } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
-import { AlertTriangle, Printer } from 'lucide-react';
+import { AlertTriangle, Printer, ChevronDown } from 'lucide-react';
 import { ScrollArea } from '../ui/scroll-area';
 import { Button } from '../ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
+import { Checkbox } from '../ui/checkbox';
+import { Label } from '../ui/label';
 
 interface PatientDetailsDialogProps {
   isOpen: boolean;
@@ -29,7 +32,7 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId }: Patien
   const [patientData, setPatientData] = useState<Record<string, any> | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
+  const [selectedFields, setSelectedFields] = useState<string[]>([]);
 
   useEffect(() => {
     if (isOpen && patientId) {
@@ -45,6 +48,7 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId }: Patien
           }
           const result = await response.json();
           setPatientData(result.data);
+          setSelectedFields(Object.keys(result.data)); // Select all fields by default
         } catch (err: any) {
           setError(err.message);
         } finally {
@@ -54,6 +58,12 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId }: Patien
       fetchPatientDetails();
     }
   }, [isOpen, patientId]);
+
+  const handleFieldSelectionChange = (field: string, checked: boolean) => {
+    setSelectedFields(prev => 
+      checked ? [...prev, field] : prev.filter(f => f !== field)
+    );
+  };
   
   const handlePrint = () => {
     if (!patientData) return;
@@ -91,9 +101,10 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId }: Patien
 
     doc.setFontSize(10);
 
-    for (const [key, value] of Object.entries(patientData)) {
-        if (key === 'id' || key === 'Marca temporal') continue;
-
+    for (const key of selectedFields) {
+        if (!patientData.hasOwnProperty(key) || key === 'id' || key === 'Marca temporal') continue;
+        
+        const value = patientData[key];
         const keyText = `${key.replace(/_/g, ' ')}:`;
         const valueText = String(value) || 'N/A';
 
@@ -150,7 +161,7 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId }: Patien
     }
 
     return (
-      <div ref={contentRef} id="patient-details-content" className="space-y-2 p-2">
+      <div id="patient-details-content" className="space-y-2 p-2">
         {Object.entries(patientData).map(([key, value]) => (
           <div key={key} className="grid grid-cols-1 md:grid-cols-3 gap-x-4 border-b py-2 text-sm">
             <span className="font-semibold text-muted-foreground capitalize">{key.replace(/_/g, ' ')}</span>
@@ -170,10 +181,45 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId }: Patien
             Información completa del paciente seleccionado.
           </DialogDescription>
         </DialogHeader>
-        <ScrollArea className="h-[65vh] pr-4">
-          {renderContent()}
-        </ScrollArea>
+        <div className="flex-1 overflow-y-auto pr-6 -mr-6">
+          <ScrollArea className="h-full pr-6">
+            {renderContent()}
+          </ScrollArea>
+        </div>
          <DialogFooter>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline">
+                Seleccionar Campos <ChevronDown className="ml-2 h-4 w-4" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80">
+                <div className="grid gap-4">
+                  <div className="space-y-2">
+                    <h4 className="font-medium leading-none">Campos para Imprimir</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Selecciona los campos que deseas incluir en el PDF.
+                    </p>
+                  </div>
+                   <ScrollArea className="h-64">
+                    <div className="space-y-2 p-1">
+                      {patientData && Object.keys(patientData).map(field => (
+                        <div key={field} className="flex items-center space-x-2">
+                           <Checkbox
+                            id={`field-${field}`}
+                            checked={selectedFields.includes(field)}
+                            onCheckedChange={(checked) => handleFieldSelectionChange(field, !!checked)}
+                          />
+                          <Label htmlFor={`field-${field}`} className="font-normal capitalize">
+                            {field.replace(/_/g, ' ')}
+                          </Label>
+                        </div>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                </div>
+            </PopoverContent>
+          </Popover>
           <Button onClick={handlePrint} disabled={isLoading || !!error || !patientData}>
             <Printer className="mr-2 h-4 w-4" />
             Imprimir
