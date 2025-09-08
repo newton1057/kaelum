@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, type DragEvent } from 'react';
@@ -10,7 +11,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { FileUp, File as FileIcon, X } from 'lucide-react';
+import { FileUp, File as FileIcon, X, Loader } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 
@@ -27,6 +28,7 @@ const ALLOWED_FILE_TYPES = [
 export function ImportPatientsDialog({ isOpen, onOpenChange }: ImportPatientsDialogProps) {
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const [file, setFile] = useState<File | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
   const handleFileChange = (selectedFile: File) => {
@@ -68,14 +70,43 @@ export function ImportPatientsDialog({ isOpen, onOpenChange }: ImportPatientsDia
     }
   };
 
-  const handleImport = () => {
+  const handleImport = async () => {
     if (!file) return;
-    // Lógica de importación aquí
-    toast({
-      title: 'Importación iniciada',
-      description: `El archivo "${file.name}" se está procesando.`,
-    });
-    handleClose();
+    
+    setIsLoading(true);
+
+    const formData = new FormData();
+    formData.append('excel', file);
+
+    try {
+      const response = await fetch('https://kaelumapi-703555916890.northamerica-south1.run.app/medicalRecords/uploadExcel', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        toast({
+          title: '¡Todo ok!',
+          description: `El archivo "${file.name}" se ha importado correctamente.`,
+        });
+        handleClose();
+      } else {
+        const errorData = await response.json();
+        toast({
+          variant: 'destructive',
+          title: 'Error en la importación',
+          description: errorData.message || 'Ocurrió un error al procesar el archivo.',
+        });
+      }
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Error de Red',
+        description: 'No se pudo conectar con el servidor. Inténtalo de nuevo más tarde.',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleClose = () => {
@@ -133,11 +164,12 @@ export function ImportPatientsDialog({ isOpen, onOpenChange }: ImportPatientsDia
           )}
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={handleClose}>
+          <Button variant="outline" onClick={handleClose} disabled={isLoading}>
             Cancelar
           </Button>
-          <Button onClick={handleImport} disabled={!file}>
-            Importar
+          <Button onClick={handleImport} disabled={!file || isLoading}>
+            {isLoading && <Loader className="mr-2 h-4 w-4 animate-spin" />}
+            {isLoading ? 'Importando...' : 'Importar'}
           </Button>
         </DialogFooter>
       </DialogContent>
