@@ -66,7 +66,6 @@ export function ChatDialog({ isOpen, onOpenChange, patient }: ChatDialogProps) {
                 setChat(undefined);
                 try {
                     const url = `https://kaelumapi-703555916890.northamerica-south1.run.app/medicalRecords/chatSessionMedicalRecord?patientId=${patient.id}`;
-                    // alert(url); // This was for debugging, can be removed
                     const response = await fetch(url);
                     
                     if (!response.ok) {
@@ -76,8 +75,8 @@ export function ChatDialog({ isOpen, onOpenChange, patient }: ChatDialogProps) {
                     
                     const result = await response.json();
                     
-                    if (result.session) {
-                        setChat(transformSessionToChat(result.session));
+                    if (result && result.messages) {
+                        setChat(transformSessionToChat(result));
                     } else {
                         // If no session exists, create a new local one to start the conversation
                         setChat({
