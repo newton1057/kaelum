@@ -159,9 +159,6 @@ export default function ExpedientesPage() {
               <DropdownMenuItem onSelect={() => setIsImportDialogOpen(true)}>
                 Importar Pacientes
               </DropdownMenuItem>
-              <DropdownMenuItem>Exportar Pacientes</DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Configuración</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
