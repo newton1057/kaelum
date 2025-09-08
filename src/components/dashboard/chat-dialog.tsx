@@ -65,7 +65,9 @@ export function ChatDialog({ isOpen, onOpenChange, patient }: ChatDialogProps) {
                 setError(null);
                 setChat(undefined);
                 try {
-                    const response = await fetch(`https://kaelumapi-703555916890.northamerica-south1.run.app/medicalRecords/chatSessionMedicalRecord?patientId=${patient.id}`);
+                    const url = `https://kaelumapi-703555916890.northamerica-south1.run.app/medicalRecords/chatSessionMedicalRecord?patientId=${patient.id}`;
+                    alert(url);
+                    const response = await fetch(url);
                     
                     if (!response.ok) {
                         const errorData = await response.json();
