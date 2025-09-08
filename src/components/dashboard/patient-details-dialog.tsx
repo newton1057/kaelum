@@ -85,10 +85,10 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId, onPatien
     setPatientData(prev => prev ? { ...prev, [key]: newValue } : null);
 
     try {
-        const response = await fetch(`https://kaelumapi-703555916890.northamerica-south1.run.app/medicalRecords/updateRecord/${patientId}`, {
+        const response = await fetch(`https://kaelumapi-703555916890.northamerica-south1.run.app/medicalRecords/updateRecord`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ [key]: newValue }),
+            body: JSON.stringify({ patientId: patientId, key: key, value: newValue }),
         });
         if (!response.ok) {
             throw new Error('Error al actualizar el campo');
