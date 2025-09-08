@@ -86,7 +86,7 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId, onPatien
 
     try {
         const response = await fetch(`https://kaelumapi-703555916890.northamerica-south1.run.app/medicalRecords/updateRecord`, {
-            method: 'PUT',
+            method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ patientId: patientId, key: key, value: newValue }),
         });
@@ -301,5 +301,7 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId, onPatien
     </>
   );
 }
+
+    
 
     
