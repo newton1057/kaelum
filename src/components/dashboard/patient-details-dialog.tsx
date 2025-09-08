@@ -81,7 +81,6 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId, onPatien
   const handleUpdateField = async (key: string, newValue: any) => {
     if (!patientData || !patientId) return;
 
-    // Optimistic UI update
     const oldPatientData = { ...patientData };
     setPatientData(prev => prev ? { ...prev, [key]: newValue } : null);
 
