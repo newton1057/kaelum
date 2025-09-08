@@ -30,6 +30,7 @@ import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { AddNoteDialog } from '@/components/dashboard/add-note-dialog';
 import { ChatDialog } from '@/components/dashboard/chat-dialog';
+import { ScreeningQuestionnaireDialog, type ScreeningFormValues } from '@/components/chat/screening-questionnaire-dialog';
 
 type Patient = {
   id: string;
@@ -49,6 +50,7 @@ export default function ExpedientesPage() {
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
   const [isAddNoteDialogOpen, setIsAddNoteDialogOpen] = useState(false);
   const [isChatDialogOpen, setIsChatDialogOpen] = useState(false);
+  const [isScreeningDialogOpen, setIsScreeningDialogOpen] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [patients, setPatients] = useState<Patient[]>([]);
   const [filteredPatients, setFilteredPatients] = useState<Patient[]>([]);
@@ -95,9 +97,48 @@ export default function ExpedientesPage() {
       setPatients(formattedPatients);
     } catch (error) {
       console.error(error);
-      // Handle error (e.g., show a toast message)
+      toast({
+        variant: 'destructive',
+        title: 'Error de Carga',
+        description: (error as Error).message || 'No se pudieron cargar los expedientes.'
+      });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleCreatePatient = async (formData: ScreeningFormValues) => {
+    try {
+      const dataToSend = {
+        id: formData.curp,
+        data: formData
+      };
+
+      const response = await fetch('https://kaelumapi-703555916890.northamerica-south1.run.app/medicalRecords/createRecord', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dataToSend),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error al crear el expediente.');
+      }
+
+      toast({
+        title: 'Expediente Creado',
+        description: `El expediente para "${formData.nombre}" ha sido creado exitosamente.`
+      });
+      setIsScreeningDialogOpen(false);
+      fetchPatients(); // Refresh the list
+    } catch (error) {
+       toast({
+        variant: 'destructive',
+        title: 'Error al Crear',
+        description: (error as Error).message || 'No se pudo crear el expediente.'
+      });
     }
   };
 
@@ -118,8 +159,6 @@ export default function ExpedientesPage() {
     if (!patient) return;
     setSelectedPatient(patient);
     setIsChatDialogOpen(true);
-    // The previous logic to hit the /chat/start endpoint can be moved
-    // inside the ChatDialog component when it opens.
   };
 
   if (!isAuth) {
@@ -144,7 +183,7 @@ export default function ExpedientesPage() {
           Expedientes de Pacientes
         </h2>
         <div className="flex items-center gap-2">
-          <Button>
+          <Button onClick={() => setIsScreeningDialogOpen(true)}>
             <PlusCircle className="mr-2 h-4 w-4" />
             Añadir Paciente
           </Button>
@@ -251,6 +290,11 @@ export default function ExpedientesPage() {
     {selectedPatient && <PatientDetailsDialog isOpen={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen} patientId={selectedPatient.id} onPatientUpdate={fetchPatients} />}
     {selectedPatient && <AddNoteDialog isOpen={isAddNoteDialogOpen} onOpenChange={setIsAddNoteDialogOpen} patientId={selectedPatient.id} />}
     {selectedPatient && <ChatDialog isOpen={isChatDialogOpen} onOpenChange={setIsChatDialogOpen} patient={selectedPatient} />}
+    <ScreeningQuestionnaireDialog
+        isOpen={isScreeningDialogOpen}
+        onOpenChange={setIsScreeningDialogOpen}
+        onSubmit={handleCreatePatient}
+      />
     </>
   );
 }
