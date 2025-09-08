@@ -52,25 +52,21 @@ export function EditFieldDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-[625px]">
         <DialogHeader>
-          <DialogTitle>Editar Campo: {fieldKey.replace(/_/g, ' ')}</DialogTitle>
+          <DialogTitle>Editar: {fieldKey.replace(/_/g, ' ')}</DialogTitle>
           <DialogDescription>
             Modifica el valor del campo y haz clic en Actualizar para guardar los cambios.
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="field-value" className="text-right">
-              Valor
-            </Label>
+        <div className="py-4">
             <Textarea
               id="field-value"
               value={currentValue}
               onChange={(e) => setCurrentValue(e.target.value)}
-              className="col-span-3 h-32"
+              className="h-48"
+              placeholder="Añade tu nota aquí..."
             />
-          </div>
         </div>
         <DialogFooter>
             <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
@@ -82,5 +78,3 @@ export function EditFieldDialog({
     </Dialog>
   );
 }
-
-    

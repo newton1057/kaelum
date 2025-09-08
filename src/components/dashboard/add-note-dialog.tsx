@@ -18,6 +18,7 @@ import { ScrollArea } from '../ui/scroll-area';
 import { Label } from '../ui/label';
 import { EditFieldDialog } from './edit-field-dialog';
 import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
 
 interface AddNoteDialogProps {
   isOpen: boolean;
@@ -77,6 +78,7 @@ export function AddNoteDialog({ isOpen, onOpenChange, patientId }: AddNoteDialog
     if (!patientId) return;
 
     const originalValue = patientData ? patientData[key] : '';
+    // Optimistic update
     setPatientData(prev => (prev ? { ...prev, [key]: newValue } : null));
 
     try {
@@ -91,11 +93,9 @@ export function AddNoteDialog({ isOpen, onOpenChange, patientId }: AddNoteDialog
       }
 
       await response.json();
-      toast({
-        title: 'Campo actualizado',
-        description: `La sección "${key}" de la nota se ha guardado.`,
-      });
+      // No toast here, it's in the edit dialog
     } catch (error: any) {
+      // Revert on error
       setPatientData(prev => (prev ? { ...prev, [key]: originalValue } : null));
       toast({
         variant: 'destructive',
@@ -113,8 +113,8 @@ export function AddNoteDialog({ isOpen, onOpenChange, patientId }: AddNoteDialog
         <div className="space-y-6">
           {Array.from({ length: SKELETON_ITEMS }).map((_, index) => (
             <div key={index} className="space-y-2">
-              <Skeleton className="h-4 w-1/3" />
-              <Skeleton className="h-16 w-full" />
+              <Skeleton className="h-5 w-1/3" />
+              <Skeleton className="h-20 w-full" />
             </div>
           ))}
         </div>
@@ -142,7 +142,7 @@ export function AddNoteDialog({ isOpen, onOpenChange, patientId }: AddNoteDialog
           return (
             <div key={fieldKey} className="space-y-2">
               <div className="flex justify-between items-center">
-                <Label htmlFor={fieldKey} className="font-semibold capitalize">
+                <Label htmlFor={fieldKey} className="font-semibold capitalize text-base">
                   {fieldKey.replace(/_/g, ' ')}
                 </Label>
                 <Button
@@ -154,8 +154,14 @@ export function AddNoteDialog({ isOpen, onOpenChange, patientId }: AddNoteDialog
                   Editar
                 </Button>
               </div>
-              <div className="min-h-[60px] w-full rounded-md border border-input bg-background/30 px-3 py-2 text-sm text-muted-foreground whitespace-pre-wrap">
-                {value || 'No hay información registrada.'}
+              <div
+                onClick={() => handleEditClick(fieldKey, value)} 
+                className={cn(
+                  "min-h-[80px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm whitespace-pre-wrap cursor-pointer transition-colors hover:bg-muted/50",
+                   !value && "text-muted-foreground"
+                )}
+              >
+                {value || 'No hay información registrada. Haz clic para añadir.'}
               </div>
             </div>
           );
@@ -171,10 +177,10 @@ export function AddNoteDialog({ isOpen, onOpenChange, patientId }: AddNoteDialog
           <DialogHeader>
             <div className="flex items-center gap-2">
               <BookOpen className="h-6 w-6" />
-              <DialogTitle>Notas Clínicas del Paciente</DialogTitle>
+              <DialogTitle className="text-xl">Notas Clínicas del Paciente</DialogTitle>
             </div>
             <DialogDescription>
-              Consulta o edita las secciones de la nota clínica del paciente. Los cambios se guardan individualmente.
+              Consulta o edita las secciones de la nota clínica. Los cambios se guardan individualmente al hacer clic en "Actualizar" en la ventana de edición.
             </DialogDescription>
           </DialogHeader>
           <div className="flex-1 overflow-y-auto pr-6 -mr-6">
@@ -201,3 +207,4 @@ export function AddNoteDialog({ isOpen, onOpenChange, patientId }: AddNoteDialog
     </>
   );
 }
+
