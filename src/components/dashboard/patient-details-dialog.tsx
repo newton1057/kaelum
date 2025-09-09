@@ -216,7 +216,7 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId, onPatien
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(primaryColor);
-    doc.text("Firma del Paciente", margin, y);
+    doc.text("Firma del Doctor", margin, y);
     
     const doctorName = patientData['Asistiré a consulta con'];
     if (doctorName) {
