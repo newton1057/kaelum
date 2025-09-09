@@ -75,16 +75,6 @@ export default function ChatSidebar({
           </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton
-              onClick={() => router.push('/dashboard')}
-              isActive={pathname === '/dashboard'}
-              className="w-full justify-start"
-            >
-              <LayoutDashboard />
-              <span>Dashboard</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton
               onClick={() => router.push('/chat')}
               isActive={pathname.startsWith('/chat')}
               className="w-full justify-start"
