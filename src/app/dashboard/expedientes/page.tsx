@@ -42,6 +42,24 @@ type Patient = {
   [key: string]: any; // Allow other properties
 };
 
+const calculateAge = (birthDateString: string): number | string => {
+    if (!birthDateString) return 'N/A';
+    try {
+        const birthDate = new Date(birthDateString);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDifference = today.getMonth() - birthDate.getMonth();
+        if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+        return age;
+    } catch (error) {
+        console.error("Error parsing date:", birthDateString, error);
+        return "N/A";
+    }
+};
+
+
 export default function ExpedientesPage() {
   const router = useRouter();
   const { toast } = useToast();
@@ -88,7 +106,7 @@ export default function ExpedientesPage() {
         ...record, // Keep all original data
         id: record.id || record['CURP del paciente'] || Math.random().toString(36).substring(2, 15),
         name: record.Nombre,
-        age: record.Edad,
+        age: calculateAge(record['Fecha de Nacimiento']),
         gender: record.Sexo,
         lastConsultation: record['Fecha de Nacimiento'] ? format(new Date(record['Fecha de Nacimiento']), 'yyyy-MM-dd') : 'N/A',
         status: 'Activo', // Placeholder status
