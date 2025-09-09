@@ -1,3 +1,4 @@
+
 'use client';
 
 import { cn } from '@/lib/utils';
@@ -156,7 +157,7 @@ export default function ChatMessage({ message }: ChatMessageProps) {
             message.content === '' && !message.isReasoningComplete && 'hidden'
           )}
         >
-          <div className="prose prose-sm prose-p:text-inherit prose-strong:text-inherit prose-em:text-inherit prose-code:text-inherit prose-li:text-inherit max-w-none text-sm leading-relaxed text-inherit">
+          <div className="prose prose-sm prose-headings:text-inherit prose-p:text-inherit prose-strong:text-inherit prose-em:text-inherit prose-code:text-inherit prose-li:text-inherit max-w-none text-sm leading-relaxed text-inherit">
             <ReactMarkdown
               components={{
                 p: ({ node, ...props }) => (
