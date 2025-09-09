@@ -86,8 +86,7 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId, onPatien
 
     try {
         const body = { parentId: patientId, key: key, value: newValue };
-        alert(`Enviando a la API:\n${JSON.stringify(body, null, 2)}`);
-
+        
         const response = await fetch(`https://kaelumapi-703555916890.northamerica-south1.run.app/medicalRecords/updateRecord`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -181,7 +180,7 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId, onPatien
     y += lineHeight * 2;
 
     for (const key of Object.keys(patientData)) {
-      if (!selectedFields.includes(key)) continue;
+      if (!selectedFields.includes(key) || key === 'Asistiré a consulta con') continue;
 
       const value = patientData[key];
       const keyText = `${key.replace(/_/g, ' ')}:`;
@@ -202,6 +201,29 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId, onPatien
       doc.text(splitValue, margin, y + lineHeight);
       
       y += (splitValue.length * lineHeight) + 5;
+    }
+    
+    // Signature section
+    checkPageBreak(30); 
+    y += 20; // Add some space before signature
+    
+    doc.setDrawColor(primaryColor);
+    doc.setLineWidth(0.3);
+    doc.line(margin, y, margin + 80, y); // Signature line
+    
+    y += lineHeight;
+
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(primaryColor);
+    doc.text("Firma del Paciente", margin, y);
+    
+    const doctorName = patientData['Asistiré a consulta con'];
+    if (doctorName) {
+        y += lineHeight;
+        doc.setFontSize(8);
+        doc.setTextColor(secondaryColor);
+        doc.text(`Asistirá a consulta con: ${doctorName}`, margin, y);
     }
 
     addFooter();
