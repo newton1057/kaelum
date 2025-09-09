@@ -90,7 +90,7 @@ export default function ChatSidebar({
               className="w-full justify-start"
             >
               <MessageCircle />
-              <span>Chat General</span>
+              <span>Chat Medico</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
