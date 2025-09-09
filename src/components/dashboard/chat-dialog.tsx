@@ -37,10 +37,27 @@ function transformSessionToChat(session: any): Chat {
     url: file.url,
   }));
 
+  // Sort messages by timestamp, then by sender (user before model)
+  const sortedMessages = (session.messages || []).sort((a: any, b: any) => {
+    const timeA = a.created_at || 0;
+    const timeB = b.created_at || 0;
+    if (timeA !== timeB) {
+      return timeA - timeB;
+    }
+    // If timestamps are the same, user messages come first
+    if (a.sender === 'user' && b.sender === 'model') {
+      return -1;
+    }
+    if (a.sender === 'model' && b.sender === 'user') {
+      return 1;
+    }
+    return 0;
+  });
+
   return {
     id: session.session_id,
     title: `Consulta de ${patientName}`,
-    messages: session.messages.map((msg: any, idx: number) => ({
+    messages: sortedMessages.map((msg: any, idx: number) => ({
       id: msg.id || `${session.session_id}-${idx}`,
       role: msg.sender === 'model' ? 'bot' : 'user',
       content: msg.text,
