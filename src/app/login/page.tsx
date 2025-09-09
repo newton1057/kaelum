@@ -43,7 +43,7 @@ export default function LoginPage() {
           title: '¡Bienvenido!',
           description: `Has iniciado sesión correctamente. Tipo de usuario: ${result.type || 'No especificado'}`,
         });
-        router.push('/chat');
+        router.push('/dashboard/expedientes');
       } else {
         const errorText = 'Acceso no autorizado. Verifica tu PIN e inténtalo de nuevo.';
         setError(errorText);
