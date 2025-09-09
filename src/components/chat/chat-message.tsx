@@ -174,7 +174,7 @@ export default function ChatMessage({ message }: ChatMessageProps) {
       {isUser && (
         <Avatar className="h-10 w-10 shrink-0">
           <AvatarImage
-            src="https://firebasestorage.googleapis.com/v0/b/aurora-4e980.appspot.com/o/resourcesPDFima%2Fdefault.jpg?alt=media&token=31b50401-b3d0-49c9-b186-6545c413c608"
+            src="https://firebasestorage.googleapis.com/v0/b/aurora-4e980.appspot.com/o/config%2F75FDADCB-7F5F-4E35-BFE5-F0BB75197201.JPEG?alt=media&token=648233e3-c47d-4ed7-8661-dc5b4e10c601"
             alt="User Avatar"
           />
           <AvatarFallback className="bg-primary/20 text-primary">
