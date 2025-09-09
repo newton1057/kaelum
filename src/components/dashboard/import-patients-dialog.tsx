@@ -90,6 +90,7 @@ export function ImportPatientsDialog({ isOpen, onOpenChange }: ImportPatientsDia
           description: `El archivo "${file.name}" se ha importado correctamente.`,
         });
         handleClose();
+        window.location.reload();
       } else {
         const errorData = await response.json();
         toast({
