@@ -50,7 +50,7 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId, onPatien
     setError(null);
     setPatientData(null);
     try {
-      const response = await fetch(`https://kaelumapi-703555916890.northamerica-south1.run.app/medicalRecords/getRecord/${patientId}`);
+      const response = await fetch(`https://kaelumapi-866322842519.northamerica-south1.run.app/medicalRecords/getRecord/${patientId}`);
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Error al obtener los detalles del paciente.');
@@ -87,7 +87,7 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId, onPatien
     try {
         const body = { parentId: patientId, key: key, value: newValue };
         
-        const response = await fetch(`https://kaelumapi-703555916890.northamerica-south1.run.app/medicalRecords/updateRecord`, {
+        const response = await fetch(`https://kaelumapi-866322842519.northamerica-south1.run.app/medicalRecords/updateRecord`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body),

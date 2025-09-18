@@ -79,7 +79,7 @@ export function ImportPatientsDialog({ isOpen, onOpenChange }: ImportPatientsDia
     formData.append('excel', file);
 
     try {
-      const response = await fetch('https://kaelumapi-703555916890.northamerica-south1.run.app/medicalRecords/uploadExcel', {
+      const response = await fetch('https://kaelumapi-866322842519.northamerica-south1.run.app/medicalRecords/uploadExcel', {
         method: 'POST',
         body: formData,
       });

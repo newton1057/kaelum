@@ -96,7 +96,7 @@ export default function ExpedientesPage() {
   const fetchPatients = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch('https://kaelumapi-703555916890.northamerica-south1.run.app/medicalRecords/getRecords');
+      const response = await fetch('https://kaelumapi-866322842519.northamerica-south1.run.app/medicalRecords/getRecords');
       if (!response.ok) {
         throw new Error('Error al obtener los expedientes');
       }
@@ -132,7 +132,7 @@ export default function ExpedientesPage() {
         data: formData
       };
 
-      const response = await fetch('https://kaelumapi-703555916890.northamerica-south1.run.app/medicalRecords/createRecord', {
+      const response = await fetch('https://kaelumapi-866322842519.northamerica-south1.run.app/medicalRecords/createRecord', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

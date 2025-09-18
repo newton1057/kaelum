@@ -55,7 +55,7 @@ export default function DashboardLayout({
   useEffect(() => {
     const fetchChats = async () => {
       try {
-        const res = await fetch('https://kaelumapi-703555916890.northamerica-south1.run.app/chat/sessions');
+        const res = await fetch('https://kaelumapi-866322842519.northamerica-south1.run.app/chat/sessions');
         if (!res.ok) {
            throw new Error(`HTTP error! status: ${res.status}`);
         }
@@ -80,7 +80,7 @@ export default function DashboardLayout({
       data: patientData
     }
     
-    const response = await fetch('https://kaelumapi-703555916890.northamerica-south1.run.app/chat/start', {
+    const response = await fetch('https://kaelumapi-866322842519.northamerica-south1.run.app/chat/start', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -114,7 +114,7 @@ export default function DashboardLayout({
       data: formData
     }
     
-    const response = await fetch('https://kaelumapi-703555916890.northamerica-south1.run.app/chat/start', {
+    const response = await fetch('https://kaelumapi-866322842519.northamerica-south1.run.app/chat/start', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

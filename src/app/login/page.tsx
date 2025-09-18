@@ -23,7 +23,7 @@ export default function LoginPage() {
     setError('');
 
     try {
-      const response = await fetch('https://kaelumapi-703555916890.northamerica-south1.run.app/access/login', {
+      const response = await fetch('https://kaelumapi-866322842519.northamerica-south1.run.app/access/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -41,7 +41,7 @@ export default function GeneralChatLayout() {
   useEffect(() => {
     const fetchChats = async () => {
       try {
-        const res = await fetch('https://kaelumapi-703555916890.northamerica-south1.run.app/chat/sessions?mode=general');
+        const res = await fetch('https://kaelumapi-866322842519.northamerica-south1.run.app/chat/sessions?mode=general');
         if (!res.ok) {
            throw new Error(`HTTP error! status: ${res.status}`);
         }
@@ -79,7 +79,7 @@ export default function GeneralChatLayout() {
       }
     }
     
-    const response = await fetch('https://kaelumapi-703555916890.northamerica-south1.run.app/chat/start?mode=general', {
+    const response = await fetch('https://kaelumapi-866322842519.northamerica-south1.run.app/chat/start?mode=general', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -143,6 +143,17 @@ export default function GeneralChatLayout() {
       })
     );
   };
+  
+  const updateChatTitle = (chatId: string, title: string) => {
+    setChats((prevChats) =>
+      prevChats.map((chat) => {
+        if (chat.id === chatId) {
+          return { ...chat, title };
+        }
+        return chat;
+      })
+    );
+  };
 
   const handleSendMessage = async (content: string, file?: File) => {
     if (!activeChatId) return;
@@ -184,7 +195,7 @@ export default function GeneralChatLayout() {
   };
   
   const sendMessageToServer = async (data: FormData, chatId: string, loadingMessageId: string) => {
-    const response = await fetch('https://kaelumapi-703555916890.northamerica-south1.run.app/chat/message', {
+    const response = await fetch('https://kaelumapi-866322842519.northamerica-south1.run.app/chat/message', {
       method: 'POST',
       body: data,
     });
@@ -200,6 +211,11 @@ export default function GeneralChatLayout() {
     const result = await response.json();
     const botResponseText = result.messages[result.messages.length - 1].text;
     const botAttachment = result.messages[result.messages.length - 1].attachment;
+    const newTitle = result.title;
+
+    if (newTitle) {
+      updateChatTitle(chatId, newTitle);
+    }
 
     updateMessageInChat(chatId, loadingMessageId, {
       isLoading: false,
