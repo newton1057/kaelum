@@ -74,7 +74,7 @@ export default function LoginPage() {
             <div className="mx-auto mb-4">
               <AppLogo />
             </div>
-            <CardTitle>Bienvenido a Kaelum</CardTitle>
+            <CardTitle>Bienvenido a MentalBeat</CardTitle>
             <CardDescription>
               Ingresa tu PIN de 6 dígitos para continuar.
             </CardDescription>

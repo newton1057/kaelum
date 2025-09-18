@@ -17,7 +17,7 @@ const initialChats: Chat[] = [
       {
         id: '1-1',
         role: 'bot',
-        content: '¡Hola! Soy Kaelum. ¿Cómo puedo ayudarte hoy?',
+        content: '¡Hola! Soy MentalBeat. ¿Cómo puedo ayudarte hoy?',
       },
     ],
   },
@@ -45,7 +45,7 @@ export default function ChatLayout({ onDeleteAllChats }) {
         {
           id: uuidv4(),
           role: 'bot',
-          content: 'Soy Kaelum. ¡Pregúntame lo que sea!',
+          content: 'Soy MentalBeat. ¡Pregúntame lo que sea!',
         },
       ],
     };

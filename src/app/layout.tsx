@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from '@/components/theme-provider';
 
 export const metadata: Metadata = {
-  title: 'Kaelum Chat',
+  title: 'MentalBeat Chat',
   description: 'Generado por Firebase Studio',
 };
 
