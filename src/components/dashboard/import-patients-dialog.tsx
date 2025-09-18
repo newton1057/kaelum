@@ -18,6 +18,7 @@ import { useToast } from '@/hooks/use-toast';
 interface ImportPatientsDialogProps {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
+  onImportSuccess: () => void;
 }
 
 const ALLOWED_FILE_TYPES = [
@@ -25,7 +26,7 @@ const ALLOWED_FILE_TYPES = [
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
 ];
 
-export function ImportPatientsDialog({ isOpen, onOpenChange }: ImportPatientsDialogProps) {
+export function ImportPatientsDialog({ isOpen, onOpenChange, onImportSuccess }: ImportPatientsDialogProps) {
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -89,6 +90,7 @@ export function ImportPatientsDialog({ isOpen, onOpenChange }: ImportPatientsDia
           title: '¡Todo ok!',
           description: `El archivo "${file.name}" se ha importado correctamente.`,
         });
+        onImportSuccess();
         handleClose();
         window.location.reload();
       } else {

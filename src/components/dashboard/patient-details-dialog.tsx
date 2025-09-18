@@ -19,6 +19,7 @@ import { Button } from '../ui/button';
 import { Checkbox } from '../ui/checkbox';
 import { Label } from '../ui/label';
 import { EditFieldDialog } from './edit-field-dialog';
+import { AccessDeniedDialog } from './access-denied-dialog';
 
 interface PatientDetailsDialogProps {
   isOpen: boolean;
@@ -33,11 +34,16 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId, onPatien
   const [patientData, setPatientData] = useState<Record<string, any> | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [userType, setUserType] = useState<string | null>(null);
   const [selectedFields, setSelectedFields] = useState<string[]>([]);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isAccessDeniedDialogOpen, setIsAccessDeniedDialogOpen] = useState(false);
   const [fieldToEdit, setFieldToEdit] = useState<{ key: string; value: any } | null>(null);
 
   useEffect(() => {
+    const storedUserType = localStorage.getItem('userType');
+    setUserType(storedUserType);
+
     if (isOpen && patientId) {
       fetchPatientDetails();
     }
@@ -74,6 +80,10 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId, onPatien
   };
   
   const handleEditClick = (key: string, value: any) => {
+    if (userType !== 'admin') {
+        setIsAccessDeniedDialogOpen(true);
+        return;
+    }
     setFieldToEdit({ key, value });
     setIsEditModalOpen(true);
   };
@@ -108,6 +118,10 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId, onPatien
 
 
   const handlePrint = () => {
+    if (userType !== 'admin') {
+        setIsAccessDeniedDialogOpen(true);
+        return;
+    }
     if (!patientData) return;
 
     const doc = new jsPDF();
@@ -323,6 +337,7 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId, onPatien
             onUpdate={handleUpdateField}
         />
     )}
+    <AccessDeniedDialog isOpen={isAccessDeniedDialogOpen} onOpenChange={setIsAccessDeniedDialogOpen} />
     </>
   );
 }

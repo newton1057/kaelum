@@ -31,6 +31,7 @@ import { useToast } from '@/hooks/use-toast';
 import { AddNoteDialog } from '@/components/dashboard/add-note-dialog';
 import { ChatDialog } from '@/components/dashboard/chat-dialog';
 import { ScreeningQuestionnaireDialog, type ScreeningFormValues } from '@/components/chat/screening-questionnaire-dialog';
+import { AccessDeniedDialog } from '@/components/dashboard/access-denied-dialog';
 
 type Patient = {
   id: string;
@@ -64,11 +65,13 @@ export default function ExpedientesPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [isAuth, setIsAuth] = useState(false);
+  const [userType, setUserType] = useState<string | null>(null);
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
   const [isAddNoteDialogOpen, setIsAddNoteDialogOpen] = useState(false);
   const [isChatDialogOpen, setIsChatDialogOpen] = useState(false);
   const [isScreeningDialogOpen, setIsScreeningDialogOpen] = useState(false);
+  const [isAccessDeniedDialogOpen, setIsAccessDeniedDialogOpen] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [patients, setPatients] = useState<Patient[]>([]);
   const [filteredPatients, setFilteredPatients] = useState<Patient[]>([]);
@@ -77,10 +80,12 @@ export default function ExpedientesPage() {
 
   useEffect(() => {
     const isAuthenticated = localStorage.getItem('isAuthenticated');
+    const storedUserType = localStorage.getItem('userType');
     if (!isAuthenticated) {
       router.replace('/login');
     } else {
       setIsAuth(true);
+      setUserType(storedUserType);
       fetchPatients();
     }
   }, [router]);
@@ -167,6 +172,10 @@ export default function ExpedientesPage() {
   }
   
   const handleAddNote = (patientId: string) => {
+    if (userType !== 'admin') {
+        setIsAccessDeniedDialogOpen(true);
+        return;
+    }
     const patient = patients.find(p => p.id === patientId);
     setSelectedPatient(patient || null);
     setIsAddNoteDialogOpen(true);
@@ -304,7 +313,7 @@ export default function ExpedientesPage() {
         </Table>
       </div>
     </div>
-    <ImportPatientsDialog isOpen={isImportDialogOpen} onOpenChange={setIsImportDialogOpen} />
+    <ImportPatientsDialog isOpen={isImportDialogOpen} onOpenChange={setIsImportDialogOpen} onImportSuccess={fetchPatients} />
     {selectedPatient && <PatientDetailsDialog isOpen={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen} patientId={selectedPatient.id} onPatientUpdate={fetchPatients} />}
     {selectedPatient && <AddNoteDialog isOpen={isAddNoteDialogOpen} onOpenChange={setIsAddNoteDialogOpen} patientId={selectedPatient.id} />}
     {selectedPatient && <ChatDialog isOpen={isChatDialogOpen} onOpenChange={setIsChatDialogOpen} patient={selectedPatient} />}
@@ -312,7 +321,8 @@ export default function ExpedientesPage() {
         isOpen={isScreeningDialogOpen}
         onOpenChange={setIsScreeningDialogOpen}
         onSubmit={handleCreatePatient}
-      />
+    />
+    <AccessDeniedDialog isOpen={isAccessDeniedDialogOpen} onOpenChange={setIsAccessDeniedDialogOpen} />
     </>
   );
 }

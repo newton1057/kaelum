@@ -19,6 +19,7 @@ import { Label } from '../ui/label';
 import { EditFieldDialog } from './edit-field-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { AccessDeniedDialog } from './access-denied-dialog';
 
 interface AddNoteDialogProps {
   isOpen: boolean;
@@ -39,7 +40,9 @@ export function AddNoteDialog({ isOpen, onOpenChange, patientId }: AddNoteDialog
   const [patientData, setPatientData] = useState<Record<string, any> | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [userType, setUserType] = useState<string | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isAccessDeniedDialogOpen, setIsAccessDeniedDialogOpen] = useState(false);
   const [fieldToEdit, setFieldToEdit] = useState<{ key: string; value: any } | null>(null);
   const { toast } = useToast();
 
@@ -64,12 +67,18 @@ export function AddNoteDialog({ isOpen, onOpenChange, patientId }: AddNoteDialog
   };
   
   useEffect(() => {
+    const storedUserType = localStorage.getItem('userType');
+    setUserType(storedUserType);
     if (isOpen && patientId) {
       fetchPatientDetails();
     }
   }, [isOpen, patientId]);
 
   const handleEditClick = (key: string, value: any) => {
+    if (userType !== 'admin') {
+      setIsAccessDeniedDialogOpen(true);
+      return;
+    }
     setFieldToEdit({ key, value });
     setIsEditModalOpen(true);
   };
@@ -204,7 +213,7 @@ export function AddNoteDialog({ isOpen, onOpenChange, patientId }: AddNoteDialog
           onUpdate={handleUpdateField}
         />
       )}
+      <AccessDeniedDialog isOpen={isAccessDeniedDialogOpen} onOpenChange={setIsAccessDeniedDialogOpen} />
     </>
   );
 }
-
