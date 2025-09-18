@@ -16,6 +16,7 @@ import type { Chat } from '@/lib/types';
 import { AppLogo } from '../icons';
 import { useRouter, usePathname } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
+import { useEffect, useState } from 'react';
 
 
 interface ChatSidebarProps {
@@ -34,6 +35,13 @@ export default function ChatSidebar({
   const router = useRouter();
   const pathname = usePathname();
   const { toast } = useToast();
+  const [userType, setUserType] = useState<string | null>(null);
+
+  useEffect(() => {
+    const storedUserType = localStorage.getItem('userType');
+    setUserType(storedUserType);
+  }, []);
+
 
   const handleLogout = () => {
     localStorage.removeItem('isAuthenticated');
@@ -73,16 +81,18 @@ export default function ChatSidebar({
               <span>Expedientes</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
-           <SidebarMenuItem>
-            <SidebarMenuButton
-              onClick={() => router.push('/general')}
-              isActive={pathname.startsWith('/general')}
-              className="w-full justify-start"
-            >
-              <MessageCircle />
-              <span>Chat Medico</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
+           {userType !== 'tertiary' && (
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                onClick={() => router.push('/general')}
+                isActive={pathname.startsWith('/general')}
+                className="w-full justify-start"
+              >
+                <MessageCircle />
+                <span>Chat Medico</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+           )}
         </SidebarMenu>
         <SidebarMenu>
           {displayedChats.map((chat) => (
