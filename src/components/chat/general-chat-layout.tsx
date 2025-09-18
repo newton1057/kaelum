@@ -20,7 +20,7 @@ function transformSessionToChat(session: any): Chat {
   
   return {
     id: session.session_id,
-    title: session.data?.title || `Chat General ${new Date(session.created_at * 1000).toLocaleString()}`,
+    title: session.title || `Chat General ${new Date(session.created_at * 1000).toLocaleString()}`,
     messages: session.messages.map((msg: any, idx: number) => ({
       id: `${session.session_id}-${idx}`,
       role: msg.sender === 'model' ? 'bot' : 'user',
