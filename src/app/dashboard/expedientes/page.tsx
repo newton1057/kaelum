@@ -169,7 +169,7 @@ export default function ExpedientesPage() {
 
   const handleViewDetails = (patientId: string) => {
     const patient = patients.find(p => p.id === patientId);
-    if (userType === 'other' || userType === 'tertiary') {
+    if (userType === 'other') {
         setSelectedPatient(patient || null);
         setIsDetailsDialogOpen(true);
         return;
@@ -189,7 +189,7 @@ export default function ExpedientesPage() {
   }
 
   const handleStartChat = async (patientId: string) => {
-    if (userType === 'other' || userType === 'tertiary') {
+    if (userType === 'other') {
       setIsAccessDeniedDialogOpen(true);
       return;
     }
