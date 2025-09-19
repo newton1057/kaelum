@@ -93,10 +93,10 @@ export function PatientDocumentsDialog({ isOpen, onOpenChange, patient }: Patien
 
     setIsUploading(true);
     const formData = new FormData();
-    formData.append('document', file);
+    formData.append('file', file);
 
     try {
-        const response = await fetch(`https://kaelumapi-866322842519.northamerica-south1.run.app/medicalRecords/uploadDocument/${patient.id}`, {
+        const response = await fetch(`https://kaelumapi-866322842519.northamerica-south1.run.app/medicalRecords/uploadFiles/${patient.id}`, {
             method: 'POST',
             body: formData,
         });
