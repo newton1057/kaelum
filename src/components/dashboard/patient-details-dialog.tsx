@@ -118,7 +118,7 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId, onPatien
 
 
   const handlePrint = () => {
-    if (userType === 'secondary') {
+    if (userType === 'other') {
         setIsAccessDeniedDialogOpen(true);
         return;
     }
