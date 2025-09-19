@@ -169,6 +169,11 @@ export default function ExpedientesPage() {
 
   const handleViewDetails = (patientId: string) => {
     const patient = patients.find(p => p.id === patientId);
+    if (userType === 'other' || userType === 'tertiary') {
+        setSelectedPatient(patient || null);
+        setIsDetailsDialogOpen(true);
+        return;
+    }
     setSelectedPatient(patient || null);
     setIsDetailsDialogOpen(true);
   }
@@ -201,7 +206,7 @@ export default function ExpedientesPage() {
   };
   
   const handleOpenAddPatientDialog = () => {
-    if (userType === 'secondary') {
+    if (userType === 'tertiary') {
       setIsAccessDeniedDialogOpen(true);
     } else {
       setIsScreeningDialogOpen(true);
@@ -209,7 +214,7 @@ export default function ExpedientesPage() {
   };
   
   const handleOpenImportDialog = () => {
-    if (userType === 'secondary') {
+    if (userType === 'tertiary') {
       setIsAccessDeniedDialogOpen(true);
     } else {
       setIsImportDialogOpen(true);
