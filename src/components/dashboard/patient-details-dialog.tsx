@@ -118,10 +118,6 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId, onPatien
 
 
   const handlePrint = () => {
-    if (userType === 'other') {
-        setIsAccessDeniedDialogOpen(true);
-        return;
-    }
     if (!patientData) return;
 
     const doc = new jsPDF();
