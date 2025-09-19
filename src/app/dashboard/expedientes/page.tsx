@@ -32,6 +32,7 @@ import { AddNoteDialog } from '@/components/dashboard/add-note-dialog';
 import { ChatDialog } from '@/components/dashboard/chat-dialog';
 import { ScreeningQuestionnaireDialog, type ScreeningFormValues } from '@/components/chat/screening-questionnaire-dialog';
 import { AccessDeniedDialog } from '@/components/dashboard/access-denied-dialog';
+import { PatientDocumentsDialog } from '@/components/dashboard/patient-documents-dialog';
 
 type Patient = {
   id: string;
@@ -72,6 +73,7 @@ export default function ExpedientesPage() {
   const [isChatDialogOpen, setIsChatDialogOpen] = useState(false);
   const [isScreeningDialogOpen, setIsScreeningDialogOpen] = useState(false);
   const [isAccessDeniedDialogOpen, setIsAccessDeniedDialogOpen] = useState(false);
+  const [isDocumentsDialogOpen, setIsDocumentsDialogOpen] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [patients, setPatients] = useState<Patient[]>([]);
   const [filteredPatients, setFilteredPatients] = useState<Patient[]>([]);
@@ -195,6 +197,12 @@ export default function ExpedientesPage() {
     setSelectedPatient(patient);
     setIsChatDialogOpen(true);
   };
+  
+  const handleOpenDocuments = (patientId: string) => {
+    const patient = patients.find(p => p.id === patientId);
+    setSelectedPatient(patient || null);
+    setIsDocumentsDialogOpen(true);
+  };
 
   if (!isAuth) {
     return (
@@ -307,6 +315,7 @@ export default function ExpedientesPage() {
                         <DropdownMenuItem onSelect={() => handleViewDetails(patient.id)}>Ver Expediente</DropdownMenuItem>
                         <DropdownMenuItem onSelect={() => handleStartChat(patient.id)}>Chat</DropdownMenuItem>
                         <DropdownMenuItem onSelect={() => handleAddNote(patient.id)}>Añadir Nota Clínica</DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => handleOpenDocuments(patient.id)}>Documentos</DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className="text-destructive">
                           Archivar Paciente
@@ -325,6 +334,7 @@ export default function ExpedientesPage() {
     {selectedPatient && <PatientDetailsDialog isOpen={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen} patientId={selectedPatient.id} onPatientUpdate={fetchPatients} />}
     {selectedPatient && <AddNoteDialog isOpen={isAddNoteDialogOpen} onOpenChange={setIsAddNoteDialogOpen} patientId={selectedPatient.id} />}
     {selectedPatient && <ChatDialog isOpen={isChatDialogOpen} onOpenChange={setIsChatDialogOpen} patient={selectedPatient} />}
+    {selectedPatient && <PatientDocumentsDialog isOpen={isDocumentsDialogOpen} onOpenChange={setIsDocumentsDialogOpen} patient={selectedPatient} />}
     <ScreeningQuestionnaireDialog
         isOpen={isScreeningDialogOpen}
         onOpenChange={setIsScreeningDialogOpen}
