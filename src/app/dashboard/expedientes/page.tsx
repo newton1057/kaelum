@@ -206,7 +206,7 @@ export default function ExpedientesPage() {
   };
   
   const handleOpenAddPatientDialog = () => {
-    if (userType === 'tertiary') {
+    if (userType === 'tertiary' || userType === 'secondary') {
       setIsAccessDeniedDialogOpen(true);
     } else {
       setIsScreeningDialogOpen(true);
@@ -214,7 +214,7 @@ export default function ExpedientesPage() {
   };
   
   const handleOpenImportDialog = () => {
-    if (userType === 'tertiary') {
+    if (userType === 'tertiary' || userType === 'secondary') {
       setIsAccessDeniedDialogOpen(true);
     } else {
       setIsImportDialogOpen(true);
