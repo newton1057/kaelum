@@ -60,15 +60,18 @@ export function PatientDocumentsDialog({ isOpen, onOpenChange, patient }: Patien
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch(`https://kaelumapi-866322842519.northamerica-south1.run.app/medicalRecords/getDocuments/${patient.id}`);
+      const response = await fetch(`https://kaelumapi-866322842519.northamerica-south1.run.app/medicalRecords/getRecord/${patient.id}`);
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Error al obtener los documentos.');
+        throw new Error(errorData.message || 'Error al obtener los documentos del expediente.');
       }
       const result = await response.json();
-      setDocuments(result.data || []);
+      // The 'files' property is expected inside the 'data' object.
+      const filesList = result.data?.files || [];
+      setDocuments(filesList);
     } catch (err: any) {
       setError(err.message);
+      setDocuments([]); // Ensure documents are cleared on error
     } finally {
       setIsLoading(false);
     }
@@ -78,6 +81,7 @@ export function PatientDocumentsDialog({ isOpen, onOpenChange, patient }: Patien
     if (isOpen && patient?.id) {
       fetchDocuments();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, patient]);
 
   const handleFileSelect = () => {
@@ -156,8 +160,10 @@ export function PatientDocumentsDialog({ isOpen, onOpenChange, patient }: Patien
               <div className="flex items-center gap-3">
                 <File className="h-8 w-8 text-muted-foreground flex-shrink-0" />
                 <div className="flex flex-col truncate">
-                  <span className="text-sm font-medium truncate max-w-xs">{doc.name}</span>
-                  <span className="text-xs text-muted-foreground">{formatBytes(doc.size)} - {new Date(doc.createdAt).toLocaleDateString()}</span>
+                  <span className="text-sm font-medium truncate max-w-xs">{doc.name || 'Nombre de archivo no disponible'}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {doc.size ? formatBytes(doc.size) : 'Tamaño desconocido'} - {doc.createdAt ? new Date(doc.createdAt).toLocaleDateString() : 'Fecha desconocida'}
+                  </span>
                 </div>
               </div>
               <Button asChild variant="ghost" size="icon">
