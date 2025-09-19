@@ -29,6 +29,7 @@ interface AddNoteDialogProps {
 
 const SKELETON_ITEMS = 5;
 const CLINICAL_NOTE_FIELDS = [
+  'Notas Generales',
   'Examen mental',
   'Diagnostico presuntivo',
   'Plan de tratamiento',
