@@ -168,6 +168,10 @@ export default function ExpedientesPage() {
   };
 
   const handleViewDetails = (patientId: string) => {
+    if (userType === 'other') {
+        setIsAccessDeniedDialogOpen(true);
+        return;
+    }
     const patient = patients.find(p => p.id === patientId);
     setSelectedPatient(patient || null);
     setIsDetailsDialogOpen(true);
@@ -184,7 +188,7 @@ export default function ExpedientesPage() {
   }
 
   const handleStartChat = async (patientId: string) => {
-    if (userType === 'other') {
+    if (userType === 'other' || userType === 'tertiary') {
       setIsAccessDeniedDialogOpen(true);
       return;
     }
@@ -198,6 +202,14 @@ export default function ExpedientesPage() {
     const patient = patients.find(p => p.id === patientId);
     setSelectedPatient(patient || null);
     setIsDocumentsDialogOpen(true);
+  };
+  
+  const handleOpenAddPatientDialog = () => {
+    if (userType === 'secondary') {
+      setIsAccessDeniedDialogOpen(true);
+    } else {
+      setIsScreeningDialogOpen(true);
+    }
   };
 
   if (!isAuth) {
@@ -222,7 +234,7 @@ export default function ExpedientesPage() {
           Expedientes de Pacientes
         </h2>
         <div className="flex items-center gap-2">
-          <Button onClick={() => setIsScreeningDialogOpen(true)}>
+          <Button onClick={handleOpenAddPatientDialog}>
             <PlusCircle className="mr-2 h-4 w-4" />
             Añadir Paciente
           </Button>
