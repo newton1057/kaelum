@@ -55,7 +55,13 @@ export default function DashboardLayout({
   useEffect(() => {
     const fetchChats = async () => {
       try {
-        const res = await fetch('https://kaelumapi-866322842519.northamerica-south1.run.app/chat/sessions');
+        const userEmail = localStorage.getItem('userEmail');
+        if (!userEmail) {
+            console.error('No user email found in local storage');
+            return;
+        }
+
+        const res = await fetch(`https://kaelumapi-866322842519.northamerica-south1.run.app/chat/sessions?user=${encodeURIComponent(userEmail)}`);
         if (!res.ok) {
            throw new Error(`HTTP error! status: ${res.status}`);
         }
