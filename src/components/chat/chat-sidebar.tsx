@@ -81,7 +81,7 @@ export default function ChatSidebar({
               <span>Expedientes</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
-           {userType !== 'tertiary' && (
+           {userType !== 'tertiary' && userType !== 'other' && (
             <SidebarMenuItem>
               <SidebarMenuButton
                 onClick={() => router.push('/general')}
