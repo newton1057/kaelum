@@ -211,6 +211,15 @@ export default function ExpedientesPage() {
       setIsScreeningDialogOpen(true);
     }
   };
+  
+  const handleOpenImportDialog = () => {
+    if (userType === 'secondary') {
+      setIsAccessDeniedDialogOpen(true);
+    } else {
+      setIsImportDialogOpen(true);
+    }
+  };
+
 
   if (!isAuth) {
     return (
@@ -246,7 +255,7 @@ export default function ExpedientesPage() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-              <DropdownMenuItem onSelect={() => setIsImportDialogOpen(true)}>
+              <DropdownMenuItem onSelect={handleOpenImportDialog}>
                 Importar Pacientes
               </DropdownMenuItem>
             </DropdownMenuContent>
