@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
-import { AlertTriangle, Upload, File, Loader, Download } from 'lucide-react';
+import { AlertTriangle, Upload, File as FileIcon, Loader, Download } from 'lucide-react';
 import { ScrollArea } from '../ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent } from '../ui/card';
@@ -66,12 +66,11 @@ export function PatientDocumentsDialog({ isOpen, onOpenChange, patient }: Patien
         throw new Error(errorData.message || 'Error al obtener los documentos del expediente.');
       }
       const result = await response.json();
-      // The 'files' property is expected inside the 'data' object.
       const filesList = result.data?.files || [];
       setDocuments(filesList);
     } catch (err: any) {
       setError(err.message);
-      setDocuments([]); // Ensure documents are cleared on error
+      setDocuments([]);
     } finally {
       setIsLoading(false);
     }
@@ -120,7 +119,6 @@ export function PatientDocumentsDialog({ isOpen, onOpenChange, patient }: Patien
         });
     } finally {
         setIsUploading(false);
-        // Reset file input
         if (fileInputRef.current) {
             fileInputRef.current.value = '';
         }
@@ -158,7 +156,7 @@ export function PatientDocumentsDialog({ isOpen, onOpenChange, patient }: Patien
           <Card key={index} className="overflow-hidden">
             <CardContent className="p-3 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <File className="h-8 w-8 text-muted-foreground flex-shrink-0" />
+                <FileIcon className="h-8 w-8 text-muted-foreground flex-shrink-0" />
                 <div className="flex flex-col truncate">
                   <span className="text-sm font-medium truncate max-w-xs">{doc.name || 'Nombre de archivo no disponible'}</span>
                   <span className="text-xs text-muted-foreground">
