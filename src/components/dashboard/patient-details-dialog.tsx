@@ -118,7 +118,7 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId, onPatien
 
 
   const handlePrint = () => {
-    if (userType !== 'admin') {
+    if (userType === 'secondary') {
         setIsAccessDeniedDialogOpen(true);
         return;
     }
@@ -333,7 +333,7 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId, onPatien
         <DialogFooter>
           <Button onClick={handlePrint} disabled={isLoading || !!error || !patientData}>
             <Printer className="mr-2 h-4 w-4" />
-            Imprimir ({userType === 'other' ? '0' : selectedFields.length})
+            {userType === 'other' ? 'Imprimir' : `Imprimir (${selectedFields.length})`}
           </Button>
         </DialogFooter>
       </DialogContent>
