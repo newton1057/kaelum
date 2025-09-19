@@ -189,9 +189,13 @@ export default function GeneralChatLayout() {
     };
     addMessageToChat(activeChatId, botLoadingMessage);
 
+    const userEmail = localStorage.getItem('userEmail');
     const formData = new FormData();
     formData.append('session_id', activeChatId);
     formData.append('msg', content);
+    if (userEmail) {
+        formData.append('user', userEmail);
+    }
     if (file) {
       formData.append('multimedia', file);
     }
