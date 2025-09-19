@@ -179,7 +179,7 @@ export default function ExpedientesPage() {
   }
   
   const handleAddNote = (patientId: string) => {
-    if (userType !== 'admin') {
+    if (userType !== 'admin' && userType !== 'tertiary') {
         setIsAccessDeniedDialogOpen(true);
         return;
     }
