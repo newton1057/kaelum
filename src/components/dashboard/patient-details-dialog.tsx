@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
-import { AlertTriangle, Printer, Pencil } from 'lucide-react';
+import { AlertTriangle, Printer, Pencil, ShieldAlert } from 'lucide-react';
 import { ScrollArea } from '../ui/scroll-area';
 import { Button } from '../ui/button';
 import { Checkbox } from '../ui/checkbox';
@@ -153,7 +153,7 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId, onPatien
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(10);
       doc.setTextColor(secondaryColor);
-      doc.text('Mental Beat', pageWidth - margin, y - lineHeight, { align: 'right' });
+      doc.text('MentalBeat', pageWidth - margin, y - lineHeight, { align: 'right' });
       
       doc.setFont('helvetica', 'normal');
       doc.text(`Generado el: ${currentDate}`, pageWidth - margin, y, { align: 'right' });
@@ -271,6 +271,16 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId, onPatien
     if (!patientData) {
       return <p className="text-muted-foreground text-center">No hay datos para mostrar.</p>;
     }
+    
+    if (userType === 'other') {
+      return (
+        <div className="flex flex-col items-center justify-center h-full text-center p-8">
+            <ShieldAlert className="h-16 w-16 text-muted-foreground mb-4" />
+            <h3 className="text-lg font-semibold">Información no disponible</h3>
+            <p className="text-muted-foreground">La visualización de detalles está restringida para tu tipo de usuario. Solo la función de impresión está habilitada.</p>
+        </div>
+      )
+    }
 
     const fieldsToDisplay = Object.entries(patientData).filter(
       ([key]) => key !== 'id' && key !== 'Marca temporal'
@@ -323,7 +333,7 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId, onPatien
         <DialogFooter>
           <Button onClick={handlePrint} disabled={isLoading || !!error || !patientData}>
             <Printer className="mr-2 h-4 w-4" />
-            Imprimir ({selectedFields.length})
+            Imprimir ({userType === 'other' ? '0' : selectedFields.length})
           </Button>
         </DialogFooter>
       </DialogContent>

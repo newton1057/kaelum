@@ -168,10 +168,6 @@ export default function ExpedientesPage() {
   };
 
   const handleViewDetails = (patientId: string) => {
-    if (userType === 'other') {
-      setIsAccessDeniedDialogOpen(true);
-      return;
-    }
     const patient = patients.find(p => p.id === patientId);
     setSelectedPatient(patient || null);
     setIsDetailsDialogOpen(true);
