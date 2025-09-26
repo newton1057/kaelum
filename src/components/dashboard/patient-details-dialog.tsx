@@ -268,7 +268,7 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId, onPatien
       return <p className="text-muted-foreground text-center">No hay datos para mostrar.</p>;
     }
     
-    if (userType === 'other') {
+    if (userType === 'other' || userType === 'v2') {
       return (
         <div className="flex flex-col items-center justify-center h-full text-center p-8">
             <ShieldAlert className="h-16 w-16 text-muted-foreground mb-4" />
@@ -329,7 +329,7 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId, onPatien
         <DialogFooter>
           <Button onClick={handlePrint} disabled={isLoading || !!error || !patientData}>
             <Printer className="mr-2 h-4 w-4" />
-            {userType === 'other' ? 'Imprimir' : `Imprimir (${selectedFields.length})`}
+            {userType === 'other' || userType === 'v2' ? 'Imprimir' : `Imprimir (${selectedFields.length})`}
           </Button>
         </DialogFooter>
       </DialogContent>
