@@ -206,7 +206,7 @@ export default function ExpedientesPage() {
   };
   
   const handleOpenAddPatientDialog = () => {
-    if (userType === 'tertiary' || userType === 'secondary') {
+    if (userType === 'tertiary' || userType === 'secondary' || userType === 'v3') {
       setIsAccessDeniedDialogOpen(true);
     } else {
       setIsScreeningDialogOpen(true);
@@ -214,7 +214,7 @@ export default function ExpedientesPage() {
   };
   
   const handleOpenImportDialog = () => {
-    if (userType === 'tertiary' || userType === 'secondary') {
+    if (userType === 'tertiary' || userType === 'secondary' || userType === 'v3') {
       setIsAccessDeniedDialogOpen(true);
     } else {
       setIsImportDialogOpen(true);
@@ -362,3 +362,5 @@ export default function ExpedientesPage() {
     </>
   );
 }
+
+    

@@ -76,12 +76,12 @@ export function AddNoteDialog({ isOpen, onOpenChange, patientId }: AddNoteDialog
   }, [isOpen, patientId]);
 
   const handleEditClick = (key: string, value: any) => {
-    if (userType !== 'admin') {
-      setIsAccessDeniedDialogOpen(true);
-      return;
+    if (userType === 'admin' || userType === 'tertiary') {
+        setFieldToEdit({ key, value });
+        setIsEditModalOpen(true);
+    } else {
+        setIsAccessDeniedDialogOpen(true);
     }
-    setFieldToEdit({ key, value });
-    setIsEditModalOpen(true);
   };
 
   const handleUpdateField = async (key: string, newValue: any) => {
@@ -218,3 +218,5 @@ export function AddNoteDialog({ isOpen, onOpenChange, patientId }: AddNoteDialog
     </>
   );
 }
+
+    
