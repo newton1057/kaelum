@@ -168,6 +168,10 @@ export default function ExpedientesPage() {
   };
 
   const handleViewDetails = (patientId: string) => {
+    if (userType === 'v2') {
+        setIsAccessDeniedDialogOpen(true);
+        return;
+    }
     const patient = patients.find(p => p.id === patientId);
     if (userType === 'other') {
         setSelectedPatient(patient || null);
@@ -179,7 +183,7 @@ export default function ExpedientesPage() {
   }
   
   const handleAddNote = (patientId: string) => {
-    if (userType !== 'admin' && userType !== 'tertiary') {
+    if (userType === 'other' || userType === 'v1' || userType === 'v2') {
         setIsAccessDeniedDialogOpen(true);
         return;
     }
@@ -189,7 +193,7 @@ export default function ExpedientesPage() {
   }
 
   const handleStartChat = async (patientId: string) => {
-    if (userType === 'other') {
+    if (userType === 'other' || userType === 'v2') {
       setIsAccessDeniedDialogOpen(true);
       return;
     }
