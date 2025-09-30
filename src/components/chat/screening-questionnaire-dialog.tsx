@@ -69,7 +69,7 @@ const screeningSchema = z.object({
   }).max(18, {
     message: 'La CURP debe tener 18 caracteres.',
   }),
-  doctor: z.enum(['Dra. Yariela Delgadillo', 'Dr. Carlos Chicalote'], {
+  doctor: z.enum(['Dra. Yariela Delgadillo', 'Dr. Carlos Chicalote', 'Dr. Omar Alfredo Morelos Alvarez', 'Dra Elizabeth Yañez Maya', 'Dra Diana Evaristto', 'Dra Catalina Cuevas Gutierrez', 'Prof Francisco Javier Soto Paramo'], {
     required_error: 'Debes seleccionar un doctor.',
   }),
   channel: z.enum(['Iniciativa propia', 'Trabajo', 'Internet', 'Otro'], {
@@ -2720,6 +2720,46 @@ export function ScreeningQuestionnaireDialog({
                         </FormControl>
                         <FormLabel className="font-normal">
                           Dr. Carlos Chicalote
+                        </FormLabel>
+                      </FormItem>
+                      <FormItem className="flex items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="Dr. Omar Alfredo Morelos Alvarez" />
+                        </FormControl>
+                        <FormLabel className="font-normal">
+                          Dr. Omar Alfredo Morelos Alvarez
+                        </FormLabel>
+                      </FormItem>
+                      <FormItem className="flex items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="Dra Elizabeth Yañez Maya" />
+                        </FormControl>
+                        <FormLabel className="font-normal">
+                          Dra Elizabeth Yañez Maya
+                        </FormLabel>
+                      </FormItem>
+                      <FormItem className="flex items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="Dra Diana Evaristto" />
+                        </FormControl>
+                        <FormLabel className="font-normal">
+                          Dra Diana Evaristto
+                        </FormLabel>
+                      </FormItem>
+                      <FormItem className="flex items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="Dra Catalina Cuevas Gutierrez" />
+                        </FormControl>
+                        <FormLabel className="font-normal">
+                          Dra Catalina Cuevas Gutierrez
+                        </FormLabel>
+                      </FormItem>
+                      <FormItem className="flex items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="Prof Francisco Javier Soto Paramo" />
+                        </FormControl>
+                        <FormLabel className="font-normal">
+                          Prof Francisco Javier Soto Paramo
                         </FormLabel>
                       </FormItem>
                     </RadioGroup>
