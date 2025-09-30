@@ -48,6 +48,9 @@ const calculateAge = (birthDateString: string): number | string => {
     if (!birthDateString) return 'N/A';
     try {
         const birthDate = new Date(birthDateString);
+        if (isNaN(birthDate.getTime())) {
+          return "N/A";
+        }
         const today = new Date();
         let age = today.getFullYear() - birthDate.getFullYear();
         const monthDifference = today.getMonth() - birthDate.getMonth();
@@ -109,15 +112,21 @@ export default function ExpedientesPage() {
       }
       const result = await response.json();
       
-      const formattedPatients = result.data.map((record: any) => ({
-        ...record, // Keep all original data
-        id: record.id || record['CURP del paciente'] || Math.random().toString(36).substring(2, 15),
-        name: record.Nombre,
-        age: calculateAge(record['Fecha de Nacimiento']),
-        gender: record.Sexo,
-        lastConsultation: record['Fecha de Nacimiento'] ? format(new Date(record['Fecha de Nacimiento']), 'yyyy-MM-dd') : 'N/A',
-        status: 'Activo', // Placeholder status
-      }));
+      const formattedPatients = result.data.map((record: any) => {
+        const birthDateString = record['Fecha de Nacimiento'];
+        const birthDate = new Date(birthDateString);
+        const isValidDate = !isNaN(birthDate.getTime());
+
+        return {
+          ...record, // Keep all original data
+          id: record.id || record['CURP del paciente'] || Math.random().toString(36).substring(2, 15),
+          name: record.Nombre,
+          age: calculateAge(birthDateString),
+          gender: record.Sexo,
+          lastConsultation: birthDateString && isValidDate ? format(birthDate, 'yyyy-MM-dd') : 'N/A',
+          status: 'Activo', // Placeholder status
+        }
+      });
       
       setPatients(formattedPatients);
     } catch (error) {
@@ -362,5 +371,7 @@ export default function ExpedientesPage() {
     </>
   );
 }
+
+    
 
     
