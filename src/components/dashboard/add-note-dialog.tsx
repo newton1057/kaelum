@@ -76,7 +76,7 @@ export function AddNoteDialog({ isOpen, onOpenChange, patientId }: AddNoteDialog
   }, [isOpen, patientId]);
 
   const handleEditClick = (key: string, value: any) => {
-    if (userType === 'admin' || userType === 'tertiary' || userType === 'v3') {
+    if (userType === 'admin' || userType === 'tertiary' || userType === 'v3' || userType === 'v2') {
         setFieldToEdit({ key, value });
         setIsEditModalOpen(true);
     } else {

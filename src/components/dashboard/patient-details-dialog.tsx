@@ -80,12 +80,12 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId, onPatien
   };
   
   const handleEditClick = (key: string, value: any) => {
-    if (userType !== 'admin') {
+    if (userType === 'v2' || userType === 'admin') {
+        setFieldToEdit({ key, value });
+        setIsEditModalOpen(true);
+    } else {
         setIsAccessDeniedDialogOpen(true);
-        return;
     }
-    setFieldToEdit({ key, value });
-    setIsEditModalOpen(true);
   };
 
   const handleUpdateField = async (key: string, newValue: any) => {
@@ -272,7 +272,7 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId, onPatien
       return <p className="text-muted-foreground text-center">No hay datos para mostrar.</p>;
     }
     
-    if (userType === 'other' || userType === 'v2') {
+    if (userType === 'other') {
       return (
         <div className="flex flex-col items-center justify-center h-full text-center p-8">
             <ShieldAlert className="h-16 w-16 text-muted-foreground mb-4" />
@@ -333,7 +333,7 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId, onPatien
         <DialogFooter>
           <Button onClick={handlePrint} disabled={isLoading || !!error || !patientData}>
             <Printer className="mr-2 h-4 w-4" />
-            {userType === 'other' || userType === 'v2' ? 'Imprimir' : `Imprimir (${selectedFields.length})`}
+            {userType === 'other' ? 'Imprimir' : `Imprimir (${selectedFields.length})`}
           </Button>
         </DialogFooter>
       </DialogContent>
