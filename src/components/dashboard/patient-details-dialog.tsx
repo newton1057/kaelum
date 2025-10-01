@@ -282,16 +282,6 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId, onPatien
       )
     }
 
-    if (userType === 'v2') {
-      return (
-        <div className="flex flex-col items-center justify-center h-full text-center p-8">
-            <ShieldAlert className="h-16 w-16 text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold">Información no disponible para visualizar</h3>
-            <p className="text-muted-foreground">Tu rol solo permite imprimir el expediente. Utiliza el botón de abajo para generar el PDF.</p>
-        </div>
-      )
-    }
-
     const fieldsToDisplay = Object.entries(patientData).filter(
       ([key]) => key !== 'id' && key !== 'Marca temporal'
     );
@@ -361,6 +351,8 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId, onPatien
     </>
   );
 }
+
+    
 
     
 
