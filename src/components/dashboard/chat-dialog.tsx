@@ -169,10 +169,39 @@ export function ChatDialog({ isOpen, onOpenChange, patient, isDemoMode }: ChatDi
              setTimeout(() => {
                 setChat(prevChat => {
                     if (!prevChat) return undefined;
+                    let botResponse = "Esta es una respuesta de demostración. La funcionalidad completa está desactivada en Modo Demo.";
+
+                    if (content.toLowerCase().includes('analisis')) {
+                        botResponse = `
+### Análisis Clínico Avanzado (Simulación)
+
+**Paciente:** ${patient.name}, ${patient.age} años.
+
+**1. Resumen Clínico y Hallazgos:**
+- **Síntomas Principales:** El paciente reporta fatiga persistente y cefaleas tensionales durante las últimas 3 semanas.
+- **Historial Relevante:** Antecedentes de hipertensión arterial (HTA) en tratamiento con Losartán 50mg.
+- **Datos Biométricos:** IMC de 28.5, indicando sobrepeso.
+
+**2. Diagnósticos Diferenciales (Basado en Síntomas):**
+- **Trastorno de Ansiedad Generalizada (TAG):** La fatiga y cefaleas son síntomas somáticos comunes.
+- **Apnea Obstructiva del Sueño:** El sobrepeso es un factor de riesgo importante.
+- **Hipotiroidismo Subclínico:** Podría explicar la fatiga y se debe descartar con pruebas de TSH y T4 libre.
+
+**3. Análisis Farmacogenético (Simulado):**
+- **CYP2C9 (*1/*3):** Metabolizador intermedio. La dosis actual de Losartán podría ser subóptima. Se recomienda monitorizar la presión arterial y considerar un ajuste o un fármaco alternativo si no se alcanzan los objetivos.
+- **MTHFR (C677T):** Genotipo heterocigoto. Podría haber una menor eficiencia en el metabolismo del folato, lo cual se ha asociado a una respuesta reducida a ciertos antidepresivos (ISRS).
+
+**4. Recomendación (Simulación):**
+Se sugiere realizar un perfil tiroideo y una polisomnografía para descartar las condiciones mencionadas. Desde el punto de vista farmacológico, si se considera iniciar un tratamiento para la ansiedad, se podría optar por un IRSN como la Venlafaxina, que puede ser más eficaz en pacientes con polimorfismos en MTHFR. Es crucial un seguimiento estricto de la presión arterial.
+
+*Nota: Este es un análisis generado en Modo Demo. La información es ficticia y no debe usarse para tomar decisiones clínicas reales.*
+                        `;
+                    }
+
                     const updatedMessages = prevChat.messages.map(m => m.id === botLoadingMessageId ? {
                         ...m,
                         isLoading: false,
-                        content: "Esta es una respuesta de demostración. La funcionalidad completa está desactivada en Modo Demo."
+                        content: botResponse,
                     } : m);
                     return { ...prevChat, messages: updatedMessages };
                 });
