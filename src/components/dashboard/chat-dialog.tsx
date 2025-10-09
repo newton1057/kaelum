@@ -171,7 +171,7 @@ export function ChatDialog({ isOpen, onOpenChange, patient, isDemoMode }: ChatDi
                     if (!prevChat) return undefined;
                     let botResponse = "Esta es una respuesta de demostración. La funcionalidad completa está desactivada en Modo Demo.";
 
-                    if (content.toLowerCase().includes('analisis')) {
+                    if (content.toLowerCase().includes('análisis') || content.toLowerCase().includes('analisis')) {
                         botResponse = `
 ### Análisis Clínico Avanzado (Simulación)
 
