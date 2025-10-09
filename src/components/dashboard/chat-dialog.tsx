@@ -167,35 +167,15 @@ export function ChatDialog({ isOpen, onOpenChange, patient }: ChatDialogProps) {
             const result = await response.json();
             const botResponseText = result?.botMessage?.text || "No se recibió una respuesta válida.";
 
-            // First, update the loading message to a normal message without content
             setChat(prevChat => {
                 if (!prevChat) return undefined;
                 const updatedMessages = prevChat.messages.map(m => m.id === botLoadingMessageId ? {
                     ...m,
                     isLoading: false,
-                    content: '', // Start with empty content
+                    content: botResponseText,
                 } : m);
                 return { ...prevChat, messages: updatedMessages };
             });
-
-
-            // Then, animate the response
-            let currentText = '';
-            let charIndex = 0;
-            const interval = setInterval(() => {
-                if (charIndex < botResponseText.length) {
-                    currentText += botResponseText.charAt(charIndex);
-                    setChat(prevChat => {
-                        if (!prevChat) return undefined;
-                        const updatedMessages = prevChat.messages.map(m => m.id === botLoadingMessageId ? { ...m, content: currentText } : m);
-                        return { ...prevChat, messages: updatedMessages };
-                    });
-                    charIndex++;
-                } else {
-                    clearInterval(interval);
-                }
-            }, 25);
-
 
         } catch (err) {
             setChat(prevChat => {

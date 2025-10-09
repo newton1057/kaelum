@@ -245,26 +245,10 @@ export default function AppLayout() {
 
     updateMessageInChat(chatId, loadingMessageId, {
       isLoading: false,
-      isReasoningComplete: false,
+      isReasoningComplete: true, // Mark as complete since it appears at once
       attachment: botAttachment,
+      content: botResponseText,
     });
-    
-    let currentText = '';
-    let charIndex = 0;
-    const interval = setInterval(() => {
-      if (charIndex < botResponseText.length) {
-        currentText += botResponseText.charAt(charIndex);
-        updateMessageInChat(chatId, loadingMessageId, {
-          content: currentText,
-        });
-        charIndex++;
-      } else {
-        clearInterval(interval);
-        updateMessageInChat(chatId, loadingMessageId, {
-          isReasoningComplete: true, 
-        });
-      }
-    }, 25); 
   }
 
   const handleSendSuggestedQuestion = (question: SuggestedQuestion) => {

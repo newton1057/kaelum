@@ -229,21 +229,8 @@ export default function GeneralChatLayout() {
     updateMessageInChat(chatId, loadingMessageId, {
       isLoading: false,
       attachment: botAttachment,
+      content: botResponseText,
     });
-    
-    let currentText = '';
-    let charIndex = 0;
-    const interval = setInterval(() => {
-      if (charIndex < botResponseText.length) {
-        currentText += botResponseText.charAt(charIndex);
-        updateMessageInChat(chatId, loadingMessageId, {
-          content: currentText,
-        });
-        charIndex++;
-      } else {
-        clearInterval(interval);
-      }
-    }, 25);
   };
 
 
