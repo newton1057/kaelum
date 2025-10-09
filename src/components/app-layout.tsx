@@ -295,7 +295,7 @@ export default function AppLayout() {
             content: question.answer,
           });
         }
-      }, 25); // Interval per character
+      }, 12); // Interval per character (was 25)
     }, randomDelay);
   };
   

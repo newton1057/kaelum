@@ -134,16 +134,15 @@ export default function ChatLayout({ onDeleteAllChats }) {
 
     // Simulate typing for reasoning
     let reasoningText = '';
-    const reasoningWords = question.reasoning.split(' ');
-    let wordIndex = 0;
+    let charIndex = 0;
 
     const interval = setInterval(() => {
-      if (wordIndex < reasoningWords.length) {
-        reasoningText += (wordIndex > 0 ? ' ' : '') + reasoningWords[wordIndex];
+      if (charIndex < question.reasoning.length) {
+        reasoningText += question.reasoning.charAt(charIndex);
         updateMessageInChat(activeChatId, botMessageId, {
           reasoning: reasoningText,
         });
-        wordIndex++;
+        charIndex++;
       } else {
         clearInterval(interval);
         // Finish reasoning and add final answer
@@ -152,7 +151,7 @@ export default function ChatLayout({ onDeleteAllChats }) {
           content: question.answer,
         });
       }
-    }, 50);
+    }, 12);
   };
 
   const handleDeleteAllLocalChats = () => {
