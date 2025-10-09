@@ -23,10 +23,10 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
-import { MoreHorizontal, PlusCircle, SlidersHorizontal, Search } from 'lucide-react';
+import { MoreHorizontal, PlusCircle, SlidersHorizontal, Search, TestTube2 } from 'lucide-react';
 import { ImportPatientsDialog } from '@/components/dashboard/import-patients-dialog';
 import { PatientDetailsDialog } from '@/components/dashboard/patient-details-dialog';
-import { format } from 'date-fns';
+import { format, subYears } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { AddNoteDialog } from '@/components/dashboard/add-note-dialog';
 import { ChatDialog } from '@/components/dashboard/chat-dialog';
@@ -64,12 +64,39 @@ const calculateAge = (birthDateString: string): number | string => {
     }
 };
 
+const generateFakePatients = (count: number): Patient[] => {
+    const fakePatients: Patient[] = [];
+    const firstNames = ['Juan', 'Maria', 'Carlos', 'Ana', 'Luis', 'Laura', 'Pedro', 'Sofia', 'Miguel', 'Elena'];
+    const lastNames = ['García', 'Rodriguez', 'Martinez', 'Hernandez', 'Lopez', 'Gonzalez', 'Perez', 'Sanchez', 'Ramirez', 'Torres'];
+    const genders = ['Masculino', 'Femenino'];
+    const statuses = ['Activo', 'Inactivo', 'En tratamiento'];
+
+    for (let i = 0; i < count; i++) {
+        const name = `${firstNames[Math.floor(Math.random() * firstNames.length)]} ${lastNames[Math.floor(Math.random() * lastNames.length)]}`;
+        const age = Math.floor(Math.random() * 60) + 18;
+        const birthDate = subYears(new Date(), age);
+        
+        fakePatients.push({
+            id: `demo-${i}`,
+            name,
+            age,
+            gender: genders[Math.floor(Math.random() * genders.length)],
+            lastConsultation: format(birthDate, 'yyyy-MM-dd'),
+            status: statuses[Math.floor(Math.random() * statuses.length)],
+            'Fecha de Nacimiento': format(birthDate, 'yyyy-MM-dd'),
+            Sexo: genders[Math.floor(Math.random() * genders.length)],
+        });
+    }
+    return fakePatients;
+};
+
 
 export default function ExpedientesPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [isAuth, setIsAuth] = useState(false);
   const [userType, setUserType] = useState<string | null>(null);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
   const [isAddNoteDialogOpen, setIsAddNoteDialogOpen] = useState(false);
@@ -82,18 +109,26 @@ export default function ExpedientesPage() {
   const [filteredPatients, setFilteredPatients] = useState<Patient[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [isDemoMode, setIsDemoMode] = useState(false);
 
   useEffect(() => {
     const isAuthenticated = localStorage.getItem('isAuthenticated');
     const storedUserType = localStorage.getItem('userType');
+    const storedUserEmail = localStorage.getItem('userEmail');
     if (!isAuthenticated) {
       router.replace('/login');
     } else {
       setIsAuth(true);
       setUserType(storedUserType);
-      fetchPatients();
+      setUserEmail(storedUserEmail);
+      if (isDemoMode) {
+        loadDemoData();
+      } else {
+        fetchPatients();
+      }
     }
-  }, [router]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router, isDemoMode]);
 
   useEffect(() => {
     const lowercasedQuery = searchQuery.toLowerCase();
@@ -102,6 +137,12 @@ export default function ExpedientesPage() {
     );
     setFilteredPatients(filtered);
   }, [searchQuery, patients]);
+  
+  const loadDemoData = () => {
+    setIsLoading(true);
+    setPatients(generateFakePatients(15));
+    setIsLoading(false);
+  };
 
   const fetchPatients = async () => {
     try {
@@ -139,6 +180,10 @@ export default function ExpedientesPage() {
     } finally {
       setIsLoading(false);
     }
+  };
+  
+  const handleToggleDemoMode = () => {
+      setIsDemoMode(prev => !prev);
   };
 
   const handleCreatePatient = async (formData: ScreeningFormValues) => {
@@ -178,7 +223,7 @@ export default function ExpedientesPage() {
 
   const handleViewDetails = (patientId: string) => {
     const patient = patients.find(p => p.id === patientId);
-    if (userType === 'v2' || userType === 'other') {
+    if (userType === 'other' || userType === 'v2') {
         setSelectedPatient(patient || null);
         setIsDetailsDialogOpen(true);
         return;
@@ -188,7 +233,7 @@ export default function ExpedientesPage() {
   }
   
   const handleAddNote = (patientId: string) => {
-    if (userType === 'other' || userType === 'v1' || userType === 'v2') {
+    if (userType === 'v1' || userType === 'secondary') {
         setIsAccessDeniedDialogOpen(true);
         return;
     }
@@ -215,7 +260,7 @@ export default function ExpedientesPage() {
   };
   
   const handleOpenAddPatientDialog = () => {
-    if (userType === 'tertiary' || userType === 'secondary' || userType === 'v3') {
+    if (userType === 'secondary' || userType === 'v3') {
       setIsAccessDeniedDialogOpen(true);
     } else {
       setIsScreeningDialogOpen(true);
@@ -223,7 +268,7 @@ export default function ExpedientesPage() {
   };
   
   const handleOpenImportDialog = () => {
-    if (userType === 'tertiary' || userType === 'secondary' || userType === 'v3') {
+    if (userType === 'secondary' || userType === 'v3') {
       setIsAccessDeniedDialogOpen(true);
     } else {
       setIsImportDialogOpen(true);
@@ -253,6 +298,12 @@ export default function ExpedientesPage() {
           Expedientes de Pacientes
         </h2>
         <div className="flex items-center gap-2">
+          {userEmail === 'admin@mentalbeat.com.mx' && (
+            <Button onClick={handleToggleDemoMode} variant={isDemoMode ? "default" : "outline"}>
+              <TestTube2 className="mr-2 h-4 w-4" />
+              Modo Demo
+            </Button>
+          )}
           <Button onClick={handleOpenAddPatientDialog}>
             <PlusCircle className="mr-2 h-4 w-4" />
             Añadir Paciente
@@ -357,8 +408,8 @@ export default function ExpedientesPage() {
         </Table>
       </div>
     </div>
-    <ImportPatientsDialog isOpen={isImportDialogOpen} onOpenChange={setIsImportDialogOpen} onImportSuccess={fetchPatients} />
-    {selectedPatient && <PatientDetailsDialog isOpen={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen} patientId={selectedPatient.id} onPatientUpdate={fetchPatients} />}
+    <ImportPatientsDialog isOpen={isImportDialogOpen} onOpenChange={setIsImportDialogOpen} onImportSuccess={isDemoMode ? loadDemoData : fetchPatients} />
+    {selectedPatient && <PatientDetailsDialog isOpen={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen} patientId={selectedPatient.id} onPatientUpdate={isDemoMode ? loadDemoData : fetchPatients} />}
     {selectedPatient && <AddNoteDialog isOpen={isAddNoteDialogOpen} onOpenChange={setIsAddNoteDialogOpen} patientId={selectedPatient.id} />}
     {selectedPatient && <ChatDialog isOpen={isChatDialogOpen} onOpenChange={setIsChatDialogOpen} patient={selectedPatient} />}
     {selectedPatient && <PatientDocumentsDialog isOpen={isDocumentsDialogOpen} onOpenChange={setIsDocumentsDialogOpen} patient={selectedPatient} />}
@@ -371,9 +422,3 @@ export default function ExpedientesPage() {
     </>
   );
 }
-
-    
-
-    
-
-    

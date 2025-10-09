@@ -1,4 +1,4 @@
-import { BrainCircuit, File } from 'lucide-react';
+import { BrainCircuit, File, TestTube2 } from 'lucide-react';
 import type { SVGProps } from 'react';
 import Image from 'next/image';
 
