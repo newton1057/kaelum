@@ -24,7 +24,8 @@ import { AccessDeniedDialog } from './access-denied-dialog';
 interface AddNoteDialogProps {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
-  patientId: string | null;
+  patient: { id: string, [key: string]: any } | null;
+  isDemoMode: boolean;
 }
 
 const SKELETON_ITEMS = 5;
@@ -37,7 +38,7 @@ const CLINICAL_NOTE_FIELDS = [
   'Observaciones adicionales',
 ];
 
-export function AddNoteDialog({ isOpen, onOpenChange, patientId }: AddNoteDialogProps) {
+export function AddNoteDialog({ isOpen, onOpenChange, patient, isDemoMode }: AddNoteDialogProps) {
   const [patientData, setPatientData] = useState<Record<string, any> | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -48,12 +49,12 @@ export function AddNoteDialog({ isOpen, onOpenChange, patientId }: AddNoteDialog
   const { toast } = useToast();
 
   const fetchPatientDetails = async () => {
-    if (!patientId) return;
+    if (!patient?.id) return;
     setIsLoading(true);
     setError(null);
     setPatientData(null);
     try {
-      const response = await fetch(`https://kaelumapi-866322842519.northamerica-south1.run.app/medicalRecords/getRecord/${patientId}`);
+      const response = await fetch(`https://kaelumapi-866322842519.northamerica-south1.run.app/medicalRecords/getRecord/${patient.id}`);
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Error al obtener los detalles del paciente.');
@@ -70,10 +71,17 @@ export function AddNoteDialog({ isOpen, onOpenChange, patientId }: AddNoteDialog
   useEffect(() => {
     const storedUserType = localStorage.getItem('userType');
     setUserType(storedUserType);
-    if (isOpen && patientId) {
-      fetchPatientDetails();
+    if (isOpen && patient?.id) {
+        if (isDemoMode) {
+            setIsLoading(true);
+            setPatientData(patient);
+            setTimeout(() => setIsLoading(false), 500); // Simulate loading
+        } else {
+            fetchPatientDetails();
+        }
     }
-  }, [isOpen, patientId]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, patient, isDemoMode]);
 
   const handleEditClick = (key: string, value: any) => {
     if (userType === 'admin' || userType === 'tertiary' || userType === 'v3' || userType === 'v2') {
@@ -85,7 +93,17 @@ export function AddNoteDialog({ isOpen, onOpenChange, patientId }: AddNoteDialog
   };
 
   const handleUpdateField = async (key: string, newValue: any) => {
-    if (!patientId) return;
+    if (!patient?.id) return;
+
+    if (isDemoMode) {
+        setPatientData(prev => (prev ? { ...prev, [key]: newValue } : null));
+        toast({
+            title: 'Actualizado (Modo Demo)',
+            description: `El campo "${key}" se ha actualizado en la vista de demostración.`
+        });
+        setIsEditModalOpen(false);
+        return;
+    }
 
     const originalValue = patientData ? patientData[key] : '';
     // Optimistic update
@@ -95,7 +113,7 @@ export function AddNoteDialog({ isOpen, onOpenChange, patientId }: AddNoteDialog
       const response = await fetch(`https://kaelumapi-866322842519.northamerica-south1.run.app/medicalRecords/updateRecord`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ parentId: patientId, key: key, value: newValue }),
+        body: JSON.stringify({ parentId: patient.id, key: key, value: newValue }),
       });
 
       if (!response.ok) {
@@ -218,7 +236,3 @@ export function AddNoteDialog({ isOpen, onOpenChange, patientId }: AddNoteDialog
     </>
   );
 }
-
-    
-
-    

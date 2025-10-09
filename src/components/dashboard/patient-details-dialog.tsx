@@ -24,13 +24,14 @@ import { AccessDeniedDialog } from './access-denied-dialog';
 interface PatientDetailsDialogProps {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
-  patientId: string | null;
+  patient: { id: string, [key: string]: any } | null;
   onPatientUpdate: () => void;
+  isDemoMode: boolean;
 }
 
 const SKELETON_ITEMS = 15;
 
-export function PatientDetailsDialog({ isOpen, onOpenChange, patientId, onPatientUpdate }: PatientDetailsDialogProps) {
+export function PatientDetailsDialog({ isOpen, onOpenChange, patient, onPatientUpdate, isDemoMode }: PatientDetailsDialogProps) {
   const [patientData, setPatientData] = useState<Record<string, any> | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -44,19 +45,26 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId, onPatien
     const storedUserType = localStorage.getItem('userType');
     setUserType(storedUserType);
 
-    if (isOpen && patientId) {
-      fetchPatientDetails();
+    if (isOpen && patient?.id) {
+        if (isDemoMode) {
+            setIsLoading(true);
+            setPatientData(patient);
+            setSelectedFields(Object.keys(patient).filter(key => key !== 'id' && key !== 'Marca temporal'));
+            setTimeout(() => setIsLoading(false), 500); // Simulate loading
+        } else {
+            fetchPatientDetails();
+        }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen, patientId]);
+  }, [isOpen, patient, isDemoMode]);
 
   const fetchPatientDetails = async () => {
-    if (!patientId) return;
+    if (!patient?.id) return;
     setIsLoading(true);
     setError(null);
     setPatientData(null);
     try {
-      const response = await fetch(`https://kaelumapi-866322842519.northamerica-south1.run.app/medicalRecords/getRecord/${patientId}`);
+      const response = await fetch(`https://kaelumapi-866322842519.northamerica-south1.run.app/medicalRecords/getRecord/${patient.id}`);
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Error al obtener los detalles del paciente.');
@@ -89,13 +97,20 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId, onPatien
   };
 
   const handleUpdateField = async (key: string, newValue: any) => {
-    if (!patientData || !patientId) return;
+    if (!patientData || !patient?.id) return;
+
+    if (isDemoMode) {
+        setPatientData(prev => prev ? { ...prev, [key]: newValue } : null);
+        onPatientUpdate(); // This will just refetch the demo data, which is fine
+        setIsEditModalOpen(false);
+        return;
+    }
 
     const oldPatientData = { ...patientData };
     setPatientData(prev => prev ? { ...prev, [key]: newValue } : null);
 
     try {
-        const body = { parentId: patientId, key: key, value: newValue };
+        const body = { parentId: patient.id, key: key, value: newValue };
         
         const response = await fetch(`https://kaelumapi-866322842519.northamerica-south1.run.app/medicalRecords/updateRecord`, {
             method: 'POST',
@@ -241,7 +256,7 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId, onPatien
     }
 
     addFooter();
-    doc.save(`expediente-${patientName.replace(/\s/g, '_') || patientId}.pdf`);
+    doc.save(`expediente-${patientName.replace(/\s/g, '_') || patient.id}.pdf`);
   };
 
   const renderContent = () => {
@@ -351,9 +366,3 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patientId, onPatien
     </>
   );
 }
-
-    
-
-    
-
-    

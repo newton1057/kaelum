@@ -85,6 +85,7 @@ const generateFakePatients = (count: number): Patient[] => {
             status: statuses[Math.floor(Math.random() * statuses.length)],
             'Fecha de Nacimiento': format(birthDate, 'yyyy-MM-dd'),
             Sexo: genders[Math.floor(Math.random() * genders.length)],
+            'CURP': `DEMO-CURP-${i}`,
         });
     }
     return fakePatients;
@@ -221,41 +222,36 @@ export default function ExpedientesPage() {
     }
   };
 
-  const handleViewDetails = (patientId: string) => {
-    const patient = patients.find(p => p.id === patientId);
+  const handleViewDetails = (patient: Patient) => {
     if (userType === 'other' || userType === 'v2') {
-        setSelectedPatient(patient || null);
+        setSelectedPatient(patient);
         setIsDetailsDialogOpen(true);
         return;
     }
-    setSelectedPatient(patient || null);
+    setSelectedPatient(patient);
     setIsDetailsDialogOpen(true);
   }
   
-  const handleAddNote = (patientId: string) => {
+  const handleAddNote = (patient: Patient) => {
     if (userType === 'v1' || userType === 'secondary') {
         setIsAccessDeniedDialogOpen(true);
         return;
     }
-    const patient = patients.find(p => p.id === patientId);
-    setSelectedPatient(patient || null);
+    setSelectedPatient(patient);
     setIsAddNoteDialogOpen(true);
   }
 
-  const handleStartChat = async (patientId: string) => {
+  const handleStartChat = async (patient: Patient) => {
     if (userType === 'other' || userType === 'v2') {
       setIsAccessDeniedDialogOpen(true);
       return;
     }
-    const patient = patients.find((p) => p.id === patientId);
-    if (!patient) return;
     setSelectedPatient(patient);
     setIsChatDialogOpen(true);
   };
   
-  const handleOpenDocuments = (patientId: string) => {
-    const patient = patients.find(p => p.id === patientId);
-    setSelectedPatient(patient || null);
+  const handleOpenDocuments = (patient: Patient) => {
+    setSelectedPatient(patient);
     setIsDocumentsDialogOpen(true);
   };
   
@@ -390,10 +386,10 @@ export default function ExpedientesPage() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                        <DropdownMenuItem onSelect={() => handleViewDetails(patient.id)}>Ver Expediente</DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => handleStartChat(patient.id)}>Chat</DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => handleAddNote(patient.id)}>Añadir Nota Clínica</DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => handleOpenDocuments(patient.id)}>Documentos</DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => handleViewDetails(patient)}>Ver Expediente</DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => handleStartChat(patient)}>Chat</DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => handleAddNote(patient)}>Añadir Nota Clínica</DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => handleOpenDocuments(patient)}>Documentos</DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className="text-destructive">
                           Archivar Paciente
@@ -409,9 +405,9 @@ export default function ExpedientesPage() {
       </div>
     </div>
     <ImportPatientsDialog isOpen={isImportDialogOpen} onOpenChange={setIsImportDialogOpen} onImportSuccess={isDemoMode ? loadDemoData : fetchPatients} />
-    {selectedPatient && <PatientDetailsDialog isOpen={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen} patientId={selectedPatient.id} onPatientUpdate={isDemoMode ? loadDemoData : fetchPatients} />}
-    {selectedPatient && <AddNoteDialog isOpen={isAddNoteDialogOpen} onOpenChange={setIsAddNoteDialogOpen} patientId={selectedPatient.id} />}
-    {selectedPatient && <ChatDialog isOpen={isChatDialogOpen} onOpenChange={setIsChatDialogOpen} patient={selectedPatient} />}
+    {selectedPatient && <PatientDetailsDialog isOpen={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen} patient={selectedPatient} onPatientUpdate={isDemoMode ? loadDemoData : fetchPatients} isDemoMode={isDemoMode} />}
+    {selectedPatient && <AddNoteDialog isOpen={isAddNoteDialogOpen} onOpenChange={setIsAddNoteDialogOpen} patient={selectedPatient} isDemoMode={isDemoMode} />}
+    {selectedPatient && <ChatDialog isOpen={isChatDialogOpen} onOpenChange={setIsChatDialogOpen} patient={selectedPatient} isDemoMode={isDemoMode} />}
     {selectedPatient && <PatientDocumentsDialog isOpen={isDocumentsDialogOpen} onOpenChange={setIsDocumentsDialogOpen} patient={selectedPatient} />}
     <ScreeningQuestionnaireDialog
         isOpen={isScreeningDialogOpen}

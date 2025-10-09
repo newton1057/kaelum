@@ -24,6 +24,7 @@ interface ChatDialogProps {
     name: string;
     [key: string]: any;
   };
+  isDemoMode: boolean;
 }
 
 
@@ -69,7 +70,7 @@ function transformSessionToChat(session: any): Chat {
 }
 
 
-export function ChatDialog({ isOpen, onOpenChange, patient }: ChatDialogProps) {
+export function ChatDialog({ isOpen, onOpenChange, patient, isDemoMode }: ChatDialogProps) {
     const [chat, setChat] = useState<Chat | undefined>(undefined);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -77,6 +78,21 @@ export function ChatDialog({ isOpen, onOpenChange, patient }: ChatDialogProps) {
 
     useEffect(() => {
         if (isOpen && patient?.id) {
+            if (isDemoMode) {
+                setIsLoading(false);
+                setError(null);
+                setChat({
+                    id: patient.id,
+                    title: `Consulta de ${patient.name}`,
+                    messages: [{
+                        id: uuidv4(),
+                        role: 'bot',
+                        content: `Iniciando nueva consulta para **${patient.name}** (Modo Demo). ¿En qué puedo ayudarte hoy?`
+                    }]
+                });
+                return;
+            }
+
             const fetchChatSession = async () => {
                 setIsLoading(true);
                 setError(null);
@@ -120,7 +136,8 @@ export function ChatDialog({ isOpen, onOpenChange, patient }: ChatDialogProps) {
             }
             fetchChatSession();
         }
-    }, [isOpen, patient, toast]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isOpen, patient, isDemoMode, toast]);
 
     const handleSendMessage = async (content: string, file?: File) => {
         if (!chat) return;
@@ -147,6 +164,21 @@ export function ChatDialog({ isOpen, onOpenChange, patient }: ChatDialogProps) {
                 messages: [...prevChat.messages, userMessage, botLoadingMessage]
             };
         });
+
+        if (isDemoMode) {
+             setTimeout(() => {
+                setChat(prevChat => {
+                    if (!prevChat) return undefined;
+                    const updatedMessages = prevChat.messages.map(m => m.id === botLoadingMessageId ? {
+                        ...m,
+                        isLoading: false,
+                        content: "Esta es una respuesta de demostración. La funcionalidad completa está desactivada en Modo Demo."
+                    } : m);
+                    return { ...prevChat, messages: updatedMessages };
+                });
+            }, 1500);
+            return;
+        }
 
         try {
             const response = await fetch('https://kaelumapi-866322842519.northamerica-south1.run.app/medicalRecords/chatSessionMedicalRecord/message', {
