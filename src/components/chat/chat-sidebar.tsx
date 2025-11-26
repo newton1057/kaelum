@@ -106,28 +106,31 @@ export default function ChatSidebar({
         }}
       >
         <AppLogo />
-        <button
-          onClick={onNewChat}
-          type="button"
-          style={{
-            width: 32,
-            height: 32,
-            borderRadius: 6,
-            border: `1px solid ${palette.border}`,
-            background: 'transparent',
-            color: palette.text,
-            fontSize: 18,
-            fontWeight: 700,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            transition: 'background 0.2s ease, border 0.2s ease',
-          }}
-          aria-label="Nueva Consulta"
-        >
-          +
-        </button>
+        {/* Ocultar botón + cuando esté en Chat Médico */}
+        {!isGeneralChat && (
+          <button
+            onClick={onNewChat}
+            type="button"
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: 6,
+              border: `1px solid ${palette.border}`,
+              background: 'transparent',
+              color: palette.text,
+              fontSize: 18,
+              fontWeight: 700,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              transition: 'background 0.2s ease, border 0.2s ease',
+            }}
+            aria-label="Nueva Consulta"
+          >
+            +
+          </button>
+        )}
       </div>
 
       {/* General Navigation Section */}
@@ -156,7 +159,36 @@ export default function ChatSidebar({
             <button
               key={item.key}
               type="button"
-              onClick={() => router.push(item.path)}
+              onClick={async () => {
+                // Si es Chat Médico, crear un nuevo chat general automáticamente
+                if (item.key === 'general') {
+                  try {
+                    const dataToSend = {
+                      data: {
+                        title: 'Nueva Conversación'
+                      }
+                    };
+
+                    const response = await fetch('https://kaelumapi-866322842519.northamerica-south1.run.app/chat/start?mode=general', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify(dataToSend),
+                    });
+
+                    if (response.ok) {
+                      const result = await response.json();
+                      // Navegar con el ID del nuevo chat
+                      router.push(`${item.path}?newChat=${result.session_id}`);
+                      return;
+                    }
+                  } catch (error) {
+                    console.error('Error creating new chat:', error);
+                  }
+                }
+                router.push(item.path);
+              }}
               aria-current={isActive ? 'page' : undefined}
               style={{
                 display: 'flex',
@@ -169,7 +201,7 @@ export default function ChatSidebar({
                 background: isActive ? palette.accent : 'transparent',
                 border: 'none',
                 borderRadius: 0,
-                cursor: isActive ? 'default' : 'pointer',
+                cursor: 'pointer',
                 transition: 'background 0.2s ease, color 0.2s ease',
                 textAlign: 'left',
               }}
