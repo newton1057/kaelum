@@ -42,6 +42,7 @@ body {
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
+
   .dark {
     --background: 185 81% 9%;
     --foreground: 70 87% 80%;
@@ -76,6 +77,7 @@ body {
     --sidebar-border: 185 81% 15%;
     --sidebar-ring: 70 87% 63%;
   }
+
   .high-contrast {
     --background: 0 0% 0%;
     --foreground: 0 0% 100%;
@@ -116,7 +118,68 @@ body {
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+}
+
+.full-screen-login {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100dvh;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+
+  --ink: #082323;
+  --accent: #D2F252;
+
+  background-color: var(--ink);
+
+  background:
+    radial-gradient(80vmax 80vmax at 18% 12%, rgba(210, 242, 82, 0.10), transparent 60%),
+    radial-gradient(70vmax 70vmax at 82% 88%, rgba(210, 242, 82, 0.08), transparent 60%),
+    linear-gradient(180deg, #0b2b2b 0%, var(--ink) 100%);
+}
+
+.full-screen-dashboard {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  box-sizing: border-box;
+  color: #E9FFD0;
+}
+
+.search-input {
+  border: 1px solid rgba(210, 242, 82, 0.35);
+  background: linear-gradient(135deg, rgba(3, 23, 24, 0.75), rgba(12, 45, 45, 0.9));
+  color: #e9ffd0;
+  box-shadow:
+    0 0 0 1px rgba(210, 242, 82, 0.08),
+    0 12px 24px rgba(0, 0, 0, 0.35);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.2s ease;
+  outline: none;
+}
+
+.search-input:hover {
+  border-color: rgba(210, 242, 82, 0.55);
+  box-shadow:
+    0 0 0 1px rgba(210, 242, 82, 0.15),
+    0 14px 28px rgba(0, 0, 0, 0.4);
+}
+
+.search-input:focus {
+  border-color: rgba(210, 242, 82, 0.8);
+  box-shadow:
+    0 0 0 2px rgba(210, 242, 82, 0.22),
+    0 16px 34px rgba(0, 0, 0, 0.48);
+  background: linear-gradient(135deg, rgba(4, 28, 29, 0.9), rgba(18, 60, 60, 0.95));
+}
+
+.search-input::placeholder {
+  color: rgba(210, 242, 82, 0.5);
 }
