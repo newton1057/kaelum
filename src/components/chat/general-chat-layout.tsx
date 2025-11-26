@@ -67,13 +67,7 @@ export default function GeneralChatLayout() {
             const newChat: Chat = {
               id: newChatId,
               title: 'Nueva Conversación',
-              messages: [
-                {
-                  id: uuidv4(),
-                  role: 'bot',
-                  content: 'Soy MentalBeat. ¡Pregúntame lo que sea!',
-                },
-              ],
+              messages: [],
               mode: 'general',
             };
 

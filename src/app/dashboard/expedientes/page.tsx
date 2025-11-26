@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -14,16 +13,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Skeleton } from '@/components/ui/skeleton';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
-import { MoreHorizontal, PlusCircle, SlidersHorizontal, Search, TestTube2 } from 'lucide-react';
+import { MoreHorizontal, PlusCircle, SlidersHorizontal, Search, TestTube2, FileDown } from 'lucide-react';
 import { ImportPatientsDialog } from '@/components/dashboard/import-patients-dialog';
 import { PatientDetailsDialog } from '@/components/dashboard/patient-details-dialog';
 import { format, subYears } from 'date-fns';
@@ -34,6 +25,45 @@ import { ScreeningQuestionnaireDialog, type ScreeningFormValues } from '@/compon
 import { AccessDeniedDialog } from '@/components/dashboard/access-denied-dialog';
 import { PatientDocumentsDialog } from '@/components/dashboard/patient-documents-dialog';
 
+// --- STYLES & CONSTANTS ---
+const palette = {
+  text: "#ffffff",
+  textMuted: "rgba(255,255,255,0.6)",
+  accent: "#D2F252", // Lime green inferred from shadow
+  ink: "#031718",    // Dark teal background
+  border: "rgba(255,255,255,0.1)",
+  surface: "#031718",
+  danger: "#ff6b6b",
+};
+
+const COL_WIDTHS = [280, 100, 80, 160, 120, 80]; // Name, Gender, Age, BirthDate, Status, Actions
+
+const thStyle = (key: string): React.CSSProperties => ({
+  padding: "12px 16px",
+  textAlign: key === "actions" || key === "status" || key === "age" || key === "gender" ? "center" : "left",
+  fontSize: 13,
+  fontWeight: 700,
+  color: palette.ink,
+  background: palette.accent,
+  // textTransform: "uppercase", // Removed to allow sentence case
+  letterSpacing: "0.5px",
+  whiteSpace: "nowrap",
+});
+
+const tdStyle = (key: string): React.CSSProperties => ({
+  padding: "14px 16px",
+  color: key === "status" ? palette.text : "rgb(233, 255, 208)",
+  fontSize: 14,
+  textAlign: key === "actions" || key === "status" || key === "age" || key === "gender" ? "center" : "left",
+  verticalAlign: "middle",
+});
+
+const TRUNCATE_STYLE: React.CSSProperties = {
+  whiteSpace: "nowrap",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+};
+
 type Patient = {
   id: string;
   name: string;
@@ -41,7 +71,7 @@ type Patient = {
   gender: string;
   lastConsultation: string;
   status: string;
-  [key: string]: any; // Allow other properties
+  [key: string]: any;
 };
 
 const calculateAge = (birthDateString: string): number | string => {
@@ -274,12 +304,12 @@ export default function ExpedientesPage() {
 
   if (!isAuth) {
     return (
-      <div className="flex h-screen w-full items-center justify-center">
+      <div className="flex h-screen w-full items-center justify-center bg-[#031718]">
         <div className="flex flex-col items-center gap-4">
-          <Skeleton className="h-12 w-12 rounded-full" />
+          <Skeleton className="h-12 w-12 rounded-full bg-slate-800" />
           <div className="space-y-2">
-            <Skeleton className="h-4 w-[250px]" />
-            <Skeleton className="h-4 w-[200px]" />
+            <Skeleton className="h-4 w-[250px] bg-slate-800" />
+            <Skeleton className="h-4 w-[200px] bg-slate-800" />
           </div>
         </div>
       </div>
@@ -287,123 +317,268 @@ export default function ExpedientesPage() {
   }
 
   return (
-    <>
-      <div className="flex-1 space-y-4 p-8 pt-6">
-        <div className="flex items-center justify-between space-y-2">
-          <h2 className="text-3xl font-bold tracking-tight">
-            Expedientes de Pacientes
-          </h2>
-          <div className="flex items-center gap-2">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-              <Input
-                placeholder="Buscar por nombre..."
-                className="w-[280px] pl-10 search-input"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            {userEmail === 'admin@mentalbeat.com.mx' && (
-              <Button onClick={handleToggleDemoMode} variant={isDemoMode ? "default" : "outline"}>
-                <TestTube2 className="mr-2 h-4 w-4" />
-                Modo Demo
-              </Button>
-            )}
-            <Button onClick={handleOpenAddPatientDialog}>
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Añadir Paciente
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon">
-                  <SlidersHorizontal className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                <DropdownMenuItem onSelect={handleOpenImportDialog}>
-                  Importar Pacientes
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+    <main
+      style={{
+        padding: "24px 32px",
+        display: "grid",
+        gap: 18,
+        alignContent: "start",
+        justifyItems: "start",
+        textAlign: "left",
+        minHeight: "100vh",
+        background: "#02080a", // Very dark background for the page
+      }}
+    >
+      {/* Header */}
+      <div style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: 'wrap' }}>
+        <h1 style={{ fontSize: 24, margin: 0, fontWeight: 800, color: palette.text, textAlign: "left" }}>
+          Expedientes de Pacientes
+        </h1>
+
+        <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0, flexWrap: 'wrap' }}>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <input
+              type="search"
+              className="search-input focus:outline-none focus:ring-1 focus:ring-[#D2F252]"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Buscar por nombre..."
+              style={{
+                width: 260,
+                padding: "10px 12px 10px 36px",
+                borderRadius: 10,
+                color: palette.text,
+                fontSize: 13,
+                background: "rgba(255,255,255,0.05)",
+                border: `1px solid ${palette.border}`,
+              }}
+            />
           </div>
-        </div>
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Nombre</TableHead>
-                <TableHead className="hidden sm:table-cell">Género</TableHead>
-                <TableHead className="hidden sm:table-cell">Edad</TableHead>
-                <TableHead className="hidden md:table-cell">
-                  Fecha de Nacimiento
-                </TableHead>
-                <TableHead>Estado</TableHead>
-                <TableHead>
-                  <span className="sr-only">Acciones</span>
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading ? (
-                Array.from({ length: 5 }).map((_, index) => (
-                  <TableRow key={`skeleton-row-${index}`}>
-                    <TableCell><Skeleton className="h-5 w-32" /></TableCell>
-                    <TableCell className="hidden sm:table-cell"><Skeleton className="h-5 w-20" /></TableCell>
-                    <TableCell className="hidden sm:table-cell"><Skeleton className="h-5 w-10" /></TableCell>
-                    <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-24" /></TableCell>
-                    <TableCell><Skeleton className="h-6 w-20 rounded-full" /></TableCell>
-                    <TableCell><Skeleton className="h-8 w-8" /></TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                filteredPatients.map((patient) => (
-                  <TableRow key={patient.id}>
-                    <TableCell className="font-medium">{patient.name}</TableCell>
-                    <TableCell className="hidden sm:table-cell">
-                      {patient.gender}
-                    </TableCell>
-                    <TableCell className="hidden sm:table-cell">
-                      {patient.age}
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell">
-                      {patient.lastConsultation}
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={'default'}
-                      >
-                        {patient.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button aria-haspopup="true" size="icon" variant="ghost">
-                            <MoreHorizontal className="h-4 w-4" />
-                            <span className="sr-only">Toggle menu</span>
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                          <DropdownMenuItem onSelect={() => handleViewDetails(patient)}>Ver Expediente</DropdownMenuItem>
-                          <DropdownMenuItem onSelect={() => handleStartChat(patient)}>Chat</DropdownMenuItem>
-                          <DropdownMenuItem onSelect={() => handleAddNote(patient)}>Añadir Nota Clínica</DropdownMenuItem>
-                          <DropdownMenuItem onSelect={() => handleOpenDocuments(patient)}>Documentos</DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem className="text-destructive">
-                            Archivar Paciente
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+
+          {userEmail === 'admin@mentalbeat.com.mx' && (
+            <button
+              type="button"
+              onClick={handleToggleDemoMode}
+              style={{
+                padding: "10px 16px",
+                border: `1px solid ${isDemoMode ? palette.accent : palette.border}`,
+                borderRadius: 10,
+                fontWeight: 700,
+                fontSize: 12,
+                background: isDemoMode ? palette.accent : "transparent",
+                color: isDemoMode ? palette.ink : palette.text,
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+              }}
+            >
+              <TestTube2 className="h-4 w-4" />
+              Modo Demo
+            </button>
+          )}
+
+          <button
+            type="button"
+            onClick={handleOpenAddPatientDialog}
+            style={{
+              padding: "10px 16px",
+              border: "none",
+              borderRadius: 10,
+              fontWeight: 800,
+              fontSize: 12,
+              background: palette.accent,
+              color: palette.ink,
+              boxShadow: "0 0 30px 6px rgba(210, 242, 82, 0.25)",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+            }}
+          >
+            <PlusCircle className="h-4 w-4" />
+            Añadir Paciente
+          </button>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                style={{
+                  padding: "10px",
+                  border: `1px solid ${palette.border}`,
+                  borderRadius: 10,
+                  background: "transparent",
+                  color: palette.text,
+                  cursor: "pointer",
+                  display: "grid",
+                  placeItems: "center",
+                }}
+              >
+                <SlidersHorizontal className="h-4 w-4" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="bg-[#031718] border-gray-800 text-white">
+              <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+              <DropdownMenuItem onSelect={handleOpenImportDialog} className="focus:bg-gray-800 focus:text-white cursor-pointer">
+                <FileDown className="mr-2 h-4 w-4" />
+                Importar Pacientes
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
+
+      {/* TABLA */}
+      <div
+        style={{
+          width: "100%",
+          border: `1px solid ${palette.border}`,
+          borderRadius: 12,
+          overflow: "hidden",
+          background: "rgba(3,23,24,0.30)",
+          boxShadow: "0 18px 60px rgba(0,0,0,0.35)",
+        }}
+      >
+        <div style={{ maxHeight: "calc(100vh - 180px)", overflow: "auto" }}>
+          <table
+            style={{
+              width: "100%",
+              minWidth: "1000px",
+              borderCollapse: "collapse",
+              tableLayout: "fixed",
+            }}
+          >
+            <colgroup>
+              {COL_WIDTHS.map((w, i) => (
+                <col key={i} style={{ width: `${w}px` }} />
+              ))}
+            </colgroup>
+
+            <thead>
+              <tr>
+                <th style={thStyle("name")}>Nombre</th>
+                <th style={thStyle("gender")}>Género</th>
+                <th style={thStyle("age")}>Edad</th>
+                <th style={thStyle("birthDate")}>Fecha de nacimiento</th>
+                <th style={thStyle("status")}>Estado</th>
+                <th style={thStyle("actions")}>Acciones</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {isLoading &&
+                Array.from({ length: 5 }).map((_, i) => (
+                  <tr key={`skeleton-${i}`} style={{ borderBottom: `1px solid ${palette.border}` }}>
+                    {COL_WIDTHS.map((_, j) => (
+                      <td key={j} style={{ padding: 16 }}>
+                        <Skeleton className="h-5 w-full bg-slate-800/50" />
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+
+              {!isLoading && filteredPatients.length === 0 && (
+                <tr>
+                  <td
+                    colSpan={COL_WIDTHS.length}
+                    style={{ padding: 32, color: palette.text, opacity: 0.8, fontStyle: "italic", textAlign: "center" }}
+                  >
+                    {searchQuery ? "No hay registros que coincidan con la búsqueda." : "Aún no hay registros."}
+                  </td>
+                </tr>
+              )}
+
+              {!isLoading &&
+                filteredPatients.map((r, idx) => (
+                  <tr
+                    key={r.id}
+                    style={{
+                      background: idx % 2 === 0 ? "rgba(3,23,24,0.20)" : "rgba(3,23,24,0.30)",
+                      borderBottom: `1px solid ${palette.border}`,
+                    }}
+                  >
+                    {/* Nombre */}
+                    <td style={tdStyle("name")}>
+                      <div style={TRUNCATE_STYLE}>
+                        <strong>{r.name}</strong>
+                      </div>
+                    </td>
+
+                    {/* Género */}
+                    <td style={tdStyle("gender")}>
+                      <div style={TRUNCATE_STYLE}>{r.gender}</div>
+                    </td>
+
+                    {/* Edad */}
+                    <td style={tdStyle("age")}>
+                      <div style={TRUNCATE_STYLE}>{r.age}</div>
+                    </td>
+
+                    {/* Fecha de Nacimiento */}
+                    <td style={tdStyle("birthDate")}>
+                      <div style={TRUNCATE_STYLE}>{r.lastConsultation}</div>
+                    </td>
+
+                    {/* Estado */}
+                    <td style={tdStyle("status")}>
+                      <div style={{ display: "grid", placeItems: "center" }}>
+                        <Badge
+                          variant={'default'}
+                          className="bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 border-emerald-500/50"
+                        >
+                          {r.status}
+                        </Badge>
+                      </div>
+                    </td>
+
+                    {/* Acciones */}
+                    <td style={tdStyle("actions")}>
+                      <div style={{ display: "grid", placeItems: "center" }}>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button
+                              type="button"
+                              title="Ver detalles"
+                              aria-label="Ver detalles"
+                              style={{
+                                border: "none",
+                                background: "transparent",
+                                padding: 6,
+                                cursor: "pointer",
+                                display: "grid",
+                                placeItems: "center",
+                                borderRadius: 6,
+                                transition: "background 0.2s",
+                              }}
+                              onMouseEnter={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.1)"}
+                              onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
+                            >
+                              <MoreHorizontal color={palette.accent} size={20} />
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="bg-[#031718] border-gray-800 text-white">
+                            <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+                            <DropdownMenuItem onSelect={() => handleViewDetails(r)} className="focus:bg-gray-800 focus:text-white cursor-pointer">Ver Expediente</DropdownMenuItem>
+                            <DropdownMenuItem onSelect={() => handleStartChat(r)} className="focus:bg-gray-800 focus:text-white cursor-pointer">Chat</DropdownMenuItem>
+                            <DropdownMenuItem onSelect={() => handleAddNote(r)} className="focus:bg-gray-800 focus:text-white cursor-pointer">Añadir Nota Clínica</DropdownMenuItem>
+                            <DropdownMenuItem onSelect={() => handleOpenDocuments(r)} className="focus:bg-gray-800 focus:text-white cursor-pointer">Documentos</DropdownMenuItem>
+                            <DropdownMenuSeparator className="bg-gray-800" />
+                            <DropdownMenuItem className="text-red-400 focus:text-red-300 focus:bg-gray-800 cursor-pointer">
+                              Archivar Paciente
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       <ImportPatientsDialog isOpen={isImportDialogOpen} onOpenChange={setIsImportDialogOpen} onImportSuccess={isDemoMode ? loadDemoData : fetchPatients} />
       {selectedPatient && <PatientDetailsDialog isOpen={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen} patient={selectedPatient} onPatientUpdate={isDemoMode ? loadDemoData : fetchPatients} isDemoMode={isDemoMode} />}
       {selectedPatient && <AddNoteDialog isOpen={isAddNoteDialogOpen} onOpenChange={setIsAddNoteDialogOpen} patient={selectedPatient} isDemoMode={isDemoMode} />}
@@ -415,6 +590,6 @@ export default function ExpedientesPage() {
         onSubmit={handleCreatePatient}
       />
       <AccessDeniedDialog isOpen={isAccessDeniedDialogOpen} onOpenChange={setIsAccessDeniedDialogOpen} />
-    </>
+    </main>
   );
 }
