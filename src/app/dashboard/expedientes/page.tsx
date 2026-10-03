@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
-import { MoreHorizontal, PlusCircle, SlidersHorizontal, Search, TestTube2, FileDown } from 'lucide-react';
+import { MoreHorizontal, PlusCircle, SlidersHorizontal, Search, FileDown } from 'lucide-react';
 import { ImportPatientsDialog } from '@/components/dashboard/import-patients-dialog';
 import { PatientDetailsDialog } from '@/components/dashboard/patient-details-dialog';
 import { format, subYears } from 'date-fns';
@@ -94,32 +94,7 @@ const calculateAge = (birthDateString: string): number | string => {
   }
 };
 
-const generateFakePatients = (count: number): Patient[] => {
-  const fakePatients: Patient[] = [];
-  const firstNames = ['Juan', 'Maria', 'Carlos', 'Ana', 'Luis', 'Laura', 'Pedro', 'Sofia', 'Miguel', 'Elena'];
-  const lastNames = ['García', 'Rodriguez', 'Martinez', 'Hernandez', 'Lopez', 'Gonzalez', 'Perez', 'Sanchez', 'Ramirez', 'Torres'];
-  const genders = ['Masculino', 'Femenino'];
-  const statuses = ['Activo', 'Inactivo', 'En tratamiento'];
 
-  for (let i = 0; i < count; i++) {
-    const name = `${firstNames[Math.floor(Math.random() * firstNames.length)]} ${lastNames[Math.floor(Math.random() * lastNames.length)]}`;
-    const age = Math.floor(Math.random() * 60) + 18;
-    const birthDate = subYears(new Date(), age);
-
-    fakePatients.push({
-      id: `demo-${i}`,
-      name,
-      age,
-      gender: genders[Math.floor(Math.random() * genders.length)],
-      lastConsultation: format(birthDate, 'yyyy-MM-dd'),
-      status: statuses[Math.floor(Math.random() * statuses.length)],
-      'Fecha de Nacimiento': format(birthDate, 'yyyy-MM-dd'),
-      Sexo: genders[Math.floor(Math.random() * genders.length)],
-      'CURP': `DEMO-CURP-${i}`,
-    });
-  }
-  return fakePatients;
-};
 
 
 export default function ExpedientesPage() {
@@ -140,7 +115,7 @@ export default function ExpedientesPage() {
   const [filteredPatients, setFilteredPatients] = useState<Patient[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-  const [isDemoMode, setIsDemoMode] = useState(false);
+
 
   useEffect(() => {
     const isAuthenticated = localStorage.getItem('isAuthenticated');
@@ -152,14 +127,10 @@ export default function ExpedientesPage() {
       setIsAuth(true);
       setUserType(storedUserType);
       setUserEmail(storedUserEmail);
-      if (isDemoMode) {
-        loadDemoData();
-      } else {
-        fetchPatients();
-      }
+      fetchPatients();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router, isDemoMode]);
+  }, [router]);
 
   useEffect(() => {
     const lowercasedQuery = searchQuery.toLowerCase();
@@ -169,11 +140,7 @@ export default function ExpedientesPage() {
     setFilteredPatients(filtered);
   }, [searchQuery, patients]);
 
-  const loadDemoData = () => {
-    setIsLoading(true);
-    setPatients(generateFakePatients(15));
-    setIsLoading(false);
-  };
+
 
   const fetchPatients = async () => {
     try {
@@ -213,9 +180,7 @@ export default function ExpedientesPage() {
     }
   };
 
-  const handleToggleDemoMode = () => {
-    setIsDemoMode(prev => !prev);
-  };
+
 
   const handleCreatePatient = async (formData: ScreeningFormValues) => {
     try {
@@ -331,7 +296,7 @@ export default function ExpedientesPage() {
     >
       {/* Header */}
       <div style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: 'wrap' }}>
-        <h1 style={{ fontSize: 24, margin: 0, fontWeight: 800, color: palette.text, textAlign: "left" }}>
+        <h1 style={{ fontSize: 24, margin: 0, fontWeight: 800, color: "rgb(233, 255, 208)", textAlign: "left" }}>
           Expedientes de Pacientes
         </h1>
 
@@ -356,28 +321,7 @@ export default function ExpedientesPage() {
             />
           </div>
 
-          {userEmail === 'admin@mentalbeat.com.mx' && (
-            <button
-              type="button"
-              onClick={handleToggleDemoMode}
-              style={{
-                padding: "10px 16px",
-                border: `1px solid ${isDemoMode ? palette.accent : palette.border}`,
-                borderRadius: 10,
-                fontWeight: 700,
-                fontSize: 12,
-                background: isDemoMode ? palette.accent : "transparent",
-                color: isDemoMode ? palette.ink : palette.text,
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-              }}
-            >
-              <TestTube2 className="h-4 w-4" />
-              Modo Demo
-            </button>
-          )}
+
 
           <button
             type="button"
@@ -419,9 +363,9 @@ export default function ExpedientesPage() {
                 <SlidersHorizontal className="h-4 w-4" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-[#031718] border-gray-800 text-white">
-              <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-              <DropdownMenuItem onSelect={handleOpenImportDialog} className="focus:bg-gray-800 focus:text-white cursor-pointer">
+            <DropdownMenuContent align="end" className="bg-[#031718] border-gray-800 text-[rgb(233,255,208)]">
+              <DropdownMenuLabel className="text-[rgb(233,255,208)]">Acciones</DropdownMenuLabel>
+              <DropdownMenuItem onSelect={handleOpenImportDialog} className="focus:bg-gray-800 focus:text-[rgb(233,255,208)] cursor-pointer text-[rgb(233,255,208)]">
                 <FileDown className="mr-2 h-4 w-4" />
                 Importar Pacientes
               </DropdownMenuItem>
@@ -558,12 +502,12 @@ export default function ExpedientesPage() {
                               <MoreHorizontal color={palette.accent} size={20} />
                             </button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="bg-[#031718] border-gray-800 text-white">
-                            <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                            <DropdownMenuItem onSelect={() => handleViewDetails(r)} className="focus:bg-gray-800 focus:text-white cursor-pointer">Ver Expediente</DropdownMenuItem>
-                            <DropdownMenuItem onSelect={() => handleStartChat(r)} className="focus:bg-gray-800 focus:text-white cursor-pointer">Chat</DropdownMenuItem>
-                            <DropdownMenuItem onSelect={() => handleAddNote(r)} className="focus:bg-gray-800 focus:text-white cursor-pointer">Añadir Nota Clínica</DropdownMenuItem>
-                            <DropdownMenuItem onSelect={() => handleOpenDocuments(r)} className="focus:bg-gray-800 focus:text-white cursor-pointer">Documentos</DropdownMenuItem>
+                          <DropdownMenuContent align="end" className="bg-[#031718] border-gray-800 text-[rgb(233,255,208)]">
+                            <DropdownMenuLabel className="text-[rgb(233,255,208)]">Acciones</DropdownMenuLabel>
+                            <DropdownMenuItem onSelect={() => handleViewDetails(r)} className="focus:bg-gray-800 focus:text-[rgb(233,255,208)] cursor-pointer text-[rgb(233,255,208)]">Ver Expediente</DropdownMenuItem>
+                            <DropdownMenuItem onSelect={() => handleStartChat(r)} className="focus:bg-gray-800 focus:text-[rgb(233,255,208)] cursor-pointer text-[rgb(233,255,208)]">Chat</DropdownMenuItem>
+                            <DropdownMenuItem onSelect={() => handleAddNote(r)} className="focus:bg-gray-800 focus:text-[rgb(233,255,208)] cursor-pointer text-[rgb(233,255,208)]">Añadir Nota Clínica</DropdownMenuItem>
+                            <DropdownMenuItem onSelect={() => handleOpenDocuments(r)} className="focus:bg-gray-800 focus:text-[rgb(233,255,208)] cursor-pointer text-[rgb(233,255,208)]">Documentos</DropdownMenuItem>
                             <DropdownMenuSeparator className="bg-gray-800" />
                             <DropdownMenuItem className="text-red-400 focus:text-red-300 focus:bg-gray-800 cursor-pointer">
                               Archivar Paciente
@@ -579,10 +523,10 @@ export default function ExpedientesPage() {
         </div>
       </div>
 
-      <ImportPatientsDialog isOpen={isImportDialogOpen} onOpenChange={setIsImportDialogOpen} onImportSuccess={isDemoMode ? loadDemoData : fetchPatients} />
-      {selectedPatient && <PatientDetailsDialog isOpen={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen} patient={selectedPatient} onPatientUpdate={isDemoMode ? loadDemoData : fetchPatients} isDemoMode={isDemoMode} />}
-      {selectedPatient && <AddNoteDialog isOpen={isAddNoteDialogOpen} onOpenChange={setIsAddNoteDialogOpen} patient={selectedPatient} isDemoMode={isDemoMode} />}
-      {selectedPatient && <ChatDialog isOpen={isChatDialogOpen} onOpenChange={setIsChatDialogOpen} patient={selectedPatient} isDemoMode={isDemoMode} />}
+      <ImportPatientsDialog isOpen={isImportDialogOpen} onOpenChange={setIsImportDialogOpen} onImportSuccess={fetchPatients} />
+      {selectedPatient && <PatientDetailsDialog isOpen={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen} patient={selectedPatient} onPatientUpdate={fetchPatients} />}
+      {selectedPatient && <AddNoteDialog isOpen={isAddNoteDialogOpen} onOpenChange={setIsAddNoteDialogOpen} patient={selectedPatient} />}
+      {selectedPatient && <ChatDialog isOpen={isChatDialogOpen} onOpenChange={setIsChatDialogOpen} patient={selectedPatient} />}
       {selectedPatient && <PatientDocumentsDialog isOpen={isDocumentsDialogOpen} onOpenChange={setIsDocumentsDialogOpen} patient={selectedPatient} />}
       <ScreeningQuestionnaireDialog
         isOpen={isScreeningDialogOpen}

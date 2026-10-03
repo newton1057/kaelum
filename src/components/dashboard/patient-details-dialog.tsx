@@ -3,17 +3,9 @@
 
 import { useEffect, useState } from 'react';
 import jsPDF from 'jspdf';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
-import { AlertTriangle, Printer, Pencil, ShieldAlert } from 'lucide-react';
+import { AlertTriangle, Printer, Pencil, ShieldAlert, X } from 'lucide-react';
 import { ScrollArea } from '../ui/scroll-area';
 import { Button } from '../ui/button';
 import { Checkbox } from '../ui/checkbox';
@@ -21,17 +13,27 @@ import { Label } from '../ui/label';
 import { EditFieldDialog } from './edit-field-dialog';
 import { AccessDeniedDialog } from './access-denied-dialog';
 
+// --- STYLES & CONSTANTS ---
+const palette = {
+  text: "#ffffff",
+  textMuted: "rgba(255,255,255,0.6)",
+  accent: "#D2F252",
+  ink: "#031718",
+  border: "rgba(255,255,255,0.1)",
+  surface: "#031718",
+  danger: "#ff6b6b",
+};
+
 interface PatientDetailsDialogProps {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
   patient: { id: string, [key: string]: any } | null;
   onPatientUpdate: () => void;
-  isDemoMode: boolean;
 }
 
 const SKELETON_ITEMS = 15;
 
-export function PatientDetailsDialog({ isOpen, onOpenChange, patient, onPatientUpdate, isDemoMode }: PatientDetailsDialogProps) {
+export function PatientDetailsDialog({ isOpen, onOpenChange, patient, onPatientUpdate }: PatientDetailsDialogProps) {
   const [patientData, setPatientData] = useState<Record<string, any> | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -46,17 +48,10 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patient, onPatientU
     setUserType(storedUserType);
 
     if (isOpen && patient?.id) {
-        if (isDemoMode) {
-            setIsLoading(true);
-            setPatientData(patient);
-            setSelectedFields(Object.keys(patient).filter(key => key !== 'id' && key !== 'Marca temporal'));
-            setTimeout(() => setIsLoading(false), 500); // Simulate loading
-        } else {
-            fetchPatientDetails();
-        }
+      fetchPatientDetails();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen, patient, isDemoMode]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, patient]);
 
   const fetchPatientDetails = async () => {
     if (!patient?.id) return;
@@ -86,56 +81,51 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patient, onPatientU
       prev.includes(field) ? prev.filter(f => f !== field) : [...prev, field]
     );
   };
-  
+
   const handleEditClick = (key: string, value: any) => {
     if (userType === 'admin' || userType === 'v1' || userType === 'v2') {
-        setFieldToEdit({ key, value });
-        setIsEditModalOpen(true);
+      setFieldToEdit({ key, value });
+      setIsEditModalOpen(true);
     } else {
-        setIsAccessDeniedDialogOpen(true);
+      setIsAccessDeniedDialogOpen(true);
     }
   };
 
   const handleUpdateField = async (key: string, newValue: any) => {
     if (!patientData || !patient?.id) return;
 
-    if (isDemoMode) {
-        setPatientData(prev => prev ? { ...prev, [key]: newValue } : null);
-        onPatientUpdate(); // This will just refetch the demo data, which is fine
-        setIsEditModalOpen(false);
-        return;
-    }
+
 
     const oldPatientData = { ...patientData };
     setPatientData(prev => prev ? { ...prev, [key]: newValue } : null);
 
     try {
-        const body = { parentId: patient.id, key: key, value: newValue };
-        
-        const response = await fetch(`https://kaelumapi-866322842519.northamerica-south1.run.app/medicalRecords/updateRecord`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body),
-        });
-        if (!response.ok) {
-            throw new Error('Error al actualizar el campo');
-        }
-        await response.json();
-        onPatientUpdate(); // Refresh table data
+      const body = { parentId: patient.id, key: key, value: newValue };
+
+      const response = await fetch(`https://kaelumapi-866322842519.northamerica-south1.run.app/medicalRecords/updateRecord`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (!response.ok) {
+        throw new Error('Error al actualizar el campo');
+      }
+      await response.json();
+      onPatientUpdate(); // Refresh table data
     } catch (error) {
-        console.error("Failed to update field:", error);
-        // Revert on error
-        setPatientData(oldPatientData);
+      console.error("Failed to update field:", error);
+      // Revert on error
+      setPatientData(oldPatientData);
     } finally {
-        setIsEditModalOpen(false);
+      setIsEditModalOpen(false);
     }
   };
 
 
   const handlePrint = () => {
     if (userType === 'v3') {
-        setIsAccessDeniedDialogOpen(true);
-        return;
+      setIsAccessDeniedDialogOpen(true);
+      return;
     }
     if (!patientData) return;
 
@@ -146,7 +136,7 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patient, onPatientU
     const pageWidth = doc.internal.pageSize.width;
     const contentWidth = pageWidth - margin * 2;
     const patientName = patientData.Nombre || 'Desconocido';
-    const primaryColor = '#1a1a1a'; 
+    const primaryColor = '#1a1a1a';
     const secondaryColor = '#555555';
     const lightGray = '#E5E5E5';
 
@@ -159,7 +149,7 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patient, onPatientU
         month: 'long',
         day: 'numeric',
       });
-      
+
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(16);
       doc.setTextColor(primaryColor);
@@ -169,18 +159,18 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patient, onPatientU
       doc.setFontSize(10);
       doc.setTextColor(secondaryColor);
       doc.text('MentalBeat', pageWidth - margin, y - lineHeight, { align: 'right' });
-      
+
       doc.setFont('helvetica', 'normal');
       doc.text(`Generado el: ${currentDate}`, pageWidth - margin, y, { align: 'right' });
-      
+
       y += lineHeight * 1.5;
-      
+
       doc.setDrawColor(lightGray);
       doc.setLineWidth(0.5);
       doc.line(margin, y, pageWidth - margin, y);
       y += lineHeight * 1.5;
     };
-    
+
     const addFooter = () => {
       doc.setFontSize(8);
       doc.setTextColor(secondaryColor);
@@ -196,7 +186,7 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patient, onPatientU
         addHeader();
       }
     };
-    
+
     addHeader();
 
     doc.setFontSize(12);
@@ -217,7 +207,7 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patient, onPatientU
 
       const splitValue = doc.splitTextToSize(valueText, contentWidth - 5);
       const neededHeight = (splitValue.length * lineHeight) + 5;
-      
+
       checkPageBreak(neededHeight);
 
       doc.setFontSize(10);
@@ -228,35 +218,35 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patient, onPatientU
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(secondaryColor);
       doc.text(splitValue, margin, y + lineHeight);
-      
+
       y += (splitValue.length * lineHeight) + 5;
     }
-    
+
     // Signature section
-    checkPageBreak(30); 
+    checkPageBreak(30);
     y += 20; // Add some space before signature
-    
+
     doc.setDrawColor(primaryColor);
     doc.setLineWidth(0.3);
     doc.line(margin, y, margin + 80, y); // Signature line
-    
+
     y += lineHeight;
 
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(primaryColor);
     doc.text("Firma del Doctor", margin, y);
-    
+
     const doctorName = patientData['Asistiré a consulta con'];
     if (doctorName) {
-        y += lineHeight;
-        doc.setFontSize(8);
-        doc.setTextColor(secondaryColor);
-        doc.text(`Asistirá a consulta con: ${doctorName}`, margin, y);
+      y += lineHeight;
+      doc.setFontSize(8);
+      doc.setTextColor(secondaryColor);
+      doc.text(`Asistirá a consulta con: ${doctorName}`, margin, y);
     }
 
     addFooter();
-    doc.save(`expediente-${patientName.replace(/\s/g, '_') || patient.id}.pdf`);
+    doc.save(`expediente-${patientName.replace(/\s/g, '_') || patient?.id || 'sin_id'}.pdf`);
   };
 
   const renderContent = () => {
@@ -286,13 +276,13 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patient, onPatientU
     if (!patientData) {
       return <p className="text-muted-foreground text-center">No hay datos para mostrar.</p>;
     }
-    
+
     if (userType === 'other') {
       return (
         <div className="flex flex-col items-center justify-center h-full text-center p-8">
-            <ShieldAlert className="h-16 w-16 text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold">Información no disponible</h3>
-            <p className="text-muted-foreground">La visualización de detalles está restringida para tu tipo de usuario. Solo la función de impresión está habilitada.</p>
+          <ShieldAlert className="h-16 w-16 text-muted-foreground mb-4" />
+          <h3 className="text-lg font-semibold">Información no disponible</h3>
+          <p className="text-muted-foreground">La visualización de detalles está restringida para tu tipo de usuario. Solo la función de impresión está habilitada.</p>
         </div>
       )
     }
@@ -322,7 +312,7 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patient, onPatientU
             </Label>
             <span className="break-words">{String(value) || 'N/A'}</span>
             <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleEditClick(key, value)}>
-                <Pencil className="h-4 w-4" />
+              <Pencil className="h-4 w-4" />
             </Button>
           </div>
         ))}
@@ -330,39 +320,114 @@ export function PatientDetailsDialog({ isOpen, onOpenChange, patient, onPatientU
     );
   };
 
+  if (!isOpen) return null;
+
   return (
     <>
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl max-h-[90vh] flex flex-col">
-        <DialogHeader>
-          <DialogTitle>Detalles del Expediente</DialogTitle>
-          <DialogDescription>
-            Información completa del paciente. Selecciona los campos que deseas incluir en el PDF.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="flex-1 overflow-y-auto pr-6 -mr-6">
-          <ScrollArea className="h-full pr-6">
-            {renderContent()}
-          </ScrollArea>
+      <div
+        onClick={() => onOpenChange(false)}
+        style={{
+          position: "fixed",
+          inset: 0,
+          background: "rgba(0,0,0,0.6)",
+          backdropFilter: "blur(4px)",
+          display: "grid",
+          placeItems: "center",
+          padding: "24px 16px",
+          zIndex: 10500,
+        }}
+      >
+        <div
+          role="dialog"
+          aria-modal="true"
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            width: "min(1180px, 92vw)",
+            maxHeight: "92vh",
+            borderRadius: 22,
+            border: `1px solid ${palette.border}`,
+            overflow: "hidden",
+            boxShadow: "0 30px 120px rgba(0,0,0,0.55)",
+            background: "rgba(3,23,24,0.9)",
+            display: "flex",
+            flexDirection: "column",
+            position: "relative",
+          }}
+        >
+          {/* Header */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "14px 18px",
+              borderBottom: `1px solid ${palette.border}`,
+              background: "linear-gradient(180deg, rgba(3,23,24,0.65), rgba(3,23,24,0.35))",
+              gap: 12,
+            }}
+          >
+            <div>
+              <div style={{ fontSize: 18, fontWeight: 800, color: "rgb(233, 255, 208)" }}>
+                Detalles del Expediente
+              </div>
+              <div style={{ fontSize: 13, color: palette.textMuted }}>
+                Información completa del paciente. Selecciona los campos que deseas incluir en el PDF.
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => onOpenChange(false)}
+              aria-label="Cerrar"
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: "50%",
+                border: `1px solid ${palette.border}`,
+                background: "rgba(3,23,24,0.65)",
+                color: "rgb(233, 255, 208)",
+                cursor: "pointer",
+                padding: 0,
+                display: 'grid',
+                placeItems: 'center',
+              }}
+            >
+              <X size={20} />
+            </button>
+          </div>
+
+          {/* Content */}
+          <div className="flex-1 min-h-0 flex flex-col p-4">
+            <ScrollArea className="h-full pr-4">
+              {renderContent()}
+            </ScrollArea>
+          </div>
+
+          {/* Footer */}
+          <div style={{
+            padding: "14px 18px",
+            borderTop: `1px solid ${palette.border}`,
+            display: "flex",
+            justifyContent: "flex-end",
+            background: "rgba(3,23,24,0.35)",
+          }}>
+            <Button onClick={handlePrint} disabled={isLoading || !!error || !patientData}>
+              <Printer className="mr-2 h-4 w-4" />
+              {userType === 'other' || userType === 'v2' ? 'Imprimir' : `Imprimir (${selectedFields.length})`}
+            </Button>
+          </div>
         </div>
-        <DialogFooter>
-          <Button onClick={handlePrint} disabled={isLoading || !!error || !patientData}>
-            <Printer className="mr-2 h-4 w-4" />
-            {userType === 'other' || userType === 'v2' ? 'Imprimir' : `Imprimir (${selectedFields.length})`}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-    {fieldToEdit && (
+      </div>
+
+      {fieldToEdit && (
         <EditFieldDialog
-            isOpen={isEditModalOpen}
-            onOpenChange={setIsEditModalOpen}
-            fieldKey={fieldToEdit.key}
-            initialValue={fieldToEdit.value}
-            onUpdate={handleUpdateField}
+          isOpen={isEditModalOpen}
+          onOpenChange={setIsEditModalOpen}
+          fieldKey={fieldToEdit.key}
+          initialValue={fieldToEdit.value}
+          onUpdate={handleUpdateField}
         />
-    )}
-    <AccessDeniedDialog isOpen={isAccessDeniedDialogOpen} onOpenChange={setIsAccessDeniedDialogOpen} />
+      )}
+      <AccessDeniedDialog isOpen={isAccessDeniedDialogOpen} onOpenChange={setIsAccessDeniedDialogOpen} />
     </>
   );
 }

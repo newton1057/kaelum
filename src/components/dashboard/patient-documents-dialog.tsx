@@ -3,27 +3,30 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
-import { AlertTriangle, Upload, File as FileIcon, Loader, Download } from 'lucide-react';
+import { AlertTriangle, Upload, File as FileIcon, Loader, Download, X } from 'lucide-react';
 import { ScrollArea } from '../ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent } from '../ui/card';
 
+// --- STYLES & CONSTANTS ---
+const palette = {
+  text: "#ffffff",
+  textMuted: "rgba(255,255,255,0.6)",
+  accent: "#D2F252",
+  ink: "#031718",
+  border: "rgba(255,255,255,0.1)",
+  surface: "#031718",
+  danger: "#ff6b6b",
+};
+
 type PatientDocument = {
-    name: string;
-    url: string;
-    contentType: string;
-    size: number;
-    createdAt: string;
+  name: string;
+  url: string;
+  contentType: string;
+  size: number;
+  createdAt: string;
 };
 
 interface PatientDocumentsDialogProps {
@@ -75,12 +78,12 @@ export function PatientDocumentsDialog({ isOpen, onOpenChange, patient }: Patien
       setIsLoading(false);
     }
   };
-  
+
   useEffect(() => {
     if (isOpen && patient?.id) {
       fetchDocuments();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, patient]);
 
   const handleFileSelect = () => {
@@ -96,32 +99,32 @@ export function PatientDocumentsDialog({ isOpen, onOpenChange, patient }: Patien
     formData.append('file', file);
 
     try {
-        const response = await fetch(`https://kaelumapi-866322842519.northamerica-south1.run.app/medicalRecords/uploadFiles/${patient.id}`, {
-            method: 'POST',
-            body: formData,
-        });
+      const response = await fetch(`https://kaelumapi-866322842519.northamerica-south1.run.app/medicalRecords/uploadFiles/${patient.id}`, {
+        method: 'POST',
+        body: formData,
+      });
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Error al subir el documento.');
-        }
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error al subir el documento.');
+      }
 
-        toast({
-            title: 'Éxito',
-            description: 'El documento se ha subido correctamente.',
-        });
-        fetchDocuments(); // Refresh the list
+      toast({
+        title: 'Éxito',
+        description: 'El documento se ha subido correctamente.',
+      });
+      fetchDocuments(); // Refresh the list
     } catch (err: any) {
-        toast({
-            variant: 'destructive',
-            title: 'Error de subida',
-            description: err.message,
-        });
+      toast({
+        variant: 'destructive',
+        title: 'Error de subida',
+        description: err.message,
+      });
     } finally {
-        setIsUploading(false);
-        if (fileInputRef.current) {
-            fileInputRef.current.value = '';
-        }
+      setIsUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
 
@@ -130,7 +133,7 @@ export function PatientDocumentsDialog({ isOpen, onOpenChange, patient }: Patien
       return (
         <div className="space-y-4">
           {Array.from({ length: SKELETON_ITEMS }).map((_, index) => (
-             <Skeleton key={index} className="h-16 w-full" />
+            <Skeleton key={index} className="h-16 w-full" />
           ))}
         </div>
       );
@@ -176,42 +179,117 @@ export function PatientDocumentsDialog({ isOpen, onOpenChange, patient }: Patien
     );
   };
 
-  return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg max-h-[90vh] flex flex-col">
-        <DialogHeader>
-          <DialogTitle>Documentos de {patient?.name || 'Paciente'}</DialogTitle>
-          <DialogDescription>
-            Visualiza y añade documentos al expediente del paciente.
-          </DialogDescription>
-        </DialogHeader>
-        
-        <div className="flex-1 overflow-y-auto pr-6 -mr-6">
-            <ScrollArea className="h-full pr-6">
-                {renderContent()}
-            </ScrollArea>
-        </div>
+  if (!isOpen) return null;
 
-        <DialogFooter className="flex-col-reverse sm:flex-row gap-2 pt-4 border-t">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cerrar
-          </Button>
-          <Button onClick={handleFileSelect} disabled={isUploading}>
-            {isUploading ? (
-              <Loader className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Upload className="mr-2 h-4 w-4" />
-            )}
-            {isUploading ? 'Subiendo...' : 'Añadir Documento'}
-          </Button>
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            className="hidden"
+  return (
+    <>
+      <div
+        onClick={() => onOpenChange(false)}
+        style={{
+          position: "fixed",
+          inset: 0,
+          background: "rgba(0,0,0,0.6)",
+          backdropFilter: "blur(4px)",
+          display: "grid",
+          placeItems: "center",
+          padding: "24px 16px",
+          zIndex: 10500,
+        }}
+      >
+        <div
+          role="dialog"
+          aria-modal="true"
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            width: "min(1180px, 92vw)",
+            maxHeight: "92vh",
+            borderRadius: 22,
+            border: `1px solid ${palette.border}`,
+            overflow: "hidden",
+            boxShadow: "0 30px 120px rgba(0,0,0,0.55)",
+            background: "rgba(3,23,24,0.9)",
+            display: "flex",
+            flexDirection: "column",
+            position: "relative",
+          }}
+        >
+          {/* Header */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "14px 18px",
+              borderBottom: `1px solid ${palette.border}`,
+              background: "linear-gradient(180deg, rgba(3,23,24,0.65), rgba(3,23,24,0.35))",
+              gap: 12,
+            }}
+          >
+            <div>
+              <div style={{ fontSize: 18, fontWeight: 800, color: "rgb(233, 255, 208)" }}>
+                Documentos de {patient?.name || 'Paciente'}
+              </div>
+              <div style={{ fontSize: 13, color: palette.textMuted }}>
+                Visualiza y añade documentos al expediente del paciente.
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => onOpenChange(false)}
+              aria-label="Cerrar"
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: "50%",
+                border: `1px solid ${palette.border}`,
+                background: "rgba(3,23,24,0.65)",
+                color: "rgb(233, 255, 208)",
+                cursor: "pointer",
+                padding: 0,
+                display: 'grid',
+                placeItems: 'center',
+              }}
+            >
+              <X size={20} />
+            </button>
+          </div>
+
+          {/* Content */}
+          <div className="flex-1 min-h-0 flex flex-col p-4">
+            <ScrollArea className="h-full pr-4">
+              {renderContent()}
+            </ScrollArea>
+          </div>
+
+          {/* Footer */}
+          <div style={{
+            padding: "14px 18px",
+            borderTop: `1px solid ${palette.border}`,
+            display: "flex",
+            justifyContent: "flex-end",
+            background: "rgba(3,23,24,0.35)",
+            gap: 8,
+          }}>
+            <Button variant="outline" onClick={() => onOpenChange(false)}>
+              Cerrar
+            </Button>
+            <Button onClick={handleFileSelect} disabled={isUploading}>
+              {isUploading ? (
+                <Loader className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Upload className="mr-2 h-4 w-4" />
+              )}
+              {isUploading ? 'Subiendo...' : 'Añadir Documento'}
+            </Button>
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              className="hidden"
             />
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }

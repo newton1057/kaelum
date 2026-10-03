@@ -3,17 +3,9 @@
 
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
-import { AlertTriangle, Pencil, BookOpen } from 'lucide-react';
+import { AlertTriangle, Pencil, BookOpen, X } from 'lucide-react';
 import { ScrollArea } from '../ui/scroll-area';
 import { Label } from '../ui/label';
 import { EditFieldDialog } from './edit-field-dialog';
@@ -21,11 +13,21 @@ import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { AccessDeniedDialog } from './access-denied-dialog';
 
+// --- STYLES & CONSTANTS ---
+const palette = {
+  text: "#ffffff",
+  textMuted: "rgba(255,255,255,0.6)",
+  accent: "#D2F252",
+  ink: "#031718",
+  border: "rgba(255,255,255,0.1)",
+  surface: "#031718",
+  danger: "#ff6b6b",
+};
+
 interface AddNoteDialogProps {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
   patient: { id: string, [key: string]: any } | null;
-  isDemoMode: boolean;
 }
 
 const SKELETON_ITEMS = 5;
@@ -38,7 +40,7 @@ const CLINICAL_NOTE_FIELDS = [
   'Observaciones adicionales',
 ];
 
-export function AddNoteDialog({ isOpen, onOpenChange, patient, isDemoMode }: AddNoteDialogProps) {
+export function AddNoteDialog({ isOpen, onOpenChange, patient }: AddNoteDialogProps) {
   const [patientData, setPatientData] = useState<Record<string, any> | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -67,43 +69,29 @@ export function AddNoteDialog({ isOpen, onOpenChange, patient, isDemoMode }: Add
       setIsLoading(false);
     }
   };
-  
+
   useEffect(() => {
     const storedUserType = localStorage.getItem('userType');
     setUserType(storedUserType);
     if (isOpen && patient?.id) {
-        if (isDemoMode) {
-            setIsLoading(true);
-            setPatientData(patient);
-            setTimeout(() => setIsLoading(false), 500); // Simulate loading
-        } else {
-            fetchPatientDetails();
-        }
+      fetchPatientDetails();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen, patient, isDemoMode]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, patient]);
 
   const handleEditClick = (key: string, value: any) => {
     if (userType === 'admin' || userType === 'tertiary' || userType === 'v3' || userType === 'v2') {
-        setFieldToEdit({ key, value });
-        setIsEditModalOpen(true);
+      setFieldToEdit({ key, value });
+      setIsEditModalOpen(true);
     } else {
-        setIsAccessDeniedDialogOpen(true);
+      setIsAccessDeniedDialogOpen(true);
     }
   };
 
   const handleUpdateField = async (key: string, newValue: any) => {
     if (!patient?.id) return;
 
-    if (isDemoMode) {
-        setPatientData(prev => (prev ? { ...prev, [key]: newValue } : null));
-        toast({
-            title: 'Actualizado (Modo Demo)',
-            description: `El campo "${key}" se ha actualizado en la vista de demostración.`
-        });
-        setIsEditModalOpen(false);
-        return;
-    }
+
 
     const originalValue = patientData ? patientData[key] : '';
     // Optimistic update
@@ -183,10 +171,10 @@ export function AddNoteDialog({ isOpen, onOpenChange, patient, isDemoMode }: Add
                 </Button>
               </div>
               <div
-                onClick={() => handleEditClick(fieldKey, value)} 
+                onClick={() => handleEditClick(fieldKey, value)}
                 className={cn(
                   "min-h-[80px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm whitespace-pre-wrap cursor-pointer transition-colors hover:bg-muted/50",
-                   !value && "text-muted-foreground"
+                  !value && "text-muted-foreground"
                 )}
               >
                 {value || 'No hay información registrada. Haz clic para añadir.'}
@@ -198,31 +186,106 @@ export function AddNoteDialog({ isOpen, onOpenChange, patient, isDemoMode }: Add
     );
   };
 
+  if (!isOpen) return null;
+
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-2xl max-h-[90vh] flex flex-col">
-          <DialogHeader>
-            <div className="flex items-center gap-2">
-              <BookOpen className="h-6 w-6" />
-              <DialogTitle className="text-xl">Notas Clínicas del Paciente</DialogTitle>
+      <div
+        onClick={() => onOpenChange(false)}
+        style={{
+          position: "fixed",
+          inset: 0,
+          background: "rgba(0,0,0,0.6)",
+          backdropFilter: "blur(4px)",
+          display: "grid",
+          placeItems: "center",
+          padding: "24px 16px",
+          zIndex: 10500,
+        }}
+      >
+        <div
+          role="dialog"
+          aria-modal="true"
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            width: "min(1180px, 92vw)",
+            maxHeight: "92vh",
+            borderRadius: 22,
+            border: `1px solid ${palette.border}`,
+            overflow: "hidden",
+            boxShadow: "0 30px 120px rgba(0,0,0,0.55)",
+            background: "rgba(3,23,24,0.9)",
+            display: "flex",
+            flexDirection: "column",
+            position: "relative",
+          }}
+        >
+          {/* Header */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "14px 18px",
+              borderBottom: `1px solid ${palette.border}`,
+              background: "linear-gradient(180deg, rgba(3,23,24,0.65), rgba(3,23,24,0.35))",
+              gap: 12,
+            }}
+          >
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <BookOpen className="h-5 w-5" style={{ color: "rgb(233, 255, 208)" }} />
+                <div style={{ fontSize: 18, fontWeight: 800, color: "rgb(233, 255, 208)" }}>
+                  Notas Clínicas del Paciente
+                </div>
+              </div>
+              <div style={{ fontSize: 13, color: palette.textMuted, marginTop: 4 }}>
+                Consulta o edita las secciones de la nota clínica.
+              </div>
             </div>
-            <DialogDescription>
-              Consulta o edita las secciones de la nota clínica. Los cambios se guardan individualmente al hacer clic en "Actualizar" en la ventana de edición.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex-1 overflow-y-auto pr-6 -mr-6">
-            <ScrollArea className="h-full pr-6">
+            <button
+              type="button"
+              onClick={() => onOpenChange(false)}
+              aria-label="Cerrar"
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: "50%",
+                border: `1px solid ${palette.border}`,
+                background: "rgba(3,23,24,0.65)",
+                color: "rgb(233, 255, 208)",
+                cursor: "pointer",
+                padding: 0,
+                display: 'grid',
+                placeItems: 'center',
+              }}
+            >
+              <X size={20} />
+            </button>
+          </div>
+
+          {/* Content */}
+          <div className="flex-1 min-h-0 flex flex-col p-4">
+            <ScrollArea className="h-full pr-4">
               {renderContent()}
             </ScrollArea>
           </div>
-          <DialogFooter>
+
+          {/* Footer */}
+          <div style={{
+            padding: "14px 18px",
+            borderTop: `1px solid ${palette.border}`,
+            display: "flex",
+            justifyContent: "flex-end",
+            background: "rgba(3,23,24,0.35)",
+          }}>
             <Button variant="outline" onClick={() => onOpenChange(false)}>
               Cerrar
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </div>
+        </div>
+      </div>
+
       {fieldToEdit && (
         <EditFieldDialog
           isOpen={isEditModalOpen}
